@@ -1,0 +1,92 @@
+@font-face {
+    font-family: 'icomoon';
+    src: url("../moon-fonts/icomoon.eot?tvau9e");
+    src: url("../moon-fonts/icomoon.eot?tvau9e#iefix") format("embedded-opentype"), url("../moon-fonts/icomoon.ttf?tvau9e") format("truetype"), url("../moon-fonts/icomoon.woff?tvau9e") format("woff"), url("../moon-fonts/icomoon.svg?tvau9e#icomoon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: 'icomoon' !important;
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-consult .path1:before {
+    content: "\e900";
+    color: rgb(156, 156, 156);
+}
+
+.icon-consult .path2:before {
+    content: "\e901";
+    margin-left: -0.70703125em;
+    /*color: #FFFFFF;*/
+    color: rgb(248, 248, 248);
+}
+
+.icon-consult .path3:before {
+    content: "\e902";
+    margin-left: -0.70703125em;
+    /*color: #FFFFFF;*/
+    color: rgb(156, 156, 156);
+}
+
+.icon-consult .path4:before {
+    content: "\e903";
+    margin-left: -0.70703125em;
+    /*color: #FFFFFF;*/
+    color: rgb(242, 242, 242);
+}
+
+.icon-consult .path5:before {
+    content: "\e904";
+    margin-left: -0.70703125em;
+    /*color: #FFFFFF;*/
+    color: rgb(242, 242, 242);
+}
+
+.icon-consult .path6:before {
+    content: "\e905";
+    margin-left: -0.70703125em;
+    color: rgb(242, 242, 242);
+   /*color:#FFFFFF*/
+}
+
+.icon-home:before {
+    content: "\e906";
+    /*color: #FFFFFF;*/
+}
+
+.icon-message .path1:before {
+    content: "\e907";
+    /*color: #FFFFFF;*/
+    color: rgb(151, 151, 151);
+}
+
+.icon-message .path2:before {
+    content: "\e908";
+    margin-left: -0.70703125em;
+    color: rgb(151, 151, 151);
+    /*color: #FFFFFF;*/
+}
+
+.icon-message .path3:before {
+    content: "\e909";
+    margin-left: -0.70703125em;
+    color: rgb(146, 146, 146);
+    /*color: #FFFFFF;*/
+}
+
+.icon-mine:before {
+    content: "\e90a";
+    /*color: #FFFFFF;*/
+}

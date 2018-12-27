@@ -1,0 +1,276 @@
+/**日历相关**/
+.mc-remark-options {
+    margin: 10px auto;
+    text-align: center;
+		margin-bottom: 6px;
+		border-bottom: 3px solid #C9C9C9;
+}
+.mc-remark-options p.on {
+    color: #4585D5;
+}
+.mc-remark-options p.filled {
+    color: #E45F62;
+}
+.mc-remark-options p.disabled {
+    color: #FE9900;
+    margin-right: 0;
+}
+.mc-remark-options p {
+    display: inline-block;
+    font-size: 15px;
+    line-height: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+.mc-remark-options p.on i {
+    background: #4585D5;
+}
+.mc-remark-options p.filled i, .ondate-time-main .time-items span.filled {
+    background: #E45F62;
+}
+.mc-remark-options p.disabled i, .ondate-time-main .time-items span.disabled {
+    background: #FE9900;
+}
+.mc-remark-options p i {
+    display: inline-block;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    margin-top: -1px;
+    margin-right: 8px;
+}
+/****/
+/**日历咨询列表**/
+.counsellor-item-list{
+	margin-bottom: 80px;
+}
+.counsellor-item-list .mui-table-view-cell {
+    position: relative;
+    padding: .7rem 0;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+}
+.counsellor-item-list .mui-table-view-cell > a.cell-flex:not(.mui-btn) {
+    padding: 0 1rem;
+}
+.mui-table-view-cell > a.cell-flex:not(.mui-btn) {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    margin: -11px auto;
+    border: 0;
+    border: none;
+    background: #fff;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.counsellor-item-list .mui-table-view-cell h3,.schedule-main .mui-table-view-cell h3 {
+    margin: 0 auto;
+    font-weight: normal;
+    font-size: 15px;
+}
+.counsellor-item-list .time,.schedule-main .time {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 42px;
+    line-height: 42px;
+    min-width: 78px;
+	color: #999999;
+    font-size: 12px;
+	text-align: center;
+}
+.counsellor-item-list .time span {
+    display: block;
+    color: #A2A2A2;
+    text-align: center;
+}
+.counsellor-item-list .time span, .order-time-txt {
+    font-size: 13px;
+}
+
+.mui-media-object.connect-options{
+	max-width: none;
+}
+.btn-connect-pink{
+	color: #fff;
+	background: #FF699C;
+	font-size: 12px;
+	border-radius: 6px;
+	padding: 2px 4px; 
+}
+/**日历咨询列表end**/
+
+/**日程列表**/
+.schedule-main{
+	margin-top: 44px; 
+}
+.schedule-main .mui-table-view-cell .datetime{
+	color: #767676;
+	font-size: 12px;
+}
+.schedule-main .mui-table-view-cell{
+	background: #fff;
+	border-bottom: 1px solid #CDCCD1;
+	border-top: 3px solid #F0EFF5;
+}
+.schedule-main .mui-table-view-cell:first-child{
+	border-top: 0;
+}
+/**我的咨询**/
+.advice-list-tab-container {
+    height: 44px;
+    top: 54px;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    position: absolute;
+}
+.advice-list-tab {
+    height: 44px;
+    position: relative;
+}
+.advice-list-tab .advice-list-tab-item {
+    position: relative;
+    display: block;
+    float: left;
+    width: 25%;
+    background: #FF699C;
+    font-size: 14px;
+    text-align: center;
+    line-height: 44px;
+    color: #fff;
+}
+.advice-list-tab .advice-list-tab-item:first-child{
+	line-height: 17px;
+	padding: 5px;
+}
+.advice-list-tab .advice-list-tab-item.on {
+    background: #DE376F;
+}
+.advice-list-tab .advice-list-tab-item:first-child::after {
+    border-left: 0;
+}
+.advice-list-tab .advice-list-tab-item::after {
+    position: absolute;
+    content: '';
+    top: 10px;
+    left: 0;
+    border-left: 1px solid #fff;
+    padding: 12px;
+}
+.advice-list, .appointment-list, .adviced-list, .canceled-list {
+    margin-top: 108px;
+    border: 0;
+	display: none;
+}
+
+.advice-list{
+	display: block;
+}
+.advice-list .mui-table-view-cell,.appointment-list .mui-table-view-cell,.adviced-list .mui-table-view-cell,.canceled-list .mui-table-view-cell {
+    margin-bottom: 8px;
+}
+.advice-list .mui-table-view-cell > a.cell-flex:not(.mui-btn),.appointment-list .mui-table-view-cell > a.cell-flex:not(.mui-btn),.adviced-list .mui-table-view-cell > a.cell-flex:not(.mui-btn),.canceled-list .mui-table-view-cell > a.cell-flex:not(.mui-btn) {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    margin: -11px auto;
+    border: 0;
+    border: none;
+    background: #fff;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.advice-list .mui-media-body h3,
+.appointment-list .mui-media-body h3,
+.adviced-list .mui-media-body h3,
+.canceled-list .mui-media-body h3{
+    margin: 0 auto 6px auto;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+.advice-list .current-progress-content,
+.appointment-list .current-progress-content,
+.adviced-list .current-progress-content,
+.canceled-list .current-progress-content{
+    color: #FF699C;
+    font-size: 14px;
+}
+
+.advice-list .current-progress-content span,
+.advice-list .time-txt,
+.appointment-list .current-progress-content span,
+.adviced-list .current-progress-content span,
+.canceled-list .current-progress-content span,
+.appointment-list .time-txt,
+.adviced-list .time-txt,
+.canceled-list .time-txt{
+    color: #C8C8C8;
+    font-size: 12px;
+}
+.advice-list .mui-table-view .mui-media-object,
+.appointment-list .mui-table-view .mui-media-object,
+.adviced-list .mui-table-view .mui-media-object,
+.canceled-list .mui-table-view .mui-media-object{
+    height: initial;
+	width: initial;
+    line-height: normal;
+	max-width: initial;
+}
+
+.advice-list .mui-media-object span,
+.appointment-list .mui-media-object span,
+.adviced-list .mui-media-object span,
+.canceled-list .mui-media-object span{
+    display: block;
+    color: #ff699c;
+    font-size: 14px;
+    text-align: center;
+    
+}
+.advice-list .mui-media-object span.bg,
+.appointment-list .mui-media-object span.bg,
+.adviced-list .mui-media-object span.bg,
+.canceled-list .mui-media-object span.bg{
+	color: #fff;
+	background: #ff699c;
+	border-radius: 4px;
+	padding: 2px 4px;
+	margin: 5px 0;
+}
+.advice-list .mui-media-object span.bd,
+.appointment-list .mui-media-object span.bd,
+.adviced-list .mui-media-object span.bd,
+.canceled-list .mui-media-object span.bd{
+	background: #fff;
+	border: 1px solid #ff699c;
+	color: #ff699c;
+	border-radius: 4px;
+	padding: 2px 4px;
+	margin: 6px 0;
+}
+.advice-list .mui-media-object span:first-child,
+.appointment-list .mui-media-object span:first-child,
+.adviced-list .mui-media-object span:first-child,
+.canceled-list .mui-media-object span:first-child{
+	margin-top: 0;
+}
+.advice-list .mui-media-object span:last-child,
+.appointment-list .mui-media-object span:last-child,
+.adviced-list .mui-media-object span:last-child,
+.canceled-list .mui-media-object span:last-child{
+	margin-bottom: 0;
+}
+.mui-table-view-cell .mui-media-object .address-txt{
+	margin: 0 10px;
+	color: #999999;
+}

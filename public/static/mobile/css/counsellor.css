@@ -1,0 +1,524 @@
+.counsellor-homepage-content {
+    padding: 45px 10px 0;
+}
+.counsellor-homepage-content .brief-info .avatar-container {
+    position: relative;
+    left: 50%;
+    margin-left: -85px;
+    width: 170px;
+    height: 105px;
+    text-align: center;
+}
+.counsellor-homepage-content .brief-info .avatar-container .avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+.counsellor-homepage-content .brief-info .teacher-name {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    font-size: 24px;
+    color: #4a4a4a;
+    font-weight: 700;
+    text-align: center;
+}
+
+.counsellor-homepage-content .zixun-time-block {
+    position: relative;
+    width: 100%;
+    padding-bottom: 15%;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+.counsellor-homepage-content .zixun-time-block .txt {
+    position: absolute;
+    top: 22%;
+    font-size: 14px;
+    color: #4a4a4a;
+    width: 100%;
+    text-align: center;
+}
+
+.counsellor-homepage-content .qualification-block {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+}
+.counsellor-homepage-content .qualification-block .section {
+    position: relative;
+    margin: 0 18px;
+    border-bottom: 1px solid #eaeaea;
+}
+.counsellor-homepage-content .qualification-block .section .title {
+    font-size: 15px;
+    color: #4a4a4a;
+    padding-top: 18px;
+    margin-bottom: 13px;
+    font-weight: 700;
+}
+.counsellor-homepage-content .qualification-block .section .certification {
+    height: 45px;
+    margin-bottom: 13px;
+    font-size: 13px;
+    color: #666;
+    line-height: 23px;
+    /*display: -webkit-box!important;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.counsellor-homepage-content .qualification-block .section .title {
+    font-size: 15px;
+    color: #4a4a4a;
+    padding-top: 18px;
+    margin-bottom: 13px;
+    font-weight: 700;
+}
+.counsellor-homepage-content .qualification-block .section .tags {
+    position: relative;
+    padding-right: 20px;
+    padding-bottom: 8px;
+}
+.counsellor-homepage-content .qualification-block .section .tags .tag1 {
+    display: inline-block;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    margin-right: 3px;
+    border-radius: 50px;
+    border: 1px solid #459cf3;
+    font-size: 12px;
+    line-height: 26px;
+    color: #459cf3;
+    text-align: center;
+}
+
+.zixun-way-section {
+    clear: both;
+    overflow: hidden;
+}
+ .zixun-way-section .zixun-way {
+    float: left;
+    width: 33%;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.counsellor-homepage-content .zixun-way-section .zixun-way .label {
+    display: block;
+    font-size: 13px;
+    color: #4a4a4a;
+    margin-bottom: 10px;
+}
+.counsellor-homepage-content  .zixun-way-section .zixun-way .price {
+    font-size: 12px;
+    color: #9b9b9b;
+}
+.zixun-way img{
+	width: 39px;
+    height: 39px;
+}
+
+.consult_form .form {
+    height: auto;
+    overflow: hidden;
+    margin-top: 15px;
+}
+.consult_form .zxfs {
+    font-size: 15px;
+    color: #444;
+    height: auto;
+    overflow: hidden;
+    background: #fff;
+    margin-bottom: 15px;
+}
+.consult_form .form .hd {
+    position: relative;
+    height: 47px;
+    padding-left: 12px;
+    padding-right: 12px;
+    line-height: 47px;
+    color: #444;
+    font-size: 16px;
+}
+.consult_form .form .body {
+    margin: 0 12px;
+    border-top: 1px solid #ddd;
+}
+.consult_form .zxfs .foot {
+    padding: 10px 12px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+    color: #999;
+    font-size: 11px;
+    clear: both;
+    overflow: hidden;
+}
+
+.consult_form .zxfs ul {
+    height: auto;
+    overflow: hidden;
+    margin: 15px 0;
+}
+.consult_form .zxfs ul li {
+    /*width: 30.4%;*/
+   width: 100%;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    height: 60px;
+    margin-right: 13px;
+    float: left;
+    display: inline;
+    background-color: #f7f7f7;
+    border-radius: 3px;
+    text-align: center;
+    cursor: pointer;
+}
+.consult_form .zxfs ul li h2 {
+    padding-top: 5px;
+}
+.consult_form .zxfs ul li p {
+    color: #999;
+    font-size: 11px;
+}
+.consult_form .zxfs .attr {
+    clear: both;
+    padding-bottom: 7.5px;
+    position: relative;
+    height: 45px;
+}
+.consult_form .zxfs .attr .attr-txt {
+	float: left;
+    font-size: 14px;
+    color: #2B343A;
+    line-height: 41px;
+}
+.spinner {
+    position: relative;
+    width: 120px;
+    height: 35px;
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid #bbc7ce;
+    float: right;
+    margin-top: -7px;
+    margin-bottom: 10px;
+}
+
+/**平台推荐**/
+.section-title .refresh-link {
+    display: block;
+    -webkit-box-flex: 1;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #d7d8d9;
+    width: 3rem;
+}
+.section-title .refresh-link span{
+	display: block;
+}
+.icon-refresh{
+	text-align: center;
+}
+.card-new-content{
+	margin-top: 10px;
+}
+.mui-table-view-chevron .mui-table-view-cell.pad-rt,.mui-media-body.pad-rt{
+	padding-right: 0.2rem;
+}
+.doctor-sign-sublist{
+	text-align: center;
+	color: #8c8c8c;
+	font-size: 12px;
+	border-bottom: 2px solid #e6e6e6;
+	padding-bottom: 8px;
+}
+.doctor-sign-item{
+	display: inline-block;
+}
+.doctor-sign-item i.bbc-icon-doctype{
+	height: 1.2rem;
+	line-height: 1.2rem;
+}
+.counsellor-homepage-content .card-addrs {
+	height: 1.65rem;
+}
+.counsellor-homepage-content .doctor-honor {
+	color: #fff;
+	height: auto;
+}
+.counsellor-homepage-content .doctor-address{
+	font-size: 10px;
+	line-height: 1rem;
+	color: #fff;
+	width: auto;
+	margin-right: 0;
+	text-align: center;
+}
+.counsellor-homepage-content .doctor-address i.bbc-icon-doctype{
+	height: 1rem;
+	line-height: 0.23rem;
+}
+
+.counsellor-info .section{
+	padding: 0.8rem 0.7rem;
+	margin: 0;
+	border-bottom: 2px solid #e6e6e6;
+}
+.counsellor-info .section .title{
+	color: #666;
+}
+.counsellor-info .section .doctor-sign-list{
+	margin: 5px 0;
+}
+
+.consult-way-section{
+	clear: both;
+}
+
+.consult-way-section .consult-way {
+    float: left;
+    width: 50%;
+    margin-bottom: 10px;
+		align-items: normal;
+}
+
+.consult-way-section .consult-way .label {
+    display: block;
+    font-size: 13px;
+    color: #4a4a4a;
+    margin-bottom: 6px;
+}
+.consult-way-section .consult-way .price {
+    font-size: 12px;
+    color: #9b9b9b;
+}
+.consult-way img{
+	width: 39px;
+  height: 39px;
+}
+.consult-way .con-img{
+	text-align: center;
+}
+.consult-way .con-way-content{
+	width: 60%;
+}
+.consult-way .con-way-content .bd-vip-text{
+	display: inline-block;
+	background: #4D88DD;
+	color: #fff;
+	border: 0;
+	padding: 0 3px;
+	border-radius: 4px;
+}
+
+.cons-submit-options{
+	margin: 5px auto;
+	display: -webkit-box;
+	-webkit-box-orient: horizontal;
+	-webkit-box-pack: center;
+	display: -moz-box;
+	-moz-box-orient: horizontal;
+	-moz-box-pack: center;
+	display: -o-box;
+		-o-box-orient: horizontal;
+		-o-box-pack: center;
+		display: -ms-box;
+		-ms-box-orient: horizontal;
+		-ms-box-pack: center;
+		display: box;
+		box-orient: horizontal;
+		box-pack: center;
+}
+
+.cons-submit-options .cons-btn{
+	display: inline-block;
+	margin: 0 10px;
+	border-radius: 16px;
+	padding:5px 8px;
+}
+@media only screen and (max-width:367px) {
+	.cons-submit-options .cons-btn {
+	    margin: 0 2px;
+	}
+}
+
+	.cons-submit-options .cons-btn.icon-heart{
+		border: 1px solid #598ee0;
+		color: #598ee0;
+		padding-left: 36px;
+		background: url(../img/sj.png) no-repeat 6px center;
+		background-size: 24px 18px;
+	}
+	
+	.cons-submit-options .cons-btn.icon-free-heart{
+		border: 1px solid #e65f60;
+		color: #e65f60;
+		padding-left: 34px;
+		background: url(../img/gift.png) no-repeat 6px center;
+		background-size: 22px 24px;
+	}
+	
+	
+	.section-title.cons-detail-sub-header{
+		padding: 0.5rem 1rem;
+	}
+	.doct-article-section ul li.list-cell{
+		position: relative;
+		padding: .7rem .4rem;
+		border-bottom: 1px solid #e6e6e6;
+	}
+	.doct-article-section ul li.list-cell:first-child{
+		padding: 0 .4rem 0.7rem;
+	}
+	.doct-article-section .list-cell .sub-cell{
+		display: block;
+		padding: 0 .7rem;
+	}
+	.doct-article-section .list-cell h3{
+		color: #5A5A5A;
+		font-size: 16px;
+	}
+	.doct-article-section .list-cell .cell-desc{
+		padding: 8px 0 0 0;
+		color: #646464;
+    font-size: 14px;
+	}
+	.doct-article-section .list-cell .cell-desc.cell-author{
+		padding: 8px 0 0 0;
+		font-size: 12px;
+	}
+	
+	.cons-btn.icon-bd-vip{
+		order: 0;
+		padding: .2rem .3rem .2rem 1.2rem;
+    background: #E25E5D url(../img/video-new.png) no-repeat 4px center;
+    background-size: 0.8rem 0.8rem;
+    font-size: 0.6rem;
+    border-radius: 10px;
+		color: #fff;
+	}
+	
+	.doct-desc-section,.doct-estimate-section,.doct-article-section{
+		border-bottom: 4px solid #e6e6e6; 
+	}
+	
+	.doct-desc-section .desc-txt{
+		padding: 0 1rem .7rem;
+		color: #979797;
+		font-size: 14px;
+	}
+	
+	.doct-estimate-body{
+		padding-top: .5rem;
+	}
+	
+	.doct-estimate-body li .sub-cell{
+		padding: 0.7rem 1rem;
+	}
+	.doct-estimate-body li .sub-cell:first-child{
+		padding-top: 0;
+	}
+	.content-list{
+		margin-left: 0.6rem;
+		color: #8E8E8E;
+	}
+	.content-list .content-sub .utime{
+		color: #8E8E8E;
+		font-size: .8rem;
+	}
+	.content-list .content-sub .cell-desc{
+		padding-top: .7rem;
+		font-size: 1rem;
+	}
+	.sub-cell .header-img40{
+		width: 42px;
+		height: 42px;
+		max-width: 42px;
+		overflow: hidden;
+	}
+	/****/
+.counsellor-per{
+	color: #C4C4C4;
+	font-weight: normal;
+}
+.icon-price-symbol{
+	font-size:10px;
+	color: #C4C4C4;
+}
+
+.no-opentime-tip{
+	font-size:14px;
+	color: #C4C4C4;
+}
+
+.counsellor-head-content{
+			text-align: center;
+			padding-top: 4rem;
+			padding-bottom: 0.4rem;
+			background: #4883DD;
+			margin-bottom: 0.6rem;
+		color: #fff;
+	}
+
+/**评价**/
+.counsellor-info .section.eve-form,.counsellor-article-info .section.refund-form{
+	padding: 0 0.7rem;
+  margin: 0;
+  border: 0;
+}
+.counsellor-article-info .section.refund-form{
+	padding: 0 1.2rem;
+}
+.eve-form .title{
+	font-size: 14px;
+	color: #8C8C8C;
+	text-align: center;
+}
+.refund-form .title{
+	font-size: 16px;
+	color: #8C8C8C;
+	margin-bottom: 15px;
+}
+.eve-form .star-options{
+	text-align: center;
+	margin: 5px auto;
+}
+.eve-form .star-options img {
+    width: 20px;
+    height: 20px;
+}
+.eve-form .desc-body,.refund-form .desc-body{
+	width: 80%;
+	margin: 0 auto;
+}
+.refund-form .desc-body{
+	width: 100%;
+}
+.eve-form .desc-body textarea,.refund-form .desc-body textarea{
+	resize:none;
+	min-height: 180px;
+  max-height: 360px;
+	padding: 8px;
+	text-align: left;
+}
+
+.eve-form .btn-options .mui-btn,.refund-form .btn-options .mui-btn{
+	background: #4883DD;
+	border-color: inherit;
+	border: 0;
+	width: 60%;
+	margin: 0 auto;
+	border-radius: 24px;
+}
+.refund-form .btn-options .mui-btn{
+	margin-top: 80px;
+}
