@@ -16,8 +16,7 @@ header("Content-type: text/html; charset=utf-8");
 if (version_compare(PHP_VERSION, '5.5', '<')) {
     die('PHP版本过低，最少需要PHP5.5，请升级PHP版本！');
 }
-// [ 应用入口文件 ]
-define('BIND_MODULE', 'shop');
+
 // 定义入口为shop
 define('ENTRANCE', 'shop');
 
