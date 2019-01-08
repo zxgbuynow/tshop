@@ -1,0 +1,29 @@
+<div class="form-group col-xs-12 {$extra_class|default=''}" id="form_group_{$name}">
+    <label class="col-xs-12" for="{$name}">{$title|htmlspecialchars}</label>
+    <div class="col-sm-12">
+        <div class="td">
+          <div class="spec-tree">
+            <table cellspacing="0" cellpadding="0" border="0" class="table table-bordered point-t" id="goods-table">
+              <thead>
+                <tr>
+                  <th style="width:12%;">规格值</th>
+                  <th style="width:10%;">销售价 <span class="text-danger">*</span></th>
+                  <th style="width:10%;">原价</th>
+                  <th style="width:10%;">成本价</th>
+                  <th style="width:10%;">库存 <span class="text-danger">*</span></th>
+                  <th style="width:10%;">商品货号</th>
+                  <th style="width:10%;">条形码</th>
+                </tr>
+              </thead>
+              <tbody id="dataNode">            
+                          
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {notempty name="tips"}
+        <div class="help-block">{$tips}</div>
+        {/notempty}
+    </div>
+</div>

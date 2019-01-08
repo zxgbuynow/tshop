@@ -613,13 +613,13 @@ class Builder extends ZBuilder
     private function getDefaultUrl($type = '', $params = [])
     {
         $url = $this->_module.'/'.$this->_controller.'/'.$type;
-        if ($this->_module=='shop') {
-            $MenuModel = new Smenu();
-            $menu  = $MenuModel->where('url_value', $url)->find();
-        }else{
+        // if ($this->_module=='shop') {
+        //     $MenuModel = new Smenu();
+        //     $menu  = $MenuModel->where('url_value', $url)->find();
+        // }else{
             $MenuModel = new Menu();
             $menu  = $MenuModel->where('url_value', $url)->find();
-        }
+        // }
         
         if ($menu['params'] != '') {
             $url_params = explode('&', trim($menu['params'], '&'));

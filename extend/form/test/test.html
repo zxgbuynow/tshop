@@ -1,0 +1,12 @@
+<div class="form-group col-xs-12 {$extra_class|default=''}" id="form_group_{$name}">
+    <label class="col-xs-12" for="{$name}">{$title|htmlspecialchars}</label>
+    <div class="col-sm-12">
+        <div class="js-colorpicker input-group" data-colorpicker-mode="{$mode == '' ? 'rgba' : $mode}">
+            <input class="form-control" type="text" id="{$name}" name="{$name}" value="{$value|default=''}" placeholder="请从右边选择颜色" {$extra_attr|default=''}>
+            <span class="input-group-addon"><i style="background-color: rgb(92, 144, 210);"></i></span>
+        </div>
+        {notempty name="tips"}
+        <div class="help-block">{$tips}</div>
+        {/notempty}
+    </div>
+</div>

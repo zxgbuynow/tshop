@@ -5,12 +5,12 @@ use think\Model;
 use Cron\CronExpression;
 
 /**
- * 定时任务模型
+ * 商品模型
  */
 class Item extends Model
 {
     // 设置当前模型对应的完整数据表名称
-    protected $table = '__CRONTAB__';
+    protected $table = '__ITEM__';
 
     // 自动写入时间戳
     protected $autoWriteTimestamp = true;

@@ -1,0 +1,389 @@
+<div class="form-group col-xs-12 {$extra_class|default=''}" id="form_group_{$name}">
+    <label class="col-xs-12" for="{$name}">{$title|htmlspecialchars}</label>
+    <div class="col-sm-12">
+        <div class="td">
+          <div class="spec-title" style="margin-top:1em;margin-left:1em;">
+            <div class="row form-group-sm">
+              <span class="pull-left">&nbsp;&nbsp;批量填充<label data-toggle="tooltip" data-placement="top" title="如果sku有多页，批量填充只能填充本页">&nbsp;<i class="fa fa-question-circle text-aqua"></i>&nbsp;</label></span>
+              <div class="col-sm-2" style="width:14%; padding:0 5px 10px 0;"><input type="number" name="spec_price" class="form-control" placeholder="销售价">
+              </div>
+              <div class="col-sm-2" style="width:14%; padding:0 5px 10px 0;"><input type="number" name="spec_mkt_price" class="form-control" placeholder="原价"></div>
+              <div class="col-sm-2" style="width:14%; padding: 0 5px 5px 0;"><input type="number" name="spec_cost_price" class="form-control" placeholder="成本价"></div>
+              <div class="col-sm-2" style="width:14%; padding: 0 5px 10px 0;"><input type="number" name="spec_store" class="form-control" placeholder="库存"></div>
+              <div class="col-sm-2" style="width:14%; padding: 0 5px 10px 0;"><input type="text" name="spec_bn" class="form-control" placeholder="商品货号"></div>
+              <div class="col-sm-2" style="width:14%; padding: 0 5px 10px 0;"><input type="text" name="spec_barcode" class="form-control" placeholder="条形码"></div>
+              <button type="button" class="btn btn-primary fill-action btn-xs">确定</button>
+            </div>
+          </div>
+          <div class="spec-tree">
+            <table cellspacing="0" cellpadding="0" border="0" class="table table-bordered point-t" id="goods-table">
+              <thead>
+                <tr>
+                  <th style="width:12%;">规格值</th>
+                  <th style="width:10%;">销售价 <span class="text-danger">*</span></th>
+                  <th style="width:10%;">原价</th>
+                  <th style="width:10%;">成本价</th>
+                  <th style="width:10%;">库存 <span class="text-danger">*</span></th>
+                  <th style="width:10%;">商品货号</th>
+                  <th style="width:10%;">条形码</th>
+                  <th style="width: 10%; display: none;">积分</th>
+                  <th style="width: 18%; display: none;">积分+金钱</th>
+                </tr>
+              </thead>
+              <tbody id="dataNode">            <tr data-pid="8612">
+            <td>选择一:常温，选择二:微糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="4b5657a5c2[sku_id]" value="8612">
+                <input type="number" value="16.000" class="form-control price" name="4b5657a5c2[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="4b5657a5c2[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="4b5657a5c2[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="4b5657a5c2[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E00912" class="form-control bn" name="4b5657a5c2[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="4b5657a5c2[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="4b5657a5c2[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="4b5657a5c2[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="4b5657a5c2[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8613">
+            <td>选择一:常温，选择二:少糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="4bda48e697[sku_id]" value="8613">
+                <input type="number" value="16.000" class="form-control price" name="4bda48e697[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="4bda48e697[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="4bda48e697[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="4bda48e697[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E01689" class="form-control bn" name="4bda48e697[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="4bda48e697[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="4bda48e697[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="4bda48e697[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="4bda48e697[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8614">
+            <td>选择一:常温，选择二:半糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="d3d3b41db6[sku_id]" value="8614">
+                <input type="number" value="16.000" class="form-control price" name="d3d3b41db6[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="d3d3b41db6[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="d3d3b41db6[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="d3d3b41db6[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E01E41" class="form-control bn" name="d3d3b41db6[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="d3d3b41db6[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="d3d3b41db6[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="d3d3b41db6[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="d3d3b41db6[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8615">
+            <td>选择一:常温，选择二:全糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="58031e568a[sku_id]" value="8615">
+                <input type="number" value="16.000" class="form-control price" name="58031e568a[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="58031e568a[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="58031e568a[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="58031e568a[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E02552" class="form-control bn" name="58031e568a[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="58031e568a[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="58031e568a[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="58031e568a[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="58031e568a[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8616">
+            <td>选择一:热，选择二:微糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="61c52bfa39[sku_id]" value="8616">
+                <input type="number" value="16.000" class="form-control price" name="61c52bfa39[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="61c52bfa39[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="61c52bfa39[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="61c52bfa39[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E02C8F" class="form-control bn" name="61c52bfa39[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="61c52bfa39[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="61c52bfa39[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="61c52bfa39[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="61c52bfa39[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8617">
+            <td>选择一:热，选择二:少糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="92107dc6cb[sku_id]" value="8617">
+                <input type="number" value="16.000" class="form-control price" name="92107dc6cb[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="92107dc6cb[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="92107dc6cb[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="92107dc6cb[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E033E3" class="form-control bn" name="92107dc6cb[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="92107dc6cb[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="92107dc6cb[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="92107dc6cb[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="92107dc6cb[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8618">
+            <td>选择一:热，选择二:半糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="7cacaea789[sku_id]" value="8618">
+                <input type="number" value="16.000" class="form-control price" name="7cacaea789[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="7cacaea789[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="7cacaea789[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="7cacaea789[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E03B1C" class="form-control bn" name="7cacaea789[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="7cacaea789[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="7cacaea789[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="7cacaea789[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="7cacaea789[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8619">
+            <td>选择一:热，选择二:全糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="5e07904ec2[sku_id]" value="8619">
+                <input type="number" value="16.000" class="form-control price" name="5e07904ec2[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="5e07904ec2[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="5e07904ec2[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="5e07904ec2[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E0424D" class="form-control bn" name="5e07904ec2[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="5e07904ec2[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="5e07904ec2[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="5e07904ec2[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="5e07904ec2[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8620">
+            <td>选择一:去冰，选择二:微糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="f515f4abde[sku_id]" value="8620">
+                <input type="number" value="16.000" class="form-control price" name="f515f4abde[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="f515f4abde[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="f515f4abde[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="f515f4abde[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E048BD" class="form-control bn" name="f515f4abde[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="f515f4abde[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="f515f4abde[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="f515f4abde[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="f515f4abde[point_money_money]">
+            </td>
+         
+          </tr>
+                    <tr data-pid="8621">
+            <td>选择一:去冰，选择二:少糖</td>
+            <td>
+              <div>
+                <input type="hidden" name="1b593320c5[sku_id]" value="8621">
+                <input type="number" value="16.000" class="form-control price" name="1b593320c5[price]" required="">
+              </div>
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control mkt_price" name="1b593320c5[mkt_price]">
+            </td>
+            <td>
+              <input type="number" value="0.000" class="form-control cost_price" name="1b593320c5[cost_price]">
+            </td>
+            <td nowrap="">
+              <div>
+                <input type="number" value="99999" class="form-control store" name="1b593320c5[store]" required="" min="0"> <span class="small">冻结： <em class="text-orange">0</em></span>
+              </div>
+            </td>
+            <td>
+              <input type="text" value="S5BBDB02E04EB0" class="form-control bn" name="1b593320c5[bn]">
+            </td>
+            <td>
+              <input type="text" value="" class="form-control barcode" name="1b593320c5[barcode]">
+            </td>
+            
+            <td>
+              <input type="number" value="" required="" min="0" class="form-control point store" name="1b593320c5[point]">
+            </td>
+            <td>
+              <input type="number" style="width: 80px;display: inline-block" value="" class="form-control point_money_point store" min="0" required="" name="1b593320c5[point_money_point]">:<input type="number" style="width: 80px;display: inline-block" value="" min="0" required="" class="form-control point_money_money" name="1b593320c5[point_money_money]">
+            </td>
+         
+          </tr>
+        </tbody>
+            </table>
+            <div class="text-center gridlist-footer">
+              <ul id="pager" class="pagination"><li class="prev disabled">
+                  <a title="上一页" href="javascript:void(0)">&lt;上一页</a>
+                </li><li><span class="current">1</span></li> <li><a class="flip" href="javascript:void(0)">2</a></li><li class="next">
+                  <a title="下一页" href="javascript:void(0)">下一页&gt;</a>
+                </li></ul>
+            </div>
+          </div>
+        </div>
+
+        {notempty name="tips"}
+        <div class="help-block">{$tips}</div>
+        {/notempty}
+    </div>
+</div>

@@ -1,0 +1,563 @@
+---------------------------------------------------------------
+[ 2019-01-07T11:57:56+08:00 ] 10.0.2.2 GET /admin.php/cms/page/add.html
+[ info ] zg.tshop.com/admin.php/cms/page/add.html [运行时间：2.639870s][吞吐率：0.38req/s] [内存消耗：1,503.71kb] [文件加载：80]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'cms',
+    1 => 'page',
+    2 => 'add',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'referer' => 'http://zg.tshop.com/admin.php/cms/page/index.html',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.040094s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.050373s ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\cms\admin\Page->add[ /data/httpd/tshop/application/cms/admin/Page.php ]
+[ info ] [ VIEW ] /data/httpd/tshop/public/../application/common/builder/form/layout.html [ array (
+  0 => '_admin_base_layout',
+  1 => 'system_color',
+  2 => '_pop',
+  3 => '_module',
+  4 => '_top_menus',
+  5 => '_top_menus_all',
+  6 => '_sidebar_menus',
+  7 => '_location',
+  8 => 'aside',
+  9 => 'page_title',
+  10 => 'page_tips',
+  11 => 'tips_type',
+  12 => 'btn_hide',
+  13 => 'btn_title',
+  14 => 'form_items',
+  15 => 'tab_nav',
+  16 => 'post_url',
+  17 => 'form_data',
+  18 => 'extra_html',
+  19 => 'extra_js',
+  20 => 'extra_css',
+  21 => 'ajax_submit',
+  22 => 'hide_header',
+  23 => 'header_title',
+  24 => 'js_list',
+  25 => 'css_list',
+  26 => 'field_triggers',
+  27 => 'field_hide',
+  28 => 'field_values',
+  29 => 'field_clear',
+  30 => '_js_files',
+  31 => '_js_init',
+  32 => '_css_files',
+  33 => '_layout',
+  34 => 'btn_extra',
+  35 => 'submit_confirm',
+  36 => 'extend_js_list',
+  37 => 'extend_css_list',
+  38 => '_method',
+  39 => 'empty_tips',
+  40 => '_ckeditor',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.016919s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.003303s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.014935s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.002500s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.002201s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id LIMIT 10 [ RunTime:0.003141s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id [ RunTime:0.000536s ]
+[ sql ] [ SQL ] SELECT `id` FROM `dp_admin_menu` WHERE  `pid` <> 0  AND `url_value` = 'cms/page/add' LIMIT 1 [ RunTime:0.000448s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`title`,`url_value` FROM `dp_admin_menu` [ RunTime:0.000738s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_config` [ RunTime:0.002111s ]
+[ sql ] [ SQL ] SELECT `value` FROM `dp_admin_config` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.003033s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_cms_articlecategory` [ RunTime:0.020989s ]
+[ sql ] [ SQL ] SELECT `id`,`title` FROM `dp_cms_articlecategory` WHERE  `status` = 1 [ RunTime:0.003238s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_cms_page` [ RunTime:0.001118s ]
+[ sql ] [ SQL ] SELECT `id`,`title` FROM `dp_cms_page` WHERE  `status` = 1 [ RunTime:0.003484s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_user` [ RunTime:0.009185s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.003376s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_attachment` [ RunTime:0.002907s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.005452s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.001026s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000259s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000835s ]
+---------------------------------------------------------------
+[ 2019-01-07T16:44:28+08:00 ] 10.0.2.2 GET /admin.php
+[ info ] zg.tshop.com/admin.php [运行时间：0.377154s][吞吐率：2.65req/s] [内存消耗：325.15kb] [文件加载：43]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => '',
+    1 => NULL,
+    2 => NULL,
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ LOG ] INIT File
+---------------------------------------------------------------
+[ 2019-01-07T16:44:29+08:00 ] 10.0.2.2 GET /admin.php/admin
+[ info ] zg.tshop.com/admin.php/admin [运行时间：0.553829s][吞吐率：1.81req/s] [内存消耗：928.92kb] [文件加载：73]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => NULL,
+    2 => NULL,
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.029089s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.061202s ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Index->index[ /data/httpd/tshop/application/admin/controller/Index.php ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000808s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.002366s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.003235s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.000901s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.000241s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id LIMIT 10 [ RunTime:0.003385s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id [ RunTime:0.000664s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_config` [ RunTime:0.001123s ]
+[ sql ] [ SQL ] SELECT `value` FROM `dp_admin_config` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.003440s ]
+---------------------------------------------------------------
+[ 2019-01-07T16:44:30+08:00 ] 10.0.2.2 GET /admin.php/admin/log/index.html
+[ info ] zg.tshop.com/admin.php/admin/log/index.html [运行时间：0.681149s][吞吐率：1.47req/s] [内存消耗：1,546.41kb] [文件加载：80]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'log',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.019021s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.026243s ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Log->index[ /data/httpd/tshop/application/admin/controller/Log.php ]
+[ info ] [ VIEW ] /data/httpd/tshop/public/../application/common/builder/table/layout.html [ array (
+  0 => '_admin_base_layout',
+  1 => 'system_color',
+  2 => '_pop',
+  3 => '_module',
+  4 => '_top_menus',
+  5 => '_top_menus_all',
+  6 => '_sidebar_menus',
+  7 => '_location',
+  8 => 'aside',
+  9 => 'page_title',
+  10 => 'page_tips',
+  11 => 'tips_type',
+  12 => 'tab_nav',
+  13 => 'hide_checkbox',
+  14 => 'extra_html',
+  15 => 'extra_js',
+  16 => 'extra_css',
+  17 => 'order_columns',
+  18 => 'filter_columns',
+  19 => 'filter_map',
+  20 => '_field_display',
+  21 => '_filter_content',
+  22 => '_filter',
+  23 => 'top_buttons',
+  24 => 'right_buttons',
+  25 => 'search',
+  26 => 'search_button',
+  27 => 'columns',
+  28 => 'pages',
+  29 => 'row_list',
+  30 => '_page_info',
+  31 => 'primary_key',
+  32 => '_table',
+  33 => 'js_list',
+  34 => 'css_list',
+  35 => 'validate',
+  36 => '_js_files',
+  37 => '_css_files',
+  38 => '_select_list',
+  39 => '_filter_time',
+  40 => 'empty_tips',
+  41 => '_search_area',
+  42 => '_search_area_url',
+  43 => '_search_area_op',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000924s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.002506s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000555s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.001105s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.000670s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id LIMIT 10 [ RunTime:0.000934s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id [ RunTime:0.000367s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_config` [ RunTime:0.001153s ]
+[ sql ] [ SQL ] SELECT `value` FROM `dp_admin_config` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000381s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_log` [ RunTime:0.002682s ]
+[ sql ] [ SQL ] SELECT COUNT(*) AS tp_count FROM `dp_admin_log` `admin_log` LEFT JOIN `dp_admin_action` `admin_action` ON `admin_action`.`id`=`admin_log`.`action_id` LEFT JOIN `dp_admin_user` `admin_user` ON `admin_user`.`id`=`admin_log`.`user_id` INNER JOIN `dp_admin_module` `admin_module` ON `admin_module`.`name`=`admin_action`.`module` LIMIT 1 [ RunTime:0.031607s ]
+[ sql ] [ SQL ] SELECT `admin_log`.*,`admin_action`.`title`,`admin_action`.`module`,`admin_user`.`username`,`admin_module`.`title` AS `module_title` FROM `dp_admin_log` `admin_log` LEFT JOIN `dp_admin_action` `admin_action` ON `admin_action`.`id`=`admin_log`.`action_id` LEFT JOIN `dp_admin_user` `admin_user` ON `admin_user`.`id`=`admin_log`.`user_id` INNER JOIN `dp_admin_module` `admin_module` ON `admin_module`.`name`=`admin_action`.`module` ORDER BY admin_log.id desc LIMIT 0,20 [ RunTime:0.006723s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'admin/log/edit' LIMIT 1 [ RunTime:0.001455s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_user` [ RunTime:0.001726s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000590s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_attachment` [ RunTime:0.004315s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.002949s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.000624s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000371s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000267s ]
+---------------------------------------------------------------
+[ 2019-01-07T16:44:34+08:00 ] 10.0.2.2 POST /admin.php/admin/ajax/getsidebarmenu.html
+[ info ] zg.tshop.com/admin.php/admin/ajax/getsidebarmenu.html [运行时间：0.358232s][吞吐率：2.79req/s] [内存消耗：822.09kb] [文件加载：68]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'ajax',
+    2 => 'getsidebarmenu',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'content-length' => '41',
+  'accept' => '*/*',
+  'origin' => 'http://zg.tshop.com',
+  'x-requested-with' => 'XMLHttpRequest',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'content-type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+  'referer' => 'http://zg.tshop.com/admin.php/admin/log/index.html',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+)
+[ info ] [ PARAM ] array (
+  'module_id' => '445',
+  'module' => 'shop',
+  'controller' => 'item',
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.026303s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.028575s ]
+[ info ] [ RUN ] app\admin\controller\Ajax->getSidebarMenu[ /data/httpd/tshop/application/admin/controller/Ajax.php ]
+[ info ] [ DB ] INIT mysql
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.006887s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.002538s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000507s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.004815s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.000315s ]
+---------------------------------------------------------------
+[ 2019-01-07T16:44:35+08:00 ] 10.0.2.2 GET /admin.php/shop/item/index.html
+[ info ] zg.tshop.com/admin.php/shop/item/index.html [运行时间：0.635297s][吞吐率：1.57req/s] [内存消耗：1,396.04kb] [文件加载：81]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'shop',
+    1 => 'item',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'referer' => 'http://zg.tshop.com/admin.php/admin/log/index.html',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.018430s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.023637s ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\shop\admin\Item->index[ /data/httpd/tshop/application/shop/admin/Item.php ]
+[ info ] [ VIEW ] /data/httpd/tshop/public/../application/common/builder/table/layout.html [ array (
+  0 => '_admin_base_layout',
+  1 => 'system_color',
+  2 => '_pop',
+  3 => '_module',
+  4 => '_top_menus',
+  5 => '_top_menus_all',
+  6 => '_sidebar_menus',
+  7 => '_location',
+  8 => 'aside',
+  9 => 'page_title',
+  10 => 'page_tips',
+  11 => 'tips_type',
+  12 => 'tab_nav',
+  13 => 'hide_checkbox',
+  14 => 'extra_html',
+  15 => 'extra_js',
+  16 => 'extra_css',
+  17 => 'order_columns',
+  18 => 'filter_columns',
+  19 => 'filter_map',
+  20 => '_field_display',
+  21 => '_filter_content',
+  22 => '_filter',
+  23 => 'top_buttons',
+  24 => 'right_buttons',
+  25 => 'search',
+  26 => 'search_button',
+  27 => 'columns',
+  28 => 'pages',
+  29 => 'row_list',
+  30 => '_page_info',
+  31 => 'primary_key',
+  32 => '_table',
+  33 => 'js_list',
+  34 => 'css_list',
+  35 => 'validate',
+  36 => '_js_files',
+  37 => '_css_files',
+  38 => '_select_list',
+  39 => '_filter_time',
+  40 => 'empty_tips',
+  41 => '_search_area',
+  42 => '_search_area_url',
+  43 => '_search_area_op',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.000392s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.002118s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000278s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.001209s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.000386s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id LIMIT 10 [ RunTime:0.000675s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id [ RunTime:0.000491s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_config` [ RunTime:0.001436s ]
+[ sql ] [ SQL ] SELECT `value` FROM `dp_admin_config` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000402s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_item` [ RunTime:0.078460s ]
+[ sql ] [ SQL ] SELECT COUNT(*) AS tp_count FROM `dp_item` LIMIT 1 [ RunTime:0.000289s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_item` LIMIT 0,20 [ RunTime:0.000314s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/add' LIMIT 1 [ RunTime:0.000512s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/enable' LIMIT 1 [ RunTime:0.000512s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/disable' LIMIT 1 [ RunTime:0.000394s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/delete' LIMIT 1 [ RunTime:0.000448s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/edit' LIMIT 1 [ RunTime:0.000833s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/enable' LIMIT 1 [ RunTime:0.000364s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/disable' LIMIT 1 [ RunTime:0.000355s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/item/delete' LIMIT 1 [ RunTime:0.001453s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_user` [ RunTime:0.001722s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000166s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_attachment` [ RunTime:0.002371s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000317s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.000267s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000216s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000240s ]
+---------------------------------------------------------------
+[ 2019-01-07T16:44:46+08:00 ] 10.0.2.2 GET /admin.php/shop/cat/index.html
+[ info ] zg.tshop.com/admin.php/shop/cat/index.html [运行时间：0.888017s][吞吐率：1.13req/s] [内存消耗：1,301.19kb] [文件加载：77]
+[ info ] [ LANG ] /data/httpd/tshop/thinkphp/lang/zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'shop',
+    1 => 'cat',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'host' => 'zg.tshop.com',
+  'connection' => 'keep-alive',
+  'upgrade-insecure-requests' => '1',
+  'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+  'referer' => 'http://zg.tshop.com/admin.php/shop/item/index.html',
+  'accept-encoding' => 'gzip, deflate',
+  'accept-language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+  'cookie' => 'ibhid=g4trhvpm4ku3k4i7vcq04suf45; PHPSESSID=arp72p3ptceri4msa9i1d3jce6; dolphin_home___forward__=%2Fadmin.php%2Fshop%2Fitem%2Findex.html',
+  'content-type' => '',
+  'content-length' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ CACHE ] INIT File
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Config @app_begin [ RunTime:0.038409s ]
+[ info ] [ BEHAVIOR ] Run app\common\behavior\Hook @app_begin [ RunTime:0.049743s ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'dolphin_admin_',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\shop\admin\Cat->index[ /data/httpd/tshop/application/shop/admin/Cat.php ]
+[ info ] [ VIEW ] /data/httpd/tshop/public/../application/common/builder/table/layout.html [ array (
+  0 => '_admin_base_layout',
+  1 => 'system_color',
+  2 => '_pop',
+  3 => '_module',
+  4 => '_top_menus',
+  5 => '_top_menus_all',
+  6 => '_sidebar_menus',
+  7 => '_location',
+  8 => 'aside',
+  9 => 'page_title',
+  10 => 'page_tips',
+  11 => 'tips_type',
+  12 => 'tab_nav',
+  13 => 'hide_checkbox',
+  14 => 'extra_html',
+  15 => 'extra_js',
+  16 => 'extra_css',
+  17 => 'order_columns',
+  18 => 'filter_columns',
+  19 => 'filter_map',
+  20 => '_field_display',
+  21 => '_filter_content',
+  22 => '_filter',
+  23 => 'top_buttons',
+  24 => 'right_buttons',
+  25 => 'search',
+  26 => 'search_button',
+  27 => 'columns',
+  28 => 'pages',
+  29 => 'row_list',
+  30 => '_page_info',
+  31 => 'primary_key',
+  32 => '_table',
+  33 => 'js_list',
+  34 => 'css_list',
+  35 => 'validate',
+  36 => '_js_files',
+  37 => '_css_files',
+  38 => '_select_list',
+  39 => '_filter_time',
+  40 => 'empty_tips',
+  41 => '_search_area',
+  42 => '_search_area_url',
+  43 => '_search_area_op',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.001085s ] mysql:host=127.0.0.1;port=3306;dbname=tshop;charset=utf8
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_role` [ RunTime:0.002210s ]
+[ sql ] [ SQL ] SELECT `menu_auth` FROM `dp_admin_role` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000094s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_menu` [ RunTime:0.002351s ]
+[ sql ] [ SQL ] SELECT `id`,`url_value` FROM `dp_admin_menu` WHERE  `id` = 0 [ RunTime:0.001096s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id LIMIT 10 [ RunTime:0.001041s ]
+[ sql ] [ SQL ] SELECT `id`,`pid`,`module`,`title`,`url_value`,`url_type`,`url_target`,`icon`,`params` FROM `dp_admin_menu` WHERE  `online_hide` = 0  AND `status` = 1  AND `pid` = 0 ORDER BY sort,id [ RunTime:0.000594s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_config` [ RunTime:0.001444s ]
+[ sql ] [ SQL ] SELECT `value` FROM `dp_admin_config` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000345s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_cat` [ RunTime:0.024480s ]
+[ sql ] [ SQL ] SELECT `cat`.* FROM `dp_cat` `cat` ORDER BY `cat`.`id` [ RunTime:0.000365s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/cat/add' LIMIT 1 [ RunTime:0.000618s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/cat/enable' LIMIT 1 [ RunTime:0.000544s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/cat/disable' LIMIT 1 [ RunTime:0.000654s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/cat/edit' LIMIT 1 [ RunTime:0.001073s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_menu` WHERE  `url_value` = 'shop/cat/delete' LIMIT 1 [ RunTime:0.001390s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_user` [ RunTime:0.003490s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000254s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `dp_admin_attachment` [ RunTime:0.001233s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000350s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 3 LIMIT 1 [ RunTime:0.000310s ]
+[ sql ] [ SQL ] SELECT `avatar` FROM `dp_admin_user` WHERE  `id` = 1 LIMIT 1 [ RunTime:0.000251s ]
+[ sql ] [ SQL ] SELECT * FROM `dp_admin_attachment` WHERE  `id` = 4 LIMIT 1 [ RunTime:0.000263s ]

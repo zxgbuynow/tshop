@@ -15,10 +15,8 @@ define('APP_PATH', __DIR__ . '/../application/');
 if(!is_file('../data/install.lock')){
     define('BIND_MODULE', 'install');
 }
-
 // 定义入口为admin
 define('ENTRANCE', 'admin');
-
 // +----------------------------------------------------------------------
 // | 后台默认为关闭路由
 // | 如果需要开启路由功能，请注释下面三句

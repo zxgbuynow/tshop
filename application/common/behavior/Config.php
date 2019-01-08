@@ -124,12 +124,12 @@ class Config
         config('view_replace_str.__MODULE_LIBS__', PUBLIC_PATH. 'static/'. $module .'/libs');
         // 静态文件目录
         config('public_static_path', PUBLIC_PATH. 'static/');
-
         // 读取系统配置
         $system_config = cache('system_config');
         if (!$system_config) {
             $ConfigModel   = new ConfigModel();
             $system_config = $ConfigModel->getConfig();
+
             // 所有模型配置
             $module_config = ModuleModel::where('config', 'neq', '')->column('config', 'name');
             foreach ($module_config as $module_name => $config) {

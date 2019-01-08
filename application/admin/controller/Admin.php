@@ -42,7 +42,6 @@ class Admin extends Common
 
         // 设置分页参数
         $this->setPageParam();
-
         // 如果不是ajax请求，则读取菜单
         if (!$this->request->isAjax()) {
             // 读取顶部菜单
@@ -109,10 +108,8 @@ class Admin extends Common
             if ($table_data['module'] != $module || $table_data['controller'] != $controller) {
                 $this->error('非法操作');
             }
-
             $Model = $table_data['prefix'] == 0 ? Db::table($table) : Db::name($table);
         }
-
         return $Model;
     }
 
@@ -202,7 +199,6 @@ class Admin extends Common
             config('database.prefix').'admin_user',
             config('database.prefix').'admin_role',
         ];
-
         // 验证是否操作管理员
         if (in_array($Model->getTable(), $protect_table) && $id == 1) {
             $this->error('禁止操作超级管理员');
@@ -234,6 +230,8 @@ class Admin extends Common
 
         // 主键名
         $pk     = $Model->getPk();
+        print_r(12);exit;
+
         $result = $Model->where($pk, $id)->setField($field, $value);
 
         cache('hook_plugins', null);

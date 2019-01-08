@@ -5,67 +5,75 @@ use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\shop\model\Props as PropsModel;
 use app\shop\model\PropValus as PropValusModel;
+use util\Tree;
 use think\Db;
+
 /**
  * 属性控制器
  * @package app\cms\admin
  */
-class Props extends Admin
+class Values extends Admin
 {
     /**
      * 菜单列表
      * @return mixed
      */
-    public function index()
+    public function index($id = null)
     {
+        $id === null && $this->error('参数错误');
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
         // 查询
         $map = $this->getMap();
+        $map['prop_id'] = $id;
+        //获得类型
+        $show_type = PropsModel::where(['id'=>$id])->value('show_type');
 
         // 数据列表
-        $data_list = Db::view('props', true)
-            ->order('props.order_sort')
-            ->select();
-        $btnAdd = ['icon' => 'fa fa-fw fa-navicon', 'title' => '编辑属性值', 'href' => url('Values/index', ['id' => '__id__'])];
+        $data_list = PropValusModel::where($map)->order('order_sort desc')->paginate();
+
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['prop_name' => '标题'])// 设置搜索框
+            ->setSearch(['value' => '属性值'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['prop_name', '属性名'],
+                ['prop_value', '属性值'],
                 ['order_sort', '排序', 'text.edit'],
-                ['disabled', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
-            ->addTopButton('add', ['href' => url('add')])
-            ->addTopButtons('enable,disable')// 批量添加顶部按钮
-            ->addRightButton('edit')
-            ->addRightButton('custom', $btnAdd)
+            ->addTopButton('back', ['href' => url('props/index')]) // 批量添加顶部按钮
+            ->addTopButton('add', ['href' => url('add', ['prop_id' => $id,'show_type'=>$show_type])])
+            // ->addTopButtons('enable,disable')// 批量添加顶部按钮
+            ->addRightButton('edit', ['href' => url('add', ['prop_id' => $id,'show_type'=>$show_type,'id'=>'__id__'])])
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
 
-
     /**
      * 新增
      * @return mixed
      */
-    public function add()
+    public function add($prop_id=null,$show_type=null)
     {
+        $prop_id === null && $this->error('参数错误');
+
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            
 
             // 验证
-            $result = $this->validate($data, 'Props');
+            $data['prop_id'] = $prop_id;
+            $result = $this->validate($data, 'PropValues');
             if(true !== $result) $this->error($result);
-
-            if ($props = PropsModel::create($data)) {
+            unset($data['show_type']);
+            if ($props = PropValusModel::create($data)) {
                 // 记录行为
-                action_log('props_add', 'props', $props['id'], UID, $data['prop_name']);
-                $this->success('新增成功', url('index'));
+                action_log('props_values_add', 'props_values', $props['id'], UID, $data['prop_value']);
+                $this->success('新增成功', url('index',['id' => $prop_id]));
             } else {
                 $this->error('新增失败');
             }
@@ -74,23 +82,21 @@ class Props extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'prop_name', '标题'],
-                ['text', 'prop_memo', '描述'],
-                ['radio', 'show_type', '类型', '', ['文字', '颜色'], 0],
+                ['hidden', 'show_type',$show_type],
+                ['text', 'prop_value', '标题'],
                 ['text', 'order_sort', '排序', '', 100],
-                ['radio', 'disabled', '立即启用', '', ['否', '是'], 1]
             ])
-            // ->addColorpicker('prop_type', '颜色','<code>支持颜色名称（red、blue等）、十六进制值（#ff0000）、rgba 代码</code>')
-            // ->setTrigger('show_type','1','prop_type')
+            ->addColorpicker('prop_image', '颜色','<code>支持颜色名称（red、blue等）、十六进制值（#ff0000）、rgba 代码</code>')
+            ->setTrigger('show_type','1','prop_image')
             ->fetch();
     }
 
     /**
      * 编辑
-     * @param null $id 菜单id
+     * @param null $id 属性值id
      * @return mixed
      */
-    public function edit($id = null)
+    public function edit($id = null,$prop_id = null,$show_type = null)
     {
         if ($id === null) $this->error('缺少参数');
         // 保存数据
@@ -99,13 +105,14 @@ class Props extends Admin
             $data = $this->request->post();
 
             // 验证
-            $result = $this->validate($data, 'Props');
+            $result = $this->validate($data, 'PropsValues');
             if(true !== $result) $this->error($result);
-
-            if (PropsModel::update($data)) {
+            unset($data['show_type']);
+            if (PropValusModel::update($data)) {
                 // 记录行为
-                action_log('props_edit', 'props', $id, UID, $data['prop_name']);
-                $this->success('编辑成功', url('index'));
+                action_log('props_values_edit', 'cms_props_values', $id, UID, $data['value']);
+                // $this->success('编辑成功', url('index',['id' => $id]));
+                $this->success('编辑成功', cookie('__forward__'));
             } else {
                 $this->error('编辑失败');
             }
@@ -114,15 +121,13 @@ class Props extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['hidden', 'id'],
-                ['text', 'prop_name', '标题'],
-                ['radio', 'show_type', '类型', '', ['文字', '颜色'], 0],
+                ['hidden', 'show_type',$show_type],
+                ['text', 'prop_value', '标题'],
                 ['text', 'order_sort', '排序', '', 100],
-                ['radio', 'disabled', '立即启用', '', ['否', '是'], 1]
             ])
-            // ->addColorpicker('prop_type', '颜色','<code>支持颜色名称（red、blue等）、十六进制值（#ff0000）、rgba 代码</code>')
-            // ->setTrigger('show_type','1','prop_type')
-            ->setFormData(PropsModel::get($id))
+            ->addColorpicker('prop_image', '颜色','<code>支持颜色名称（red、blue等）、十六进制值（#ff0000）、rgba 代码</code>')
+            ->setTrigger('show_type','1','prop_image')
+            ->setFormData(PropValusModel::get($id))
             ->fetch();
     }
 
@@ -134,11 +139,11 @@ class Props extends Admin
      */
     public function delete($ids = null)
     {
-        // 检查是否有子菜单
-        if (PropsValusModel::where('props_id', $ids)->find()) {
-            $this->error('请先删除该属性下的值');
-        }
-        return $this->setStatus('delete');
+        PropValusModel::where(['id'=>$ids])->delete();
+
+        return $this->success('删除成功', cookie('__forward__'));
+
+        // return $this->setStatus('delete');
     }
 
     /**
@@ -173,14 +178,13 @@ class Props extends Admin
     public function setStatus($type = '', $record = [])
     {
         $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
-        $menu_title = PropsModel::where('id', 'in', $ids)->column('prop_name');
-        return parent::setStatus($type, ['props_'.$type, 'props', 0, UID, implode('、', $menu_title)]);
+        $menu_title = PropValusModel::where('id', 'in', $ids)->column('value');
+        return parent::setStatus($type, ['props_values_'.$type, 'cms_props_values', 0, UID, implode('、', $menu_title)]);
     }
 
     /**
      * 快速编辑
      * @param array $record 行为日志
-     * @author zg
      * @return mixed
      */
     public function quickEdit($record = [])
@@ -188,8 +192,8 @@ class Props extends Admin
         $id      = input('post.pk', '');
         $field   = input('post.name', '');
         $value   = input('post.value', '');
-        $menu    = PropsModel::where('id', $id)->value($field);
+        $menu    = PropValusModel::where('id', $id)->value($field);
         $details = '字段(' . $field . ')，原值(' . $menu . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['props_edit', 'props', $id, UID, $details]);
+        return parent::quickEdit(['props_values_edit', 'cms_props_values', $id, UID, $details]);
     }
 }
