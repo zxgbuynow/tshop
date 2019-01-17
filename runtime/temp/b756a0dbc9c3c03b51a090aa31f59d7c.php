@@ -1,3 +1,4 @@
+<?php if (!defined('THINK_PATH')) exit(); /*a:0:{}*/ ?>
 <style type="text/css">
   .typelist{
     margin:.5rem;
@@ -6,9 +7,9 @@
     margin-bottom:.5rem;
   }
 </style>
-<div class="form-group  col-xs-12 {$extra_class|default=''}" id="form_group_{$name}">
-    <label class="col-xs-12" for="{$name}">{$title|htmlspecialchars}</label>
-    <div class="col-sm-12" id="speclist">
+<div class="form-group  col-xs-12 <?php echo (isset($extra_class) && ($extra_class !== '')?$extra_class:''); ?>" id="form_group_<?php echo $name; ?>">
+    <label class="col-xs-12" for="<?php echo $name; ?>"><?php echo htmlspecialchars($title); ?></label>
+    <div class="col-sm-12">
       <!-- <div class="form-group form-inline typelist">
         <label for="" class="col-sm-1 control-label">选择一：</label>
         <div class="col-sm-11 speclist" data-spec-id="19" data-spec-type="text" data-spec-name="选择一">
@@ -22,8 +23,8 @@
 
       </div> -->
     </div>
-    {notempty name="tips"}
-    <div class="help-block">{$tips}</div>
-    {/notempty}
+    <?php if(!(empty($tips) || (($tips instanceof \think\Collection || $tips instanceof \think\Paginator ) && $tips->isEmpty()))): ?>
+    <div class="help-block"><?php echo $tips; ?></div>
+    <?php endif; ?>
 </div>
 

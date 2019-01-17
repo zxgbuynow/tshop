@@ -213,6 +213,11 @@
                             {include file="../application/common/builder/form/items/tags.html" type='' /}
                             {/case}
 
+                            {case value="mcheckbox"}
+                            {// 标签 }
+                            {include file="../public/extend/form/mcheckbox/mcheckbox.html" type='' /}
+                            {/case}
+
                             {case value="text"}
                             {// 单行文本 }
                             {include file="../application/common/builder/form/items/text.html" type='' /}
@@ -245,6 +250,7 @@
                                 </div>
                             </div>
                             {/eq}
+
                             {/case}
 
                             {case value="time"}

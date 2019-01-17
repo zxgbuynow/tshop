@@ -84,15 +84,41 @@ class Item extends Admin
                 $this->error('新增失败');
             }
         }
+        $spec_url = url('spec');
+
+        $js = <<<EOF
+            <script type="text/javascript">
+                function checkSchedule(cid) {
+                    $.post("{$spec_url}", { "cat_id": cid },
+                    function(data){
+                        console.log(data);
+                        
+                        if (data.code == 1){
+                            var html = '';
+                            
+                            $('#speclist').html(html);
+                        }
+
+                    }, "json");
+                }
+            
+                $(function(){
+                    $("#cat_id").change(function(){
+                        var cid = $(this).children('option:selected').val();
+                        checkSchedule(cid);
+                    });
+                });
+            </script>
+EOF;
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['linkage', 'cat_id', '父类', '<code>必选</code>', CatModel::getTreeList(0),'',url('get_brands'), 'brand_id'],
+                ['linkage', 'cat_id', '父类', '<code>必选</code>', CatModel::getTreeList(0),'',url('get_brands'), 'brand_id,spec_desc'],
                 ['text', 'title', '商品标题'],
                 ['textarea', 'sub_title', '商品子标题'],
                 ['text', 'unit', '计价单位'],
                 ['text', 'bn', '编码','',get_bn()],
-                ['select', 'brand_id', '品牌' ],
+                ['select', 'brand_id', '品牌'],
                 ['images', 'list_image', '商品图片' ,'', '', '', '', '', ['size' => '80,80']],
                 ['text', 'order_sort', '排序'],
                 ['radio', 'is_offline', '上架状态', '', ['否', '是'], 1],
@@ -101,6 +127,8 @@ class Item extends Admin
                 ['mtable', 'sku', '商品规格(sku)']
             ])
             ->setTrigger('nospec','1','sku')
+            ->setTrigger('nospec','1','spec_desc')
+            ->setExtraJs($js)
             ->fetch();
         
     }
@@ -127,6 +155,29 @@ class Item extends Admin
         //     ['key' => '0', 'value' => '广州'],
         //     ['key' => '1', 'value' => '深圳'],
         // ]; //数据
+
+        return json($arr);
+    }
+
+    public function spec($cat_id=null)
+    {
+        $arr['code'] = '1'; //判断状态
+        $arr['msg'] = '请求成功'; //回传信息
+        //list
+        $b = db('cat_rel_props')->where(['cat_id'=>$cat_id])->value('prop_id');
+        if (!$b) {
+            $arr['list'] = []; //数据
+            return json($arr);
+        }
+        $m['id'] = array('in',$b); 
+        $l = db('props')->where($m)->select();
+        $rs = [];
+        foreach ($l as $key => $value) {
+            $rs[$key]['key']=$value['id'];
+            $rs[$key]['value']=$value['prop_name'];
+        }
+        $arr['list'] = $rs;
+
 
         return json($arr);
     }
