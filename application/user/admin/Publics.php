@@ -48,6 +48,7 @@ class Publics extends Common
                 };
             }
 
+
             // 登录
             $UserModel = new UserModel;
             $uid = $UserModel->login($data['username'], $data['password'], $rememberme);
@@ -68,7 +69,8 @@ class Publics extends Common
                     $this->error($hook_result[0]['error']);
                 }
             }
-
+            $logUrl = get_file_path(config('web_site_logo'));
+            $this->assign('logUrl',$logUrl);
             if (is_signin()) {
                 $this->redirect('admin/index/index');
             } else {

@@ -18,7 +18,7 @@ return [
   'identifier' => 'crontab.meishixiu.module',
   'icon' => 'glyphicon glyphicon-time',
   'description' => '模块依赖 composer 组件 <code>mtdowling/cron-expression</code> 和 <code>guzzlehttp/guzzle</code>',
-  'author' => '流风回雪',
+  'author' => '周工',
   'author_url' => 'http://www.dolphinphp.com/',
   'version' => '1.0.0',
   'tables' => [

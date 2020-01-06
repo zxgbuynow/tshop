@@ -7267,11 +7267,11 @@ a.block.block-link-hover3:active {
 }
 .pulldown {
     position: relative;
-    top: 50px;
+    /*top: 50px;*/
 }
 @media screen and (min-width: 992px) {
     .pulldown {
-        top: 150px;
+        /*top: 150px;*/
     }
 }
 .remove-margin {

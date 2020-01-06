@@ -62,7 +62,7 @@ class Crontab
     {
         $apikey = "8df6ed7129c50581eecdf1e875edbaa3"; 
 
-        $text = '【大观心理】温馨提示：您有新的心理咨询预约：'.$content; 
+        $text = '【呼叫中心】温馨提示：您有新的心理咨询预约：'.$content; 
 
         // error_log($text,3,'/home/wwwroot/daguan/mobile.log');
         $ch = curl_init();

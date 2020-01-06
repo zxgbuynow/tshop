@@ -230,7 +230,6 @@ class Admin extends Common
 
         // 主键名
         $pk     = $Model->getPk();
-        print_r(12);exit;
 
         $result = $Model->where($pk, $id)->setField($field, $value);
 

@@ -18,8 +18,8 @@ return [
   'identifier' => 'shop.zxgbuynow.module',
   'icon' => 'fa fa-fw fa-shopping-bag',
   'description' => '商城',
-  'author' => '睡眼朦胧中',
-  'author_url' => 'http://www.dolphinphp.com/',
+  'author' => '周工',
+  'author_url' => 'https://my.oschina.net/u/3144895',
   'version' => '1.0.0',
   'tables' => [
     'item',
