@@ -1,0 +1,66 @@
+{extend name="$_admin_base_layout" /}
+
+{block name="content"}
+{notempty name="page_tips"}
+<div class="alert alert-{$tips_type} alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <p>{$page_tips}</p>
+</div>
+{/notempty}
+
+<template>
+    <div class="layout">
+        <Layout>
+            <Header>Header</Header>
+            <Content>Content</Content>
+            <Footer>Footer</Footer>
+        </Layout>
+
+        <Layout>
+            <Header>Header</Header>
+            <Layout>
+                <Sider hide-trigger>Sider</Sider>
+                <Content>Content</Content>
+            </Layout>
+            <Footer>Footer</Footer>
+        </Layout>
+
+        <Layout>
+            <Header>Header</Header>
+            <Layout>
+                <Content>Content</Content>
+                <Sider hide-trigger>Sider</Sider>
+            </Layout>
+            <Footer>Footer</Footer>
+        </Layout>
+
+        <Layout>
+            <Sider hide-trigger>Sider</Sider>
+            <Layout>
+                <Header>Header</Header>
+                <Content>Content</Content>
+                <Footer>Footer</Footer>
+            </Layout>
+        </Layout>
+    </div>
+</template>
+
+
+{/block}
+
+{block name="plugins-css"}
+<link href="__LIBS__/iview.min.css" rel="stylesheet" type="text/css" />
+{/block}
+
+{block name="script"}
+<script src="__LIBS__/iview.min.js"></script>
+<script src="__LIBS__/vue.js"></script>
+<script>
+    $(document).ready(function(){
+       console.log('ready')
+    });
+    export default {
+        
+    }
+</script>
+{/block}

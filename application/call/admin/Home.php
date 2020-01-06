@@ -44,7 +44,7 @@ class Home extends Admin
             ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
             ->setRowList($data_list)// 设置表格数据
-            ->fetch(); // 渲染模板
+            ->fetch('index'); // 渲染模板
         
     }
 
