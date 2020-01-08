@@ -49,6 +49,8 @@ class Trade extends Admin
 
         $btnAdd = ['icon' => 'fa fa-plus', 'title' => '子订单列表', 'href' => url('order', ['id' => '__id__'])];
 
+        $itemAdd = ['icon' => 'fa fa-plus', 'title' => '添加商品', 'href' => url('item')];
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['title' => '订单标题'])// 设置搜索框
@@ -67,7 +69,7 @@ class Trade extends Admin
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
-            ->addTopButton('item', ['href' => url('item')])
+            ->addTopButton('custom', $itemAdd)
             ->addRightButton('edit')
             ->addRightButton('custom', $btnAdd)
             ->setRowList($data_list)// 设置表格数据

@@ -17,7 +17,7 @@ use think\Hook;
  * 用户默认控制器
  * @package app\call\admin
  */
-class Member extends Admin
+class Employ extends Admin
 {
     /**
      * 用户首页
@@ -30,6 +30,7 @@ class Member extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
+        $map['id'] = array('NEQ','1');
         // 数据列表
         $data_list = UserModel::where($map)->order('sort,id desc')->paginate();
 
@@ -45,7 +46,7 @@ class Member extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setPageTitle('用户管理') // 设置页面标题
+            ->setPageTitle('员工管理') // 设置页面标题
             ->setTableName('admin_user') // 设置数据表名
             ->setSearch(['id' => 'ID', 'username' => '用户名', 'email' => '邮箱']) // 设置搜索参数
             ->addColumns([ // 批量添加列

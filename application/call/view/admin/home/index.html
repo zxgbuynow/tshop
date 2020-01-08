@@ -8,59 +8,21 @@
 </div>
 {/notempty}
 
-<template>
-    <div class="layout">
-        <Layout>
-            <Header>Header</Header>
-            <Content>Content</Content>
-            <Footer>Footer</Footer>
-        </Layout>
-
-        <Layout>
-            <Header>Header</Header>
-            <Layout>
-                <Sider hide-trigger>Sider</Sider>
-                <Content>Content</Content>
-            </Layout>
-            <Footer>Footer</Footer>
-        </Layout>
-
-        <Layout>
-            <Header>Header</Header>
-            <Layout>
-                <Content>Content</Content>
-                <Sider hide-trigger>Sider</Sider>
-            </Layout>
-            <Footer>Footer</Footer>
-        </Layout>
-
-        <Layout>
-            <Sider hide-trigger>Sider</Sider>
-            <Layout>
-                <Header>Header</Header>
-                <Content>Content</Content>
-                <Footer>Footer</Footer>
-            </Layout>
-        </Layout>
-    </div>
-</template>
+<div class="jumbotron">
+  <h1>Hello, world!</h1>
+  <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information</p>
+  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+</div>
 
 
 {/block}
 
-{block name="plugins-css"}
-<link href="__LIBS__/iview.min.css" rel="stylesheet" type="text/css" />
-{/block}
 
 {block name="script"}
-<script src="__LIBS__/iview.min.js"></script>
-<script src="__LIBS__/vue.js"></script>
 <script>
     $(document).ready(function(){
        console.log('ready')
     });
-    export default {
-        
-    }
+    
 </script>
 {/block}
