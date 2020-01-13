@@ -4,7 +4,7 @@ namespace app\call\admin;
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Alloc as AllocModel;
-
+use app\call\model\Alloclg as AlloclgModel;
 /**
  * 首页后台控制器
  */
@@ -29,25 +29,29 @@ class Alloc extends Admin
         // 分页数据
         $page = $data_list->render();
 
-
+// `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分配id',
+//   `op_id` int(10) unsigned DEFAULT '0' COMMENT '操作员id',
+//   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
+//   `alloc_count` int(10) unsigned DEFAULT '0' COMMENT '分配次数',
+//   `create_time` int(10) unsigned DEFAULT NULL,
+//   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
+            // ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['custom', '客户名'],
-                ['domain', '客户域名'],
-                ['ip', '客户服务器IP'],
-                ['isonline', '授权方式'],
-                ['start_time', '开始时间','datetime'],
-                ['end_time', '结束时间','datetime'],
+                ['oper', '操作员'],
+                ['call_count', '呼叫次数'],
+                ['alloc_count', '分配次数'],
+                ['create_time', '创建时间','datetime'],
+                ['way', '分配方式','',['','平均分配','选配']],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->setRowList($data_list)// 设置表格数据
-            ->raw('isonline') // 使用原值
+            ->raw('oper') // 使用原值
             ->fetch(); // 渲染模板
         
     }

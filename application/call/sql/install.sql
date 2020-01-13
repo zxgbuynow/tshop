@@ -121,6 +121,7 @@ CREATE TABLE `zg_call_alloc` (
   `op_id` int(10) unsigned DEFAULT '0' COMMENT '操作员id',
   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
   `alloc_count` int(10) unsigned DEFAULT '0' COMMENT '分配次数',
+  `way` tinyint(1) DEFAULT '1' COMMENT '1平均分配2选配',
   `create_time` int(10) unsigned DEFAULT NULL,
   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
   PRIMARY KEY (`id`)

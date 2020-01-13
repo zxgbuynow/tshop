@@ -309,12 +309,12 @@ class Excel extends Common
                 cache('dataCover', $dataCover);
                 cache('dataSkip', $dataSkip);
                 cache('nextUrl', null);
-                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。'];
+                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name,'rate'=>round(count($data_list)/$i*100,2).'%'];
             } else {
                 return ["error" => 9, 'message' => '导入失败!请重新导入。'];
             }
         } else {
-            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!'];
+            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!','tabNm'=>$sheet_name,'rate'=>'100%'];
         }
     }
 

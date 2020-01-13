@@ -29,25 +29,30 @@ class Speechcraft extends Admin
         // 分页数据
         $page = $data_list->render();
 
+  //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '话术id',
+  // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
+  // `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
+  // `order` int(10) unsigned DEFAULT '0' COMMENT '排序',
+  // `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
+  // `create_time` int(10) unsigned DEFAULT NULL,
+  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
+            ->setSearch(['title' => '名称'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['custom', '客户名'],
-                ['domain', '客户域名'],
-                ['ip', '客户服务器IP'],
-                ['isonline', '授权方式'],
-                ['start_time', '开始时间','datetime'],
-                ['end_time', '结束时间','datetime'],
+                ['project', '项目'],
+                ['title', '名称'],
+                ['order', '排序'],
+                ['create_time', '创建时间','datetime'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->setRowList($data_list)// 设置表格数据
-            ->raw('isonline') // 使用原值
+            ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
         
     }
