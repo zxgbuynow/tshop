@@ -51,6 +51,7 @@ class Setting extends Admin
             // 使用ZBuilder快速创建表单
             return ZBuilder::make('form')
                 ->setPageTitle('短信配置') // 设置页面标题
+                ->setTabNav($list_tab,  $group)
                 ->addFormItems([ // 批量添加表单项
                     ['text', 'msg_username', 'msg_username', '短信用户名'],
                     ['text', 'msg_pwd', 'msg_pwd', '短信用户密码'],
@@ -63,6 +64,7 @@ class Setting extends Admin
             // 使用ZBuilder快速创建表单
             return ZBuilder::make('form')
                 ->setPageTitle('微信配置') // 设置页面标题
+                ->setTabNav($list_tab,  $group)
                 ->addFormItems([ // 批量添加表单项
                     ['text', 'wechat_key', 'wechat_key', 'Key微信'],
                     ['text', 'wechat_Appsecret', 'wechat_Appsecret', 'Appsecret微信'],
