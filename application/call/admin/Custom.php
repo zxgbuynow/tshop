@@ -201,7 +201,7 @@ class Custom extends Admin
      * [gtback 回收列表]
      * @return [type] [description]
      */
-    public function gtback($group=='tab1')
+    public function gtback($group='tab1')
     {
         cookie('__forward__', $_SERVER['REQUEST_URI']);
 
