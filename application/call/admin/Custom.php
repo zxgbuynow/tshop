@@ -209,8 +209,8 @@ class Custom extends Admin
         $map = $this->getMap();
 
         $list_tab = [
-            'tab1' => ['title' => '回收列表', 'url' => url('index', ['group' => 'tab1'])],
-            'tab2' => ['title' => '公海列表', 'url' => url('index', ['group' => 'tab2'])],
+            'tab1' => ['title' => '回收列表', 'url' => url('gtback', ['group' => 'tab1'])],
+            'tab2' => ['title' => '公海列表', 'url' => url('gtback', ['group' => 'tab2'])],
         ];
 
         if ($group=='tab1') {
