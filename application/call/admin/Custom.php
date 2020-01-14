@@ -173,6 +173,7 @@ class Custom extends Admin
     {
         cookie('__forward__', $_SERVER['REQUEST_URI']);
 
+
         // 保存数据
         if ($this->request->isPost()) {
             $data = $this->request->post();
@@ -200,43 +201,88 @@ class Custom extends Admin
      * [gtback 回收列表]
      * @return [type] [description]
      */
-    public function gtback()
+    public function gtback($group=='tab1')
     {
         cookie('__forward__', $_SERVER['REQUEST_URI']);
-
 
         // 获取查询条件
         $map = $this->getMap();
 
-        // 数据列表
-        $data_list = CustomModel::where($map)->order('id desc')->paginate();
+        $list_tab = [
+            'tab1' => ['title' => '回收列表', 'url' => url('index', ['group' => 'tab1'])],
+            'tab2' => ['title' => '公海列表', 'url' => url('index', ['group' => 'tab2'])],
+        ];
 
-        // 分页数据
-        $page = $data_list->render();
+        if ($group=='tab1') {
+            $map['status'] = 1;
+            // 数据列表
+            $data_list = CustomModel::where($map)->order('id desc')->paginate();
 
-  //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
-  // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
-        // 使用ZBuilder快速创建数据表格
-        return ZBuilder::make('table')
-            ->hideCheckbox()
-            // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
-            ->addColumns([ // 批量添加数据列
-                ['id', 'ID'],
-                ['project', '项目'],
-                ['custom', '客户'],
-                ['create_time', '创建时间','datetime'],
-                ['status', '状态', 'switch'],
-                ['right_button', '操作', 'btn']
-            ])
+            // 分页数据
+            $page = $data_list->render();
 
-            // ->addTopButton('add', ['href' => url('add')])
-            ->addRightButton('del')
-            ->setRowList($data_list)// 设置表格数据
-            ->raw('project,custom') // 使用原值
-            ->fetch(); // 渲染模板
+      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
+      // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
+      // `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
+      // `create_time` int(10) unsigned DEFAULT NULL,
+      // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
+            // 使用ZBuilder快速创建数据表格
+            return ZBuilder::make('table')
+                ->hideCheckbox()
+                ->setPageTitle('回收列表') // 设置页面标题
+                ->setTabNav($list_tab,  $group)
+                // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+                ->addColumns([ // 批量添加数据列
+                    ['id', 'ID'],
+                    ['project', '项目'],
+                    ['custom', '客户'],
+                    ['create_time', '创建时间','datetime'],
+                    ['status', '状态', 'switch'],
+                    ['right_button', '操作', 'btn']
+                ])
+
+                // ->addTopButton('add', ['href' => url('add')])
+                ->addRightButton('del')
+                ->setRowList($data_list)// 设置表格数据
+                ->raw('project,custom') // 使用原值
+                ->fetch(); // 渲染模板
+        }
+        
+
+        if ($group=='tab2') {
+            $map['status'] = 9;
+            // 数据列表
+            $data_list = CustomModel::where($map)->order('id desc')->paginate();
+
+            // 分页数据
+            $page = $data_list->render();
+
+      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
+      // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
+      // `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
+      // `create_time` int(10) unsigned DEFAULT NULL,
+      // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
+            // 使用ZBuilder快速创建数据表格
+            return ZBuilder::make('table')
+                ->hideCheckbox()
+                ->setPageTitle('公海列表') // 设置页面标题
+                ->setTabNav($list_tab,  $group)
+                // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+                ->addColumns([ // 批量添加数据列
+                    ['id', 'ID'],
+                    ['project', '项目'],
+                    ['custom', '客户'],
+                    ['create_time', '创建时间','datetime'],
+                    ['status', '状态', 'switch'],
+                    ['right_button', '操作', 'btn']
+                ])
+
+                // ->addTopButton('add', ['href' => url('add')])
+                ->addRightButton('del')
+                ->setRowList($data_list)// 设置表格数据
+                ->raw('project,custom') // 使用原值
+                ->fetch(); // 渲染模板
+        }
 
     }
 
