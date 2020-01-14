@@ -190,7 +190,7 @@ class Custom extends Admin
         return ZBuilder::make('form')
             ->setPageTitle('回收配置') // 设置页面标题
             ->addFormItems([ // 批量添加表单项
-                ['text', 'recover_data', 'recover_data_hour', '回收设置','超过X小时自动回收数据'],
+                ['text', 'recover_data_hour', '回收设置', '超过X小时自动回收数据',''],
             ])
             ->setFormData($info) // 设置表单数据
             ->fetch();
@@ -221,6 +221,7 @@ class Custom extends Admin
   // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+            ->hideCheckbox()
             // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
@@ -230,6 +231,7 @@ class Custom extends Admin
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
+
             // ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
