@@ -52,7 +52,7 @@ CREATE TABLE `zg_call_custom_export_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='客户导入日志表';
 
-DROP TABLE IF EXISTS `zg_call_porject_st`;
+DROP TABLE IF EXISTS `zg_call_project_st`;
 CREATE TABLE `zg_call_porject_st` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '项目设置id',
   `lable` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '字段名',

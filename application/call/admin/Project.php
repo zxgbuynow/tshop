@@ -86,7 +86,12 @@ class Project extends Admin
 //   `describe` longtext COLLATE utf8_unicode_ci COMMENT '项目说明',
 //   `create_time` int(10) unsigned DEFAULT NULL,
 //   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
-
+         // 授权按钮
+        $btn_access = [
+            'title' => '项目记录',
+            'icon'  => 'fa fa-fw fa-project',
+            'href'  => url('pjlist', ['id' => '__id__'])
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['title' => '项目名称'])// 设置搜索框
@@ -100,6 +105,7 @@ class Project extends Admin
             ])
             ->addTopButton('add', ['href' => url('pjsadd')])
             ->addRightButton('pjsedit')
+            ->addRightButton('custom', $btn_access)
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
