@@ -20,6 +20,8 @@ class TableBm extends Plugin
     // 设置当前模型对应的完整数据表名称
     protected $name = 'admin_plugin_form';
 
+    protected $table = '__ADMIN_PLUGIN_FORM__';
+
     public function test()
     {
         // 获取插件的设置信息

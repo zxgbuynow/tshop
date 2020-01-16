@@ -24,7 +24,7 @@ class TableBm extends Plugin
         // 插件名[必填]
         'name'        => 'TableBm',
         // 插件标题[必填]
-        'title'       => '超级表单报名',
+        'title'       => '超级表单',
         // 插件唯一标识[必填],格式：插件名.开发者标识.plugin
         'identifier'  => 'tablebm.jiantashangdemao.plugin',
         // 插件图标[选填]
@@ -32,7 +32,7 @@ class TableBm extends Plugin
         // 插件描述[选填]
         'description' => '这是一个超级表单插件，一切可以在插件里面进行创建表单项，进行数据处理（只是针对后台创建表单）',
         // 插件作者[必填]
-        'author'      => 'Jeffery(1345199080@qq.com)',
+        'author'      => '周工',
         // 作者主页[选填]
         'author_url'  => 'http://www.dolphinphp.com',
         // 插件版本[必填],格式采用三段式：主版本号.次版本号.修订版本号

@@ -61,7 +61,7 @@ class Admin extends Common
                 // 验证失败 输出错误信息
                 $this->error($result);
             }
-
+            $data['create_time'] = time();
             // 插入数据
             if (TableBm::create($data)) {
                 $this->success('新增成功', cookie('__forward__'));
@@ -87,6 +87,7 @@ class Admin extends Common
                 // 验证失败 输出错误信息
                 $this->error($validate->getError());
             }
+            $data['update_time'] = time();
             // 更新数据
             if (TableBm::update($data)) {
                 $this->success('编辑成功', cookie('__forward__'));

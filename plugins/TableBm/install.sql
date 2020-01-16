@@ -15,7 +15,7 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for `dolphin_plugin_hello`
 -- ----------------------------
-create table dp_admin_plugin_form
+create table admin_plugin_form
 (
   id          int auto_increment
     primary key,
@@ -25,7 +25,7 @@ create table dp_admin_plugin_form
   update_time int          not null
 ) comment '表单数据表';
 
-create table dp_admin_plugin_form_data
+create table admin_plugin_form_data
 (
   id          int auto_increment
     primary key,
