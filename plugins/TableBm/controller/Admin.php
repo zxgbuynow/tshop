@@ -176,7 +176,8 @@ class Admin extends Common
     # 字段设置
     public function field_set()
     {
-        $w[] = ['form_id','=',input('form_id',0)];
+        $map = $this->getMap();
+        $w['form_id'] = $map['form_id'];
         $data_list = Db::name('admin_plugin_form_data')->where($w)->order('sort asc')->paginate();
 
         $returnbtn_access = [
