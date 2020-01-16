@@ -252,3 +252,12 @@ CREATE TABLE `zg_call_auth` (
   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='授权表';
+
+DROP TABLE IF EXISTS `zg_call_webchat`;
+CREATE TABLE `zg_call_webchat` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '授权id',
+  `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
+  `open_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '微信openid',
+  `union_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '微信unoinid',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='微信表';
