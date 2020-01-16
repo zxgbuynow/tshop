@@ -35,9 +35,9 @@ class Sms extends Plugin
         // 插件描述[选填]
         'description' => '阿里大鱼短信插件',
         // 插件作者[必填]
-        'author'      => '蔡伟明',
+        'author'      => '周工',
         // 作者主页[选填]
-        'author_url'  => 'http://www.dolphinphp.com',
+        'author_url'  => '',
         // 插件版本[必填],格式采用三段式：主版本号.次版本号.修订版本号
         'version'     => '1.0.0',
         // 是否有后台管理功能
