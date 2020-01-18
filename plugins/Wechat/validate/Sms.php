@@ -9,11 +9,19 @@
 // | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
 
+namespace plugins\Sms\validate;
+
+use think\Validate;
+
 /**
- * 插件配置信息
+ * 后台插件验证器
+ * @package app\plugins\Sms\validate
  */
-return [
-    ['radio', 'status', '启用短信', '', ['1' => '开启', '0' => '关闭'], 1],
-    ['text', 'appkey', 'APPKEY', ''],
-    ['text', 'secret', 'SECRET', '']
-];
+class Sms extends Validate
+{
+    //定义验证规则
+    protected $rule = [
+        'title|模板名称' => 'require|unique:plugin_sms',
+        'code|模板ID'  => 'require|unique:plugin_sms',
+    ];
+}
