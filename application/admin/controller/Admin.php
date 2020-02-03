@@ -40,6 +40,18 @@ class Admin extends Common
         // 检查权限
         if (!RoleModel::checkAuth()) $this->error('权限不足！');
 
+        //swiperAdvList
+        $_advmp['status'] = 1;
+        $_advmp['start_time'] = array('<',time());
+        $_advmp['end_time'] = array('>',time());
+        $_advList = db('call_adv')->where($_advmp)->order('create_time DESC')->column('title,content');
+        $_advpush = [];
+        foreach ($_advList as $key => $value) {
+            $_advpush[$key] = $key.'【'.$value.'】';
+        }
+        $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;',$_advpush ) ;
+        // $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;', array_column($_advList, 'content')) ;
+        $this->assign('swiperAdvList', $_advstr);
         // 设置分页参数
         $this->setPageParam();
         // 如果不是ajax请求，则读取菜单
@@ -52,28 +64,68 @@ class Admin extends Common
             $this->assign('_sidebar_menus', MenuModel::getSidebarMenu());
             // 获取面包屑导航
             $this->assign('_location', MenuModel::getLocation('', true));
+
+
+
             // 构建侧栏
-            $data = [
-                'table'      => 'admin_config', // 表名或模型名
-                'prefix'     => 1,
-                'module'     => 'admin',
-                'controller' => 'system',
-                'action'     => 'quickedit',
+            // $data = [
+            //     'table'      => 'admin_config', // 表名或模型名
+            //     'prefix'     => 1,
+            //     'module'     => 'admin',
+            //     'controller' => 'system',
+            //     'action'     => 'quickedit',
+            // ];
+            // $table_token = substr(sha1('_aside'), 0, 8);
+            // session($table_token, $data);
+            // $settings = [
+            //     [
+            //         'title'   => '站点开关',
+            //         'tips'    => '站点关闭后将不能访问',
+            //         'checked' => Db::name('admin_config')->where('id', 1)->value('value'),
+            //         'table'   => $table_token,
+            //         'id'      => 1,
+            //         'field'   => 'value'
+            //     ]
+            // ];
+            // ZBuilder::make('aside')
+            //     ->addBlock('switch', '系统设置', $settings);
+
+            $tab_list = [
+                'tabs-side-notice' => '<i class="fa fa-fw fa-bullhorn"></i> 系统提醒',
+                'tabs-side-able' => '<i class="fa fa-fw fa-file-o"></i> 技巧'
             ];
-            $table_token = substr(sha1('_aside'), 0, 8);
-            session($table_token, $data);
-            $settings = [
-                [
-                    'title'   => '站点开关',
-                    'tips'    => '站点关闭后将不能访问',
-                    'checked' => Db::name('admin_config')->where('id', 1)->value('value'),
-                    'table'   => $table_token,
-                    'id'      => 1,
-                    'field'   => 'value'
-                ]
-            ];
+
+            //提醒
+            $_notice = db('call_notice_log')->where(['is_read'=>0])->order('create_time DESC')->select(); 
+            $recent_list = [];
+            foreach ($_notice as $key => $value) {
+                $recent_list[$key]['title'] = $value['title'];
+                $recent_list[$key]['link']['title'] = $value['content'];
+                $recent_list[$key]['link']['url'] = url('call/notice/detail',['id'=>$value['id']]);
+                $recent_list[$key]['tips'] = time_tran($value['create_time']);
+                $recent_list[$key]['icon'] = 'fa fa-fw fa-bullhorn';
+            }
+
+            //技巧
+            $_speechs = db('call_speechcraft')->where(['status'=>1])->select(); 
+            $speech_list = [];
+            foreach ($_speechs as $key => $value) {
+                $speech_list[$key]['title'] = $value['title'];
+                $speech_list[$key]['link']['title'] = '<span style="color:red">'.$value['content'].'</span>';
+                $speech_list[$key]['link']['url'] = '';
+                $speech_list[$key]['tips'] = $value['tags'];
+                $speech_list[$key]['icon'] = 'fa fa-commenting-o';
+            }
+            
+            
             ZBuilder::make('aside')
-                ->addBlock('switch', '系统设置', $settings);
+                ->setTabNav($tab_list, 'tabs-side-notice')
+                ->setTabCon('tabs-side-notice', [
+                    ['recent', '最近提醒', $recent_list],
+                ])
+                ->setTabCon('tabs-side-able', [
+                    ['recent', '话术提示', $speech_list],
+                ]);
         }
     }
 

@@ -39,9 +39,9 @@ class Employ extends Admin
 
         // 授权按钮
         $btn_access = [
-            'title' => '授权',
-            'icon'  => 'fa fa-fw fa-key',
-            'href'  => url('access', ['uid' => '__id__'])
+            'title' => '推送消息',
+            'icon'  => 'fa fa-fw fa-comment',
+            'href'  => url('push', ['wechatnm' => '__wechat_name__'])
         ];
 
         // 使用ZBuilder快速创建数据表格
@@ -56,12 +56,13 @@ class Employ extends Admin
                 ['role', '角色', 'select', RoleModel::getTree(null, false)],
                 ['email', '邮箱'],
                 ['mobile', '手机号'],
+                ['wechat_name', '微信企业用户名','text.edit'],
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
-            // ->addRightButton('custom', $btn_access) // 添加授权按钮
+            ->addRightButton('custom', $btn_access) // 添加授权按钮
             ->addRightButtons('edit,delete') // 批量添加右侧按钮
             ->setRowList($data_list) // 设置表格数据
             ->setPages($page) // 设置分页数据
@@ -175,6 +176,24 @@ class Employ extends Admin
             ->fetch();
     }
 
+    /**
+     * [push 测试推送]
+     * @param  integer $uid [description]
+     * @return [type]       [description]
+     */
+    public function push($wechatnm = '')
+    {
+        $user = [];
+        array_push($user, $wechatnm);
+        $toparty = [];
+        $totag = [];
+        $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', '测试推送内容']);
+        if($result['code']){
+          $this->error('发送失败，错误代码：'. $result['code']. ' 错误信息：'. $result['msg']);
+        } else {
+          $this->success('发送成功');
+        }
+    }
     /**
      * 授权
      * @param string $tab tab分组名
@@ -380,12 +399,17 @@ class Employ extends Admin
      */
     public function quickEdit($record = [])
     {
-        $id      = input('post.pk', '');
-        $id      == UID && $this->error('禁止操作当前账号');
-        $field   = input('post.name', '');
-        $value   = input('post.value', '');
-        $config  = UserModel::where('id', $id)->value($field);
-        $details = '字段(' . $field . ')，原值(' . $config . ')，新值：(' . $value . ')';
-        return parent::quickEdit(['user_edit', 'admin_user', $id, UID, $details]);
+        $id = input('post.pk', '');
+        return parent::quickEdit(['Employ_edit', 'call', 0, UID, $id]);
     }
+    // public function quickEdit($record = [])
+    // {
+    //     $id      = input('post.pk', '');
+    //     $id      == UID && $this->error('禁止操作当前账号');
+    //     $field   = input('post.name', '');
+    //     $value   = input('post.value', '');
+    //     $config  = UserModel::where('id', $id)->value($field);
+    //     $details = '字段(' . $field . ')，原值(' . $config . ')，新值：(' . $value . ')';
+    //     return parent::quickEdit(['user_edit', 'admin_user', $id, UID, $details]);
+    // }
 }

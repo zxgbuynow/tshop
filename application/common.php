@@ -1455,3 +1455,184 @@ if (!function_exists('generate_rand_str')) {
         return $str;
     }
 }
+if (!function_exists('time_tran')) {
+    /**
+     * 转换时间
+     * @param int $timer 时间戳
+     * @author zg
+     * @return string
+     */
+    function time_tran($timer)
+    {
+        $diff = $_SERVER['REQUEST_TIME'] - $timer;
+        $day  = floor($diff / 86400);
+        $free = $diff % 86400;
+        if ($day > 0) {
+            return $day . " 天前";
+        } else {
+            if ($free > 0) {
+                $hour = floor($free / 3600);
+                $free = $free % 3600;
+                if ($hour > 0) {
+                    return $hour . " 小时前";
+                } else {
+                    if ($free > 0) {
+                        $min = floor($free / 60);
+                        $free = $free % 60;
+                        if ($min > 0) {
+                            return $min . " 分钟前";
+                        } else {
+                            if ($free > 0) {
+                                return $free . " 秒前";
+                            } else {
+                                return '刚刚';
+                            }
+                        }
+                    } else {
+                        return '刚刚';
+                    }
+                }
+            } else {
+                return '刚刚';
+            }
+        }
+    }
+}
+
+if (!function_exists('push_wm_msg')) {
+
+    /**
+    ** workerman push msg
+    **/
+    function push_wm_msg($to_uid,$content)
+    {
+        // 指明给谁推送，为空表示向所有在线用户推送
+        // $to_uid = "";
+        // 推送的url地址，使用自己的服务器地址
+        $push_api_url = "http://127.0.0.1:2121";
+        $post_data = array(
+           "type" => "publish",
+           "content" => $content,
+           "to" => $to_uid, 
+        );
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $push_api_url );
+        curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt ( $ch, CURLOPT_POSTFIELDS, $post_data );
+        curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
+
+if (!function_exists('notice_log')) {
+    /**
+     * 提醒
+     * @param null $action 标识
+     * @param null $user_id 执行行为的用户id
+     * @author huajie <banhuajie@163.com>
+     * @return bool|string
+     */
+    function notice_log($action = null,  $user_id = null, $deails = '', $is_push = false)
+    {
+        
+        // 参数检查
+        if(empty($action)){
+            return '参数不能为空';
+        }
+        
+        $action_info = model('call/notice')->where('tags', $action)->find();
+        if($action_info['status'] != 1){
+            return '该禁用或删除';
+        }
+        // 插入日志
+        $data = [
+            'title'   => $action_info['title'],
+            'create_time'     => request()->time(),
+            'notice_id'   => $action_info['id'],
+            'user_id'       => $user_id
+        ];
+        // $action_info['content'] = '[project|get_projectnm]组[custom|get_custom]客户已签单';
+        // 解析日志规则,生成日志
+        if(!empty($action_info['content'])){
+            if(preg_match_all('/\[(\S+?)\]/', $action_info['content'], $match)){
+                $log = [
+                    'employ'=>$user_id,
+                    'custom'=>$deails['custom'],
+                    'project'=>$deails['project']
+                ];
+                $replace = [];
+                foreach ($match[1] as $value){
+                    $param = explode('|', $value);
+                    if(isset($param[1])){
+                        $replace[] = call_user_func($param[1], $log[$param[0]]);
+                    }else{
+                        $replace[] = $log[$param[0]];
+                    }
+                }
+
+                $data['content'] = str_replace($match[0], $replace, $action_info['content']);
+            }else{
+                $data['content'] = $action_info['content'];
+            }
+        }
+        // 保存日志
+        model('call/NoticeLg')->insert($data);
+
+        //推送消息
+        if ($is_push) {
+            push_wm_msg($user_id , $data['content']);
+        }
+    }
+
+}
+
+if (!function_exists('get_projectnm')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_projectnm($id)
+    {
+        $info = model('call/projectls')->field('col1')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['col1'];
+    }
+}
+
+if (!function_exists('get_custom')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_custom($id)
+    {
+        $info = model('call/custom')->field('name')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['name'];
+    }
+}
+if (!function_exists('get_employ')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_employ($id)
+    {
+        $info = model('user/user')->field('nickname')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['nickname'];
+    }
+}

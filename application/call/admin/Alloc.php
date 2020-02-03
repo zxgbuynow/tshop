@@ -5,6 +5,8 @@ use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Alloc as AllocModel;
 use app\call\model\Alloclg as AlloclgModel;
+use app\call\model\Custom as CustomModel;
+use app\user\model\User as UserModel;
 /**
  * 首页后台控制器
  */
@@ -28,7 +30,11 @@ class Alloc extends Admin
 
         // 分页数据
         $page = $data_list->render();
-
+        $btn_access = [
+            'title' => '分配日志',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('alloclg', ['id' => '__id__'])
+        ];
 // `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分配id',
 //   `op_id` int(10) unsigned DEFAULT '0' COMMENT '操作员id',
 //   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
@@ -42,20 +48,70 @@ class Alloc extends Admin
                 ['id', 'ID'],
                 ['oper', '操作员'],
                 ['call_count', '呼叫次数'],
-                ['alloc_count', '分配次数'],
+                // ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
-                ['way', '分配方式','',['','平均分配','选配']],
+                ['way', '分配方式',['','平均分配','选配']],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
-            ->addRightButton('edit')
+
+            ->addRightButton('custom',$btn_access)
             ->setRowList($data_list)// 设置表格数据
             ->raw('oper') // 使用原值
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [alloclg 分配日志]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function alloclg($id =null)
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+        if ($id === null) $this->error('缺少参数');
+
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        $map['alloc_id'] = $id;
+        // 数据列表
+        $data_list = AlloclgModel::where($map)->order('id desc')->paginate();
+
+        // 分页数据
+        $page = $data_list->render();
+        
+// `alloc_id` int(10) unsigned DEFAULT '0' COMMENT '分配id',
+//   `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
+//   `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
+//   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
+//   `alloc_count` int(10) unsigned DEFAULT '1' COMMENT '分配次数',
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->addTopButton('back', [
+                'title' => '返回列表',
+                'icon'  => 'fa fa-reply',
+                'href'  => url('index')
+            ])
+            // ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['user', '员工'],
+                ['custom', '客户'],
+                // ['call_count', '呼叫次数'],
+                ['alloc_count', '分配次数'],
+                ['create_time', '创建时间','datetime'],
+                // ['right_button', '操作', 'btn']
+            ])
+            // ->addTopButton('add', ['href' => url('add')])
+            // ->addRightButton('delete')
+            ->setRowList($data_list)// 设置表格数据
+            ->raw('user,custom') // 使用原值
+            ->fetch(); // 渲染模板
+    }
     /**
      * 新增
      * @return mixed
@@ -66,26 +122,133 @@ class Alloc extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if ($props = AuthModel::create($data)) {
+            $sdata['create_time'] =  time();
+            //UID
+            $sdata['op_id'] = UID;
+            $sdata['way'] = $data['way']==0?1:2;
+            $sdata['call_count'] = $data['call_count'];
+            // if ($sdata['way']==1) {
+            //         //平均分处理
+            //     $userCts = count($data['user_ids']);
+            //     $custCts = count($data['custom_ids']);
+            //     $average = ceil($custCts/$userCts);
+            //     $custCtarr = array_chunk($data['custom_ids'], $average);
+            //     // $s = [];
+            //     $r = [];
+            //     foreach ($custCtarr as $key => $value) {
+            //         // $s[$key]['user_id'] = $data['user_ids'][$key];
+            //         // $s[$key]['custom_id'] = $value;
+            //         $cc = count($value);
+            //         for ($i=0; $i < $cc; $i++) { 
+            //             $rs['custom_id'] = $value[$i];
+            //             $rs['user_id'] = $data['user_ids'][$key];
+            //             $rs['alloc_id'] = 1;
+            //             $rs['call_count'] = $data['call_count'];
+            //             $rs['create_time'] = time();
+            //             array_push($r,$rs);
+            //         }
+            //     }
+                
+                
+            // }
+            // if ($sdata['way']==2) {
+            //     $custCts = count($data['custom_id']);
+            //     $r = [];
+            //     for ($i=0; $i < $custCts; $i++) { 
+            //         $r[$i]['custom_id'] = $data['custom_id'][$i];
+            //         $r[$i]['user_id'] = $data['user_id'];
+            //         $r[$i]['alloc_id'] = 1;
+            //         $r[$i]['call_count'] = $data['call_count'];
+            //         $r[$i]['create_time'] = time();
+            //     } 
+            // }
+
+            // print_r($r);exit;
+            if ($props = AllocModel::create($sdata)) {
+                $insert_id = $props->id;
+                //分配处理
+                
+                if ($sdata['way']==1) {
+                    //平均分处理
+                    $userCts = count($data['user_ids']);
+                    $custCts = count($data['custom_ids']);
+                    $average = ceil($custCts/$userCts);
+                    $custCtarr = array_chunk($data['custom_ids'], $average);
+                    // $s = [];
+                    $r = [];
+                    foreach ($custCtarr as $key => $value) {
+                        // $s[$key]['user_id'] = $data['user_ids'][$key];
+                        // $s[$key]['custom_id'] = $value;
+                        $cc = count($value);
+                        for ($i=0; $i < $cc; $i++) { 
+                            $rs['custom_id'] = $value[$i];
+                            $rs['user_id'] = $data['user_ids'][$key];
+                            $rs['alloc_id'] = $insert_id;
+                            // $rs['call_count'] = $data['call_count'];
+                            $rs['create_time'] = time();
+                            array_push($r,$rs);
+                        }
+                    }
+                    
+                    
+                }
+                if ($sdata['way']==2) {
+                    $custCts = count($data['custom_id']);
+                    $r = [];
+                    for ($i=0; $i < $custCts; $i++) { 
+                        $r[$i]['custom_id'] = $data['custom_id'][$i];
+                        $r[$i]['user_id'] = $data['user_id'];
+                        $r[$i]['alloc_id'] = $insert_id;
+                        // $r[$i]['call_count'] = $data['call_count'];
+                        $r[$i]['create_time'] = time();
+                    } 
+                }
+                $Alloclg = new AlloclgModel;
+                $Alloclg->saveAll($r);
+
+                if ($sdata['way']==1) {
+                    $mp['id'] = array('in',$data['custom_ids']);
+                    CustomModel::where($mp)->update(['status'=>2]);
+                }
+                if ($sdata['way']==2) {
+                     $mp['id'] = array('in',$data['custom_id']);
+                    CustomModel::where($mp)->update(['status'=>2]);
+                }
+               
                 $this->success('新增成功', url('index'));
             } else {
                 $this->error('新增失败');
             }
         }
 
+        $custom =  CustomModel::where(['status'=>1])->column('id,name');
+        $map['id'] = array('>',1);
+        $user =  UserModel::where($map)->column('id,username');
+
+        // $columns = [
+        //     'id'=>'ID',
+        //     'name'=>'客户名称',
+        //     'tel'=>'客户电话',
+        //     'mobile'=>'客户手机'
+        // ];
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
+                ['text', 'call_count', '呼叫次数'],
+                ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+                // ['number', 'alloc_count', '设置分配数量'],
+                ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+
+                ['select', 'user_id', '选择员工', '', $user],
+                ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+
+                // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
             ])
+
+            ->setTrigger('way', 1, 'custom_id,user_id')
+            ->setTrigger('way', 0, 'custom_ids,user_ids')
             ->fetch();
     }
     /**
@@ -100,6 +263,7 @@ class Alloc extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+
             $data['start_time'] =strtotime($data['start_time']);
             $data['end_time'] =  strtotime($data['end_time']);
             if (AuthModel::update($data)) {
@@ -109,21 +273,28 @@ class Alloc extends Admin
             }
         }
         
+        $custom =  CustomModel::where(['status'=>1])->column('id,name');
+        $map['id'] = array('>',1);
+        $user =  UserModel::where($map)->column('id,username');
 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
+                ['text', 'call_count', '呼叫次数'],
+                ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+                // ['number', 'alloc_count', '设置分配数量'],
+                ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+
+                ['select', 'user_id', '选择员工', '', $custom],
+                ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
 
             ])
-            ->setFormData(AuthModel::get($id))
+            ->setTrigger('way', 1, 'custom_id,user_id')
+            ->setTrigger('way', 0, 'custom_ids,user_ids')
+            ->setFormData(AllocModel::get($id))
             ->fetch();
     }
 

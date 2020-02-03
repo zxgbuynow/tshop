@@ -24,7 +24,7 @@ class Speechcraft extends Admin
         $map = $this->getMap();
 
         // 数据列表
-        $data_list = SpeechcraftModel::where($map)->order('id desc')->paginate();
+        $data_list = SpeechcraftModel::where($map)->order('sort ASC')->paginate();
 
         // 分页数据
         $page = $data_list->render();
@@ -44,7 +44,7 @@ class Speechcraft extends Admin
                 ['id', 'ID'],
                 ['project', '项目'],
                 ['title', '名称'],
-                ['order', '排序'],
+                ['sort', '排序'],
                 ['create_time', '创建时间','datetime'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
@@ -63,30 +63,35 @@ class Speechcraft extends Admin
      */
     public function add()
     {
+      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '话术id',
+  // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
+  // `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
+  // `order` int(10) unsigned DEFAULT '0' COMMENT '排序',
+  // `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
+  // `create_time` int(10) unsigned DEFAULT NULL,
+  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if ($props = AuthModel::create($data)) {
+            $data['create_time'] =  time();
+            if ($props = SpeechcraftModel::create($data)) {
                 $this->success('新增成功', url('index'));
             } else {
                 $this->error('新增失败');
             }
         }
-
+        $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
+                ['select', 'project_id', '项目','',$list_project],
+                ['text', 'title', '名称'],
+                ['number', 'sort', '排序','<code>越小越排前</code>'],
+                ['textarea', 'content', '内容'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
             ])
+            ->addTags('tags', '标签')
             ->fetch();
     }
     /**
@@ -101,30 +106,27 @@ class Speechcraft extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if (AuthModel::update($data)) {
+            if (SpeechcraftModel::update($data)) {
                 $this->success('编辑成功', url('index'));
             } else {
                 $this->error('编辑失败');
             }
         }
-        
+        $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
+                ['select', 'project_id', '项目','',$list_project],
+                ['text', 'title', '名称'],
+                ['number', 'sort', '排序','<code>越小越排前</code>'],
+                ['textarea', 'content', '内容'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
 
             ])
-            ->setFormData(AuthModel::get($id))
+            ->addTags('tags', '标签')
+            ->setFormData(SpeechcraftModel::get($id))
             ->fetch();
     }
 

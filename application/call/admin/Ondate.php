@@ -4,7 +4,7 @@ namespace app\call\admin;
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Ondate as OndateModel;
-
+use app\call\model\Custom as CustomModel;
 /**
  * 首页后台控制器
  */
@@ -75,25 +75,26 @@ class Ondate extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if ($props = AuthModel::create($data)) {
+            $data['sign_time'] =strtotime($data['sign_time']);
+            $data['ondate'] =  strtotime($data['ondate']);
+            $data['create_time'] = time();
+            $result = $this->validate($data, 'Ondate');
+            if(true !== $result) $this->error($result);
+
+            if ($props = OndateModel::create($data)) {
                 $this->success('新增成功', url('index'));
             } else {
                 $this->error('新增失败');
             }
         }
-
+        $userList = CustomModel::where(['status'=>1])->column('id,name');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+                ['select', 'custom_id', '客户','',$userList],
+                ['datetime', 'sign_time', '录入时间'],
+                ['datetime', 'ondate', '预约时间'],
+                ['radio', 'status', '立即启用', '', ['待回访', '已回访'], 1],
             ])
             ->fetch();
     }
@@ -109,30 +110,29 @@ class Ondate extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if (AuthModel::update($data)) {
+            $data['sign_time'] =strtotime($data['sign_time']);
+            $data['ondate'] =  strtotime($data['ondate']);
+
+            $result = $this->validate($data, 'Ondate');
+            if(true !== $result) $this->error($result);
+
+            if (OndateModel::update($data)) {
                 $this->success('编辑成功', url('index'));
             } else {
                 $this->error('编辑失败');
             }
         }
-        
+        $userList = CustomModel::where(['status'=>1])->column('id,name');
 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['hidden', 'id'],
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
-
+                ['select', 'custom_id', '客户','',$userList],
+                ['datetime', 'sign_time', '录入时间'],
+                ['datetime', 'ondate', '预约时间'],
+                ['radio', 'status', '立即启用', '', ['待回访', '已回访'], 1],
             ])
-            ->setFormData(AuthModel::get($id))
+            ->setFormData(OndateModel::get($id))
             ->fetch();
     }
 

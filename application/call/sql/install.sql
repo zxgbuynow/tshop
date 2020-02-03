@@ -134,6 +134,7 @@ CREATE TABLE `zg_call_alloc_log` (
   `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
   `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
+  `alloc_count` int(10) unsigned DEFAULT '1' COMMENT '分配次数',
   `create_time` int(10) unsigned DEFAULT NULL,
   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
   PRIMARY KEY (`id`)
@@ -142,7 +143,7 @@ CREATE TABLE `zg_call_alloc_log` (
 
 DROP TABLE IF EXISTS `zg_call_recover_data`;
 CREATE TABLE `zg_call_recover_data` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '回收id',
   `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
   `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
   `create_time` int(10) unsigned DEFAULT NULL,
@@ -159,6 +160,7 @@ CREATE TABLE `zg_call_speechcraft` (
   `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
   `order` int(10) unsigned DEFAULT '0' COMMENT '排序',
   `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
+  `tags` varchar(150) COLLATE utf8_unicode_ci COMMENT '标签',
   `create_time` int(10) unsigned DEFAULT NULL,
   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
   PRIMARY KEY (`id`),
@@ -239,6 +241,32 @@ CREATE TABLE `zg_call_ondate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='预约表';
 
+DROP TABLE IF EXISTS `zg_call_notice`;
+CREATE TABLE `zg_call_notice` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '提醒id',
+  `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '标题',
+  `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
+  `way` tinyint(1) DEFAULT '0' COMMENT '0系统1企业微信',
+  `model` tinyint(1) DEFAULT '0' COMMENT '0事件触发1定时触发',
+  `is_admin` tinyint(1) DEFAULT '1' COMMENT '0指定人员1管理员',
+  `tags` varchar(150) COLLATE utf8_unicode_ci NULL COMMENT '标签',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1' COMMENT '0删除1正常',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='提醒表';
+
+
+DROP TABLE IF EXISTS `zg_call_notice_log`;
+CREATE TABLE `zg_call_notice_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '提醒日志id',
+  `notice_id` int(10) unsigned DEFAULT '0' COMMENT '提醒id',
+  `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
+  `is_read` tinyint(1) DEFAULT '0' COMMENT '0否1是',
+  `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '标题',
+  `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='提醒日志表';
 
 DROP TABLE IF EXISTS `zg_call_auth`;
 CREATE TABLE `zg_call_auth` (

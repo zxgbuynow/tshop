@@ -125,11 +125,12 @@ class Excel extends Common
      * @param int $type 导入模式，0默认为增量导入（导入并跳过已存在的数据），1为覆盖导入（导入并覆盖已存在的数据）
      * @param null $where 查询依据，做配合查询使用
      * @param null $main_field 作为判断导入模式依据的主要字段，比如指定为KSH，则用KSH这个字段来判断是否已存在数据库
+     * @param null $second_field 用于铺助判断主要字段是否存存
      * @author HongPing <hongping626@qq.com>
      * @alter 蔡伟明 <314013107@qq.com>
      * @return array
      */
-    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null)
+    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null, $second_field = null)
     {
         if(!file_exists($file)){
             return ["error" => 1, 'message' => '文件未找到!']; //file not found!
@@ -140,7 +141,6 @@ class Excel extends Common
         if ($file_ext != 'xls' && $file_ext != 'xlsx') {
             return ["error" => 1, 'message' => '文件类型不正确!'];
         }
-
         $file_type = $file_ext == 'xls' ? 'Excel5' : 'Excel2007';
 
         $objReader = \PHPExcel_IOFactory::createReader($file_type); //需要在前面加反斜杠，因为命名空间
@@ -248,13 +248,13 @@ class Excel extends Common
 
         //查询已经存在的数据，用于判断导入模式做对比
         $exists_list = Db::name($table)->where($where)->group($main_field)->column($main_field);
-
         //整理数据
         $fields    = array_flip($fields); //反转键值
         $data_list = [];
         $dataAdd['list']   = [];
         $dataCover['list'] = [];
         $dataSkip['list']  = [];
+        $isget = 0;
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -274,7 +274,12 @@ class Excel extends Common
                             $data[$firstRow[$index]] = trim($val);
                         }
                     }
-
+                    //按second_feild过滤 妖孽代码
+                    if ($second_field&&$isget==0) {
+                        $where[$second_field] = $data[$second_field];
+                        $exists_list = Db::name($table)->where($where)->group($main_field)->column($main_field);
+                        $isget = 1;
+                    }
                     // 判断导入模式
                     if ($type == 0) {//增量导入
                         if (in_array($data[$main_field], $exists_list)) {
@@ -314,7 +319,7 @@ class Excel extends Common
                 return ["error" => 9, 'message' => '导入失败!请重新导入。'];
             }
         } else {
-            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!','tabNm'=>$sheet_name,'rate'=>'100%'];
+            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!','tabNm'=>$sheet_name,'rate'=>'0%'];
         }
     }
 

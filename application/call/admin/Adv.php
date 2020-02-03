@@ -58,9 +58,13 @@ class Adv extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if ($props = AuthModel::create($data)) {
+            $data['create_time'] =  time();
+            $data['start_time'] = strtotime($data['start_time']);
+            $data['end_time'] = strtotime($data['end_time']);
+            $result = $this->validate($data, 'Adv');
+            if(true !== $result) $this->error($result);
+
+            if ($props = AdvModel::create($data)) {
                 $this->success('新增成功', url('index'));
             } else {
                 $this->error('新增失败');
@@ -70,10 +74,8 @@ class Adv extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
+                ['text', 'title', '标题'],
+                ['textarea', 'content', '内容'],
                 ['datetime', 'start_time', '开始时间'],
                 ['datetime', 'end_time', '结束时间'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
@@ -92,9 +94,11 @@ class Adv extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if (AuthModel::update($data)) {
+            $data['start_time'] = strtotime($data['start_time']);
+            $data['end_time'] = strtotime($data['end_time']);
+            $result = $this->validate($data, 'Adv');
+            if(true !== $result) $this->error($result);
+            if (AdvModel::update($data)) {
                 $this->success('编辑成功', url('index'));
             } else {
                 $this->error('编辑失败');
@@ -106,16 +110,15 @@ class Adv extends Admin
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
+                ['text', 'title', '标题'],
+                ['textarea', 'content', '内容'],
                 ['datetime', 'start_time', '开始时间'],
                 ['datetime', 'end_time', '结束时间'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
 
             ])
-            ->setFormData(AuthModel::get($id))
+            // ->addWangeditor('content', '内容')
+            ->setFormData(AdvModel::get($id))
             ->fetch();
     }
 
@@ -129,8 +132,8 @@ class Adv extends Admin
     public function setStatus($type = '', $record = [])
     {
         $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
-        $menu_title = AuthModel::where('id', 'in', $ids)->column('custom');
-        return parent::setStatus($type, ['call_auth_'.$type, 'call', 0, UID, implode('、', $menu_title)]);
+        $menu_title = AdvModel::where('id', 'in', $ids)->column('title');
+        return parent::setStatus($type, ['call_adv_'.$type, 'call', 0, UID, implode('、', $menu_title)]);
     }
     /**
      * 快速编辑

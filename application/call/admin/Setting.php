@@ -23,12 +23,13 @@ class Setting extends Admin
         if ($this->request->isPost()) {
             $data = $this->request->post();
             if ($group=='tab1') {
-                config('msg_username',$data['msg_username']);
-                config('msg_pwd',$data['msg_pwd']);
+                plugin_config('sms.appkey',$data['appkey']);
+                plugin_config('sms.secret',$data['secret']);
             }
             if ($group=='tab2') {
-                config('wechat_key',$data['wechat_key']);
-                config('wechat_Appsecret',$data['wechat_Appsecret']);
+                plugin_config('wechat.CORP_ID',$data['CORP_ID']);
+                plugin_config('wechat.APP_ID',$data['APP_ID']);
+                plugin_config('wechat.APP_SECRET',$data['APP_SECRET']);
             }
             
             $this->success('操作成功', cookie('__forward__'));
@@ -36,12 +37,11 @@ class Setting extends Admin
 
         // 获取数据
         $info = [
-            'msg_username'=>config('msg_username'),
-            'msg_pwd'=>config('msg_pwd'),
-            'wechat_key'=>config('wechat_key'),
-            'wechat_Appsecret'=>config('wechat_Appsecret')
+            // 'msg_username'=>config('msg_username'),
+            // 'msg_pwd'=>config('msg_pwd'),
+            // 'wechat_key'=>config('wechat_key'),
+            // 'APP_SECRET'=>plugin_config('APP_SECRET')
         ];
-
         $list_tab = [
             'tab1' => ['title' => '短信配置', 'url' => url('index', ['group' => 'tab1'])],
             'tab2' => ['title' => '微信配置', 'url' => url('index', ['group' => 'tab2'])],
@@ -53,8 +53,8 @@ class Setting extends Admin
                 ->setPageTitle('短信配置') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
                 ->addFormItems([ // 批量添加表单项
-                    ['text', 'msg_username', 'msg_username', '短信用户名'],
-                    ['text', 'msg_pwd', 'msg_pwd', '短信用户密码'],
+                    ['text', 'appkey', 'appkey', 'appkey',plugin_config('sms')['appkey']],
+                    ['text', 'secret', 'secret', 'secret', plugin_config('sms')['secret']],
                     
                 ])
                 ->setFormData($info) // 设置表单数据
@@ -66,8 +66,9 @@ class Setting extends Admin
                 ->setPageTitle('微信配置') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
                 ->addFormItems([ // 批量添加表单项
-                    ['text', 'wechat_key', 'wechat_key', 'Key微信'],
-                    ['text', 'wechat_Appsecret', 'wechat_Appsecret', 'Appsecret微信'],
+                    ['text', 'CORP_ID', 'CORP_ID', '', plugin_config('wechat')['CORP_ID']],
+                    ['text', 'APP_ID', 'APP_ID', '', plugin_config('wechat')['APP_ID']],
+                    ['text', 'APP_SECRET', 'APP_SECRET', '', plugin_config('wechat')['APP_SECRET']],
                 ])
                 ->setFormData($info) // 设置表单数据
                 ->fetch();

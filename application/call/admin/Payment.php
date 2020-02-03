@@ -29,16 +29,7 @@ class Payment extends Admin
         // 分页数据
         $page = $data_list->render();
 
-  //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单回款id',
-  // `trade_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `price` decimal(20,3) NOT NULL COMMENT '回款金额',
-  // `type` tinyint(1) DEFAULT '1' COMMENT '1订金 2货款 3尾款',
-  // `brank_account` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
-  // `is_notice` tinyint(1) DEFAULT '0' COMMENT '1已提醒',
-  // `notice_time` int(10) unsigned DEFAULT NULL,
-  // `sign_time` int(10) unsigned DEFAULT NULL,
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+  
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -49,10 +40,13 @@ class Payment extends Admin
                 ['price', '金额'],
                 ['type', '回款类型',['','订金','货款','尾款']],
                 ['brank_account', '客户账号'],
-                ['notice_time', '提醒时间','datetime'],
+                ['is_notice', '是否提醒',['否','是']],
                 ['sign_time', '回款时间','datetime'],
-                ['create_time', '创建时间','datetime']
+                ['create_time', '创建时间','datetime'],
+                ['right_button', '操作', 'btn']
             ])
+            ->addTopButton('add')
+            ->addRightButton('edit')
             ->setRowList($data_list)// 设置表格数据
             ->raw('trade') // 使用原值
             ->fetch(); // 渲染模板
@@ -69,25 +63,37 @@ class Payment extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if ($props = AuthModel::create($data)) {
+            $data['sign_time'] =strtotime($data['sign_time']);
+            $data['create_time'] = time();
+            if ($props = PaymentModel::create($data)) {
                 $this->success('新增成功', url('index'));
             } else {
                 $this->error('新增失败');
             }
         }
 
+        //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单回款id',
+  // `trade_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
+  // `price` decimal(20,3) NOT NULL COMMENT '回款金额',
+  // `type` tinyint(1) DEFAULT '1' COMMENT '1订金 2货款 3尾款',
+  // `brank_account` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
+  // `is_notice` tinyint(1) DEFAULT '0' COMMENT '1已提醒',
+  // `notice_time` int(10) unsigned DEFAULT NULL,
+  // `sign_time` int(10) unsigned DEFAULT NULL,
+  // `create_time` int(10) unsigned DEFAULT NULL,
+  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+
+        $list_trade = db('call_trade')->where(['status'=>'progress'])->column('id,title');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+                ['select', 'trade_id', '订单','',$list_trade],
+                ['text', 'price', '回款金额'],
+                ['radio', 'type', '回款方式', '', [1=>'订金', 2=>'货款', 3=>'尾款'], 1],
+                ['text', 'brank_account', '名称'],
+                ['datetime', 'sign_time', '回款时间'],
+                
+                ['radio', 'status', '状态', '', ['失效', '有效'], 1],
             ])
             ->fetch();
     }
@@ -103,30 +109,29 @@ class Payment extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $data['start_time'] =strtotime($data['start_time']);
-            $data['end_time'] =  strtotime($data['end_time']);
-            if (AuthModel::update($data)) {
+            $data['sign_time'] =strtotime($data['sign_time']);
+            if (PaymentModel::update($data)) {
                 $this->success('编辑成功', url('index'));
             } else {
                 $this->error('编辑失败');
             }
         }
-        
+        $list_trade = db('call_trade')->where(['status'=>'progress'])->column('id,title');
 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['text', 'custom', '客户名'],
-                ['text', 'domain', '域名'],
-                ['text', 'ip', '服务器ID'],
-                ['radio', 'online', '授权方式', '', ['线下', '线上'], 1],
-                ['datetime', 'start_time', '开始时间'],
-                ['datetime', 'end_time', '结束时间'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+                ['select', 'trade_id', '订单','',$list_trade],
+                ['text', 'price', '回款金额'],
+                ['radio', 'type', '回款方式', '', [1=>'订金', 2=>'货款', 3=>'尾款'], 1],
+                ['text', 'brank_account', '名称'],
+                ['datetime', 'sign_time', '回款时间'],
+                
+                ['radio', 'status', '状态', '', ['失效', '有效'], 1],
 
             ])
-            ->setFormData(AuthModel::get($id))
+            ->setFormData(PaymentModel::get($id))
             ->fetch();
     }
 

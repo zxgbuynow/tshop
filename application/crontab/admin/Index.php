@@ -118,7 +118,7 @@ EOF;
             ->setPageTitle('新增')// 设置页面标题
             ->addFormItems([ // 批量添加表单项
                 ['text', 'title', '任务标题'],
-                ['select', 'type', '类型', '1. URL类型分为两种，一是完整的URL地址，如： <code>http://www.daguanxl.com</code> ；二是本地路径 <code>/模块名/控制器名/方法名</code>，如：<code>/index/index/test</code><br />2. 如果你的服务器 php.ini 未开启 <code>shell_exec()</code> 函数，则不能使用本地URL类型模式和Shell类型！', ['url' => '请求URL', 'sql' => '执行SQL', 'shell' => '执行Shell'], 'url'],
+                ['select', 'type', '类型', '1. URL类型分为两种，一是完整的URL地址，如： <code>http://www.dolphinphp.com/download.html</code> ；二是本地路径 <code>/模块名/控制器名/方法名</code>，如：<code>/index/index/test</code><br />2. 如果你的服务器 php.ini 未开启 <code>shell_exec()</code> 函数，则不能使用本地URL类型模式和Shell类型！', ['url' => '请求URL', 'sql' => '执行SQL', 'shell' => '执行Shell'], 'url'],
                 ['textarea', 'content', '内容', ''],
                 ['text', 'schedule', '执行周期', '请使用 <code>Cron</code> 表达式', '* * * * *', [], 'style="font-size:12px;font-family: Verdana;word-spacing:23px;"'],
                 ['number', 'maximums', '最大执行次数', '0为不限次数', '0'],

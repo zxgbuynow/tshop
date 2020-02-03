@@ -5,7 +5,10 @@ use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Custom as CustomModel;
 use app\call\model\CustomEXLog as CustomEXLogModel;
-
+use app\call\model\Recoverdt as RecoverdtModel;
+use app\admin\model\Config as ConfigModel;
+use think\Cache;
+use think\Db;
 /**
  * 首页后台控制器
  */
@@ -24,6 +27,7 @@ class Custom extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
+
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate();
 
@@ -32,6 +36,7 @@ class Custom extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+
             ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
@@ -46,11 +51,11 @@ class Custom extends Admin
                 ['fee', '成本'],
                 ['extend_url', '推广链接'],
                 ['create_time', '创建时间','datetime'],
-                ['status', '状态', 'switch'],
-                ['right_button', '操作', 'btn']
+                // ['status', '状态', 'switch'],
+                // ['right_button', '操作', 'btn']
             ])
             // ->addTopButton('add', ['href' => url('add')])
-            ->addRightButton('del')
+            // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
@@ -76,8 +81,13 @@ class Custom extends Admin
 
         $btn_access = [
             'title' => '导入',
-            'icon'  => 'fa fa-fw fa-export',
-            'href' => url('exportCus')
+            'icon'  => 'glyphicon glyphicon-cloud-upload',
+            'href' => url('importCus')
+        ];
+        $btn_down = [
+            'title' => '下载模板',
+            'icon'  => 'fa fa-fw fa-cloud-download',
+            'href' => url('downtmp')
         ];
 
   //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '客户导入日志id',
@@ -87,6 +97,7 @@ class Custom extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+            ->setPageTips('下载模板时，请填充对应的项目ID号','danger')
             ->setSearch(['title'=>'客户导入日志表'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
@@ -94,10 +105,44 @@ class Custom extends Admin
                 ['rate', '净得率']
             ])
             ->addTopButton('custom', $btn_access)
+            ->addTopButton('custom', $btn_down)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
+    /**
+     * [btn_down description]
+     * @return [type] [description]
+     */
+    public function downtmp()
+    {
+        // 查询数据
+        $data = db('call_custom')->limit(1)->select();
+        foreach ($data as $key => &$value) {
+            $value['project_id'] = 1;
+        }
+        // $data['project_id'] = 1;
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['id', 'auto','ID'],
+            ['project_id', 'auto','项目ID'],
+            ['name', 'auto','客户名称'],
+            ['tel', 'auto','客户电话'],
+            ['mobile', 'auto','客户手机'],
+            ['source', 'auto','来源'],
+            ['email', 'auto','邮箱'],
+            ['address', 'auto','地址'],
+            ['note_time', 'auto','记录时间'],
+            ['note_area','auto', '记录地区'],
+            ['fee', 'auto','成本'],
+            ['extend_url', 'auto','推广链接'],
+            ['create_time', 'auto','创建时间']
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['客户模板表', $cellName, $data]);
+        
+    }
+
 
     /**
      * [importCus 导入]
@@ -111,19 +156,10 @@ class Custom extends Admin
             $excel_file = $this->request->post('excel');
             // 获取附件 ID 完整路径
             $full_path = getcwd() . get_file_path($excel_file);
-            // `name` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '客户名称',
-            //  `tel` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '客户电话',
-            //   `mobile` varchar(20) COLLATE utf8_unicode_ci NOT NULL COMMENT '客户手机',
-            //   `note_time` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '记录时间',
-            //   `note_area` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '记录地区',
-            //   `source` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '来源',
-            //   `extend_url` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '推广链接',
-            //   `policy` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '政策',
-            //   `fee` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '成本',
-            //   `address` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '地址',
-            //   `email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '邮箱',
+            
             // 只导入的字段列表
             $fields = [
+                'project_id' => '项目ID',
                 'name' => '客户名称',
                 'tel' => '客户电话',
                 'mobile' => '客户手机',
@@ -137,24 +173,25 @@ class Custom extends Admin
                 'email' => '邮箱'
             ];
             // 调用插件('插件',[路径,导入表名,字段限制,类型,条件,重复数据检测字段])
-            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile']);
+            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile'], $second_field = 'project_id');
 
             
             // 失败或无数据导入 计算净得率
             if ($import['error']){
-                if ($import['error']==9) {
+                if ($import['error']==10) {
                     $s['rate'] = $import['rate'];
-                    $s['title'] = $import['tabNm'];
-                    CustomEXLogModel::insert($s);
+                    // $s['title'] = $import['tabNm'];
+                    $s['title'] = get_file_name($excel_file);
+                    CustomEXLogModel::create($s);
                 }
-                $this->error($import['message']);
+                $this->error($import['message'], url('import'));
             }
 
             $s['rate'] = '100%';
-            $s['title'] = $import['tabNm'];
-            CustomEXLogModel::insert($s);
+            $s['title'] = get_file_name($excel_file);
+            CustomEXLogModel::create($s);
             // 导入成功
-            $this->success($import['message']);
+            $this->success($import['message'], url('import'));
         }
         // 创建演示用表单
         return ZBuilder::make('form')
@@ -171,30 +208,35 @@ class Custom extends Admin
      */
     public function backst()
     {
-        cookie('__forward__', $_SERVER['REQUEST_URI']);
+        // cookie('__forward__', $_SERVER['REQUEST_URI']);
 
 
         // 保存数据
         if ($this->request->isPost()) {
             $data = $this->request->post();
-            config('recover_data_hour',$data['recover_data_hour']);
-            $this->success('操作成功', cookie('__forward__'));
+            // Cache::set('recover_data_hour', $data['recover_data_hour']);
+            // config('recover_data_hour',$data['recover_data_hour']);
+            $map['name'] = 'recover_data_hour';
+            $sdata['value'] = $data['recover_data_hour'];
+            ConfigModel::where($map)->update($sdata);
+            // plugin_config('other.recover_data_hour',$data['recover_data_hour']);
+            $this->success('操作成功');
+        }else{
+            // 获取数据
+            $info = [
+                'recover_data_hour'=>Cache::get('recover_data_hour')?Cache::get('recover_data_hour'):'',
+            ];
+            // 使用ZBuilder快速创建表单
+            return ZBuilder::make('form')
+                ->setPageTitle('回收配置') // 设置页面标题
+                ->addFormItems([ // 批量添加表单项
+                    ['text', 'recover_data_hour', '回收设置', '超过X小时自动回收数据',config('recover_data_hour')],
+                ])
+                ->setFormData() // 设置表单数据
+                ->fetch();
         }
 
-        // 获取数据
-        $info = [
-            'recover_data_hour'=>config('recover_data_hour'),
-        ];
-
-       
-        // 使用ZBuilder快速创建表单
-        return ZBuilder::make('form')
-            ->setPageTitle('回收配置') // 设置页面标题
-            ->addFormItems([ // 批量添加表单项
-                ['text', 'recover_data_hour', '回收设置', '超过X小时自动回收数据',''],
-            ])
-            ->setFormData($info) // 设置表单数据
-            ->fetch();
+        
 
     }
     /**
@@ -216,7 +258,7 @@ class Custom extends Admin
         if ($group=='tab1') {
             $map['status'] = 1;
             // 数据列表
-            $data_list = CustomModel::where($map)->order('id desc')->paginate();
+            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
 
             // 分页数据
             $page = $data_list->render();
@@ -242,7 +284,7 @@ class Custom extends Admin
                 ])
 
                 // ->addTopButton('add', ['href' => url('add')])
-                ->addRightButton('del')
+                ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
                 ->raw('project,custom') // 使用原值
                 ->fetch(); // 渲染模板
@@ -252,7 +294,7 @@ class Custom extends Admin
         if ($group=='tab2') {
             $map['status'] = 9;
             // 数据列表
-            $data_list = CustomModel::where($map)->order('id desc')->paginate();
+            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
 
             // 分页数据
             $page = $data_list->render();
@@ -278,7 +320,7 @@ class Custom extends Admin
                 ])
 
                 // ->addTopButton('add', ['href' => url('add')])
-                ->addRightButton('del')
+                ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
                 ->raw('project,custom') // 使用原值
                 ->fetch(); // 渲染模板

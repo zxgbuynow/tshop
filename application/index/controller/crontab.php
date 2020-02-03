@@ -2,7 +2,7 @@
 
 
 namespace app\index\controller;
-
+use app\call\model\Recoverdt as RecoverdtModel;
 use \think\Request;
 use \think\Db;
 use think\Model;
@@ -33,10 +33,48 @@ class Crontab
         }
     }
 
+
+    /**
+     * [recoverTask description]
+     * @return [type] [description]
+     */
+    public function recoverTask()
+    {
+        //分配日志
+        $recoverHour = config('recover_data_hour')?config('recover_data_hour'):0;
+        if (!$recoverHour) {
+            error_log('NOT SET RECOVER HOUR RECOVERTASK_'.time(),3,'/data/httpd/tshop/public/task.log');
+            echo 'succ';exit;
+        }
+        //回收数据 分配任务状态修改 客户状态修改
+        $diff = time()-$recoverHour*60*60;
+        $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
+        if (!$userInfo) {
+            error_log('NOT MODIF CUSTOM RECOVERTASK_'.time(),3,'/data/httpd/tshop/public/task.log');
+            echo 'succ';exit;
+        }
+        db('call_alloc_log')->whereTime('create_time','<',$diff)->update(['status'=>0]);
+        $map['id'] = array('in',array_column($userInfo, 'custom_id'));
+        db('call_custom')->where($map)->update(['status'=>1]);
+        //回收列表
+        $customs = array_column($userInfo, 'custom_id');
+        foreach ($customs as $key => $value) {
+            $sv[$key]['custom_id'] = $value;
+            $sv[$key]['create_time'] = time();
+        }
+        error_log('NOT MODIF CUSTOM RECOVERTASK_'.time().json_encode($sv),3,'/data/httpd/tshop/public/task.log');
+        $Recoverdt = new RecoverdtModel;
+        $Recoverdt->saveAll($sv);
+        
+        //提醒管理员 tags user_id title content 
+        notice_log('recover',1);
+    }
+
     public function testask()
     {
+        // notice_log('recover',1,['custom'=>'1','project'=>1],true);
 
-        error_log('ts task:'.time(),3,'/data/httpd/daguan/public/task.log');
+        error_log('tsnew task:'.time(),3,'/data/httpd/tshop/public/task.log');
         echo 'succ';
     }  
     /**

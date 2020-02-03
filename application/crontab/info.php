@@ -19,7 +19,7 @@ return [
   'icon' => 'glyphicon glyphicon-time',
   'description' => '模块依赖 composer 组件 <code>mtdowling/cron-expression</code> 和 <code>guzzlehttp/guzzle</code>',
   'author' => '周工',
-  'author_url' => 'http://www.dolphinphp.com/',
+  'author_url' => '',
   'version' => '1.0.0',
   'tables' => [
     'crontab',
