@@ -1,0 +1,25 @@
+2019-06-23 10:30:36 pid:16741 Workerman[start.php] start in DEBUG mode
+2019-06-23 10:46:21 pid:16741 Workerman[start.php] stopping ...
+2019-06-23 10:46:21 pid:16741 worker[PHPSocketIO:16742] exit with status 5247
+2019-06-23 10:46:21 pid:16741 Workerman[start.php] has been stopped
+2019-06-23 16:54:30 pid:3762 Workerman[start.php] start in DEBUG mode
+2019-06-24 14:25:03 pid:5011 Workerman[start.php] start in DAEMON mode
+2019-06-24 14:26:15 pid:5015 Workerman[start.php] stop 
+2019-06-24 14:26:15 pid:5015 Workerman[start.php] not run
+2019-06-24 14:26:20 pid:5016 Workerman[start.php] start in DEBUG mode
+2019-06-24 14:27:19 pid:2571 Workerman[start.php] start in DEBUG mode
+2019-06-25 08:46:34 pid:2634 Workerman[start.php] stop 
+2019-06-25 08:46:34 pid:2634 Workerman[start.php] is stopping ...
+2019-06-25 08:46:39 pid:2634 Workerman[start.php] stop fail
+2019-06-25 08:46:44 pid:2571 Workerman[start.php] stopping ...
+2019-06-25 08:46:44 pid:2571 Workerman[start.php] stopping ...
+2019-06-25 08:46:44 pid:2571 Workerman[start.php] has been stopped
+2019-07-18 09:28:25 pid:2577 Workerman[start.php] start in DAEMON mode
+2019-07-24 14:39:52 pid:3967 Workerman[start.php] start in DAEMON mode
+2020-02-01 20:38:49 pid:21074 Workerman[start.php] start in DAEMON mode
+2020-02-01 20:39:03 pid:21173 Workerman[start.php] stop 
+2020-02-01 20:39:03 pid:21173 Workerman[start.php] is stopping ...
+2020-02-01 20:39:03 pid:21076 Workerman[start.php] stopping ...
+2020-02-01 20:39:03 pid:21076 Workerman[start.php] has been stopped
+2020-02-01 20:39:03 pid:21173 Workerman[start.php] stop success
+2020-02-02 20:48:17 pid:15018 Workerman[start.php] start in DAEMON mode
