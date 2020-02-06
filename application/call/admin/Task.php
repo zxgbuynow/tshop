@@ -32,7 +32,8 @@ class Task extends Admin
     
         $btn_access = [
             'title' => '呼叫',
-            'icon'  => 'fa fa-fw fa-whatsapp',
+            'icon'  => 'fa fa-fw fa-whatsapp ',
+            'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('call',['id'=>'__id__'])
         ];
 
@@ -49,7 +50,7 @@ class Task extends Admin
                 ['right_button', '操作', 'btn']
             ])
             // ->addTopButton('add', ['href' => url('add')])
-            ->addRightButton('custom',$btn_access)
+            ->addRightButton('custom',$btn_access, ['area' => ['800px', '90%'], 'title' => '客户信息'])
             ->setRowList($data_list)// 设置表格数据
             ->raw('custom') // 使用原值
             ->fetch(); // 渲染模板
@@ -63,7 +64,28 @@ class Task extends Admin
      */
     public function call($id = null)
     {
-      $this->success('呼叫成功', url('index'));
+        if ($id === null) $this->error('缺少参数');
+
+        $info = db('call_alloc_log')->where(['status'=>'progress'])->value('custom_id');
+        //通话 
+        $data['phone'] = isset(get_mobile($info['custom_id'])['mobile'])?get_mobile($info['custom_id'])['mobile']:get_mobile($info['custom_id'])['tel'];
+        $data['callback'] = 'cb_callout';
+        
+        $ret = ring_up('callout',$data);
+
+        if ($ret) {
+            $result = [];
+            preg_match_all("/(?:\()(.*)(?:\))/i",$ret, $result); 
+            $json =json_decode($result[1][0],true);
+
+            if ($json['status']==1) {
+                //显示客户信息
+                echo '<h1>呼叫成功</h1>';exit;
+            }else{
+                echo '<h1>呼叫失败</h1>';exit;
+            }
+        }
+        
     }
     
 

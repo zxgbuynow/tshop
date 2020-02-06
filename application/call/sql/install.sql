@@ -268,6 +268,25 @@ CREATE TABLE `zg_call_notice_log` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='提醒日志表';
 
+DROP TABLE IF EXISTS `zg_call_log`;
+CREATE TABLE `zg_call_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '提醒日志id',
+  `alloc_log_id` int(10) unsigned DEFAULT '0' COMMENT '提醒id',
+  `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
+  `followId` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '跟进ID',
+  `callType` tinyint(1) DEFAULT '1' COMMENT '呼叫类型1已接来电;2已拨电话;3未接来电4未接去电',
+  `callerNum` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '主叫号码',
+  `calledNum` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '被叫号码',
+  `startTime` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '开始通话时间',
+  `timeLength` int(10) unsigned DEFAULT '0' COMMENT '通话时长 秒',
+  `code` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '通话唯一标识',
+  `recordURL` varchar(150) COLLATE utf8_unicode_ci NOT NULL COMMENT '录音地址',
+  `ownerAcc` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '所有者帐号',
+  `communicationNO` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '通信号码',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='通讯记录表';
+
 DROP TABLE IF EXISTS `zg_call_auth`;
 CREATE TABLE `zg_call_auth` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '授权id',
@@ -280,6 +299,15 @@ CREATE TABLE `zg_call_auth` (
   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='授权表';
+
+DROP TABLE IF EXISTS `zg_call_custom_cat`;
+CREATE TABLE `zg_call_custom_cat` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '授权id',
+  `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '客户名称',
+  `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='客户分类表';
 
 DROP TABLE IF EXISTS `zg_call_webchat`;
 CREATE TABLE `zg_call_webchat` (

@@ -8,10 +8,176 @@
 </div>
 {/notempty}
 
-<div class="jumbotron">
-  <h1>Hello, world!</h1>
-  <p>This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information</p>
-  <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>
+<link rel="stylesheet" href="__HOME_CSS__/css/style.css">
+<style type="text/css">
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: $card-border-width solid $card-border-color;
+  @include border-radius($card-border-radius);
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: $card-spacer-x;
+}
+
+.card-title {
+  margin-bottom: $card-spacer-y;
+}
+
+.card-subtitle {
+  margin-top: -($card-spacer-y / 2);
+  margin-bottom: 0;
+}
+
+.card-text:last-child {
+  margin-bottom: 0;
+}
+.page-wrapper{
+	margin-left: 0px
+}
+</style>
+<div class="page-wrapper">
+    <!-- ============================================================== -->
+    <!-- Container fluid  -->
+    <!-- ============================================================== -->
+    <div class="container-fluid">
+        <!-- ============================================================== -->
+        <!-- Projects of the month -->
+        <!-- ============================================================== -->
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div>
+                                <h4 class="card-title"><span class="lstick"></span>Projects of the Month</h4></div>
+                        </div>
+                        <div class="table-responsive m-t-20">
+                            <table class="table vm no-th-brd no-wrap pro-of-month">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Assigned</th>
+                                        <th>Name</th>
+                                        <th>Priority</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width:50px;"><span class="round"><img src="../assets/images/users/1.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Sunil Joshi</h6><small class="text-muted">Web Designer</small></td>
+                                        <td>Elite Admin</td>
+                                        <td>Low</td>
+                                    </tr>
+                                    <tr class="active">
+                                        <td><span class="round"><img src="../assets/images/users/2.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Andrew</h6><small class="text-muted">Project Manager</small></td>
+                                        <td>Real Homes</td>
+                                        <td>Medium</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-success"><img src="../assets/images/users/3.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Bhavesh patel</h6><small class="text-muted">Developer</small></td>
+                                        <td>MedicalPro Theme</td>
+                                        <td>High</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-primary"><img src="../assets/images/users/4.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Nirav Joshi</h6><small class="text-muted">Frontend Eng</small></td>
+                                        <td>Elite Admin</td>
+                                        <td>Low</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-warning"><img src="../assets/images/users/5.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Micheal Doe</h6><small class="text-muted">Content Writer</small></td>
+                                        <td>Helping Hands</td>
+                                        <td>High</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <div>
+                                <h4 class="card-title"><span class="lstick"></span>Projects of the Month</h4></div>
+                        </div>
+                        <div class="table-responsive m-t-20">
+                            <table class="table vm no-th-brd no-wrap pro-of-month">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2">Assigned</th>
+                                        <th>Name</th>
+                                        <th>Priority</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width:50px;"><span class="round"><img src="../assets/images/users/1.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Sunil Joshi</h6><small class="text-muted">Web Designer</small></td>
+                                        <td>Elite Admin</td>
+                                        <td>Low</td>
+                                    </tr>
+                                    <tr class="active">
+                                        <td><span class="round"><img src="../assets/images/users/2.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Andrew</h6><small class="text-muted">Project Manager</small></td>
+                                        <td>Real Homes</td>
+                                        <td>Medium</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-success"><img src="../assets/images/users/3.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Bhavesh patel</h6><small class="text-muted">Developer</small></td>
+                                        <td>MedicalPro Theme</td>
+                                        <td>High</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-primary"><img src="../assets/images/users/4.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Nirav Joshi</h6><small class="text-muted">Frontend Eng</small></td>
+                                        <td>Elite Admin</td>
+                                        <td>Low</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="round round-warning"><img src="../assets/images/users/5.jpg" alt="user" width="50"></span></td>
+                                        <td>
+                                            <h6>Micheal Doe</h6><small class="text-muted">Content Writer</small></td>
+                                        <td>Helping Hands</td>
+                                        <td>High</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- ============================================================== -->
+        <!-- End Page Content -->
+        <!-- ============================================================== -->
+    </div>
+    
 </div>
 
 

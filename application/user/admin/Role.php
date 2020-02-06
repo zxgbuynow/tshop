@@ -85,7 +85,7 @@ class Role extends Admin
         $menus = cache('access_menus');
         if (!$menus) {
             $sm['status'] = 1;
-            $sm['system_module'] = 0;
+            // $sm['system_module'] = 0;
             $modules = Db::name('admin_module')->where($sm)->column('name');
             $menus = MenuModel::where('module', 'in', $modules)->order('sort,id')->column('id,pid,sort,title,icon');
             $menus = Tree::toLayer($menus);
@@ -141,7 +141,7 @@ class Role extends Admin
         $info       = RoleModel::get($id);
         $role_list  = RoleModel::getTree($id, '顶级角色');
         $sm['status'] = 1;
-        $sm['system_module'] = 0;
+        // $sm['system_module'] = 0;
         $modules    = Db::name('admin_module')->where($sm)->column('name');
 
         $menus      = MenuModel::where('module', 'in', $modules)->order('sort,id')->column('id,pid,sort,title,icon');

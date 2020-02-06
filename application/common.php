@@ -1527,6 +1527,39 @@ if (!function_exists('push_wm_msg')) {
         return $return;
     }
 }
+    
+if (!function_exists('ring_up')) {
+
+    /**
+     * [ring_up 呼叫]
+     * @param  [type] $aciton [description]
+     * @param  [type] $params [description]
+     * @return [type]         [description]
+     */
+    function ring_up($aciton, $params)
+    {
+
+return 'cb_callout({"status":1,"Info":{ "result":"success", "phone":"18321271831"}})';
+        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        if (!$ser) {
+            return false;
+        }
+
+        $serv_url = $ser.'/'.$aciton;
+        
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $serv_url );
+        curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt ( $ch, CURLOPT_POSTFIELDS, $params );
+        curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
+
 
 if (!function_exists('notice_log')) {
     /**
@@ -1588,6 +1621,18 @@ if (!function_exists('notice_log')) {
         }
     }
 
+}
+
+if (!function_exists('get_mobile')) {
+    /**
+     * [get_mobile description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    function get_mobile($user_id)
+    {
+        return model('call/custom')->field('mobile,tel')->find($user_id);
+    }
 }
 
 if (!function_exists('get_projectnm')) {

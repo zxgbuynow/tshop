@@ -1,0 +1,429 @@
+{extend name="$_admin_base_layout" /}
+
+{block name="content"}
+{notempty name="page_tips"}
+<div class="alert alert-{$tips_type} alert-dismissable">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <p>{$page_tips}</p>
+</div>
+{/notempty}
+
+<style type="text/css">
+    .layui-card-body-left{
+        border-width: 0px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 50px;
+    height: 50px;
+    background: inherit;
+    background-color: rgba(51, 153, 255, 1);
+    border: none;
+    border-radius: 25px;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    font-family: 'FontAwesome';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    color: #FFFFFF;
+    line-height: 20px;
+    }
+    .layui-card-body-left img{
+        border-width: 0px;
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    width: 32px;
+    height: 32px;
+    }
+    .layui-card-body-right{
+        position: absolute;
+    align-self: flex-start;
+    padding: 0px 0px 0px 60px;
+    box-sizing: border-box;
+    width: 100%;
+    }
+    .u12{
+            border-width: 0px;
+    position: absolute;
+    left: 30px;
+    top: 10px;
+    height: 80px;
+    display: flex;
+    font-family: '微软雅黑';
+    font-weight: 400;
+    font-style: normal;
+    text-align: left;
+    line-height: 32px;
+    }
+    .layui-card-body-right p{
+        margin-bottom:0px;
+    }
+    .layui-card-body-right-p1{
+        font-size: 12px;
+    }
+    .layui-card-body-right-p2{
+        font-size: 24px;
+    }
+    .layui-table td, .layui-table th{        
+        border-left-style: none!important;
+        border-right-style: none!important;
+    }
+    .circle {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        border-radius: 50%;
+        background: #00aacc;
+        margin: -10px 40px;
+    }
+    .pie_left,
+    .pie_right {
+        width: 20px;
+        height: 20px;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .left,
+    .right {
+        width: 20px;
+        height: 20px;
+        background: #fff;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+    .pie_right,
+    .right {
+        clip: rect(0, auto, auto, 10px);
+    }
+    .pie_left,
+    .left {
+        clip: rect(0, 10px, auto, 0);
+    }
+    .mask {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        left: 3px;
+        top: 3px;
+        background: #FFF;
+        position: absolute;
+        text-align: center;
+        line-height: 15px;
+        font-size: 2px;
+        font-weight: bold;
+        color: #00aacc;
+    }
+</style>
+<link rel="stylesheet" href="__HOME_CSS__/layui.css">
+<div style="background-color: #F2F2F2; margin-bottom: 20px;">
+  <div class="layui-row layui-col-space15">
+
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">待办事项</div>
+        <div class="layui-card-body">
+
+            <div class="layui-row">
+                <div class="layui-col-md3 u12">
+                    <div class="layui-card-body-left" >
+                      <img src="__HOME_IMG__/u26.svg">
+                    </div>
+                    <div class="layui-card-body-right" >
+                        <p class="layui-card-body-right-p1">新任务未联系客户</p>
+                        <p class="layui-card-body-right-p2">217</p>
+                    </div>
+                </div>
+                <div class="layui-col-md3 u12">
+                    <div class="layui-card-body-left" >
+                      <img src="__HOME_IMG__/u30.svg">
+                    </div>
+                    <div class="layui-card-body-right" >
+                        <p class="layui-card-body-right-p1">超2天未联系客户</p>
+                        <p class="layui-card-body-right-p2">19</p>
+                    </div>
+                </div>
+                <div class="layui-col-md3 u12">
+                    <div class="layui-card-body-left" >
+                      <img src="__HOME_IMG__/u20.svg">
+                    </div>
+                    <div class="layui-card-body-right" >
+                        <p class="layui-card-body-right-p1">新任务未接通未达标客户</p>
+                        <p class="layui-card-body-right-p2">23</p>
+                    </div>
+                </div>
+                <div class="layui-col-md3 u12">
+                    <div class="layui-card-body-left" >
+                      <img src="__HOME_IMG__/u29.svg">
+                    </div>
+                    <div class="layui-card-body-right" >
+                        <p class="layui-card-body-right-p1">预约提醒</p>
+                        <p class="layui-card-body-right-p2">6</p>
+                    </div>
+                </div>
+
+              </div>
+            
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">计数类排行榜  本月</div>
+        <div class="layui-card-body">
+            <table class="layui-table">
+              <colgroup>
+                <col width="100">
+                <col width="150">
+                <col>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>姓名</th>
+                  <th>通话（呼出）总数</th>
+                </tr> 
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>张小刚</td>
+                    <td>
+                        <div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 70%; background-color: rgba(251, 98, 96, 1)"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>李小红</td>
+                  <td>
+                        <div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 60%;background-color: rgba(255, 169, 76, 1)"></div>
+                        </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>王小明</td>
+                  <td>
+                      <div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 50%;background-color: rgba(75, 206, 208, 1)"></div>
+                        </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>周小伟</td>
+                  <td><div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 40%;"></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>郭小涛</td>
+                  <td><div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 39%;"></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>张小刚</td>
+                  <td><div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 38%;"></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>李小红</td>
+                  <td><div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 35%;"></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>王小明</td>
+                    <td>
+                        
+                        <div class="layui-progress" style="background-color:#fff">
+                            <div class="layui-progress-bar"  style="width: 30%;"></div>
+                        </div>
+                    </td>
+                </tr>
+
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+    <div class="layui-col-md6">
+      <div class="layui-card">
+        <div class="layui-card-header">转化率排行榜  本月</div>
+        <div class="layui-card-body">
+          <table class="layui-table">
+              <colgroup>
+                <col width="100">
+                <col width="150">
+                <col>
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>排名</th>
+                  <th>姓名</th>
+                  <th>成单总数</th>
+                </tr> 
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>张小刚</td>
+                    <td>
+                        <div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">99</span></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>李小红</td>
+                  <td>
+                        <div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">80</span></div>
+                        </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>王小明</td>
+                  <td>
+                      <div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">70</span></div>
+                        </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>周小伟</td>
+                  <td>
+                    <div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">60</span></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>郭小涛</td>
+                  <td><div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">50</span></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>张小刚</td>
+                  <td><div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">45</span></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>李小红</td>
+                  <td><div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">30</span></div>
+                        </div></td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>王小明</td>
+                  <td>
+                        <div class="circle" style="left:0">
+                            <div class="pie_left">
+                                <div class="left"></div>
+                            </div>
+                            <div class="pie_right">
+                                <div class="right"></div>
+                            </div>
+                            <div class="mask"><span style="display: none;">20</span></div>
+                        </div>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+
+{/block}
+
+
+{block name="script"}
+<script type="text/javascript" src="__HOME_JS__/layui.js"></script>
+<script>
+    //注意进度条依赖 element 模块，否则无法进行正常渲染和功能性操作
+    $('.bg-gray-lighter').hide()
+    $(function() {
+    $('.circle').each(function(index, el) {
+        var num = $(this).find('span').text() * 3.6;
+        if (num <= 180) {
+            $(this).find('.right').css('transform', "rotate(" + num + "deg)");
+        } else {
+            $(this).find('.right').css('transform', "rotate(180deg)");
+            $(this).find('.left').css('transform', "rotate(" + (num - 180) + "deg)");
+        };
+    });
+
+});
+</script>
+{/block}

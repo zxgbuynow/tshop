@@ -22,7 +22,12 @@ class Index extends Admin
      */
     public function index()
     {
-        $this->redirect('Log/index');exit;
+        if (UID==1) {
+            $this->redirect('Log/index');exit;
+        }
+
+        $this->redirect('call/Home/index');exit;
+        
         $admin_pass = Db::name('admin_user')->where('id', 1)->value('password');
 
         if (UID == 1 && $admin_pass && Hash::check('admin', $admin_pass)) {
