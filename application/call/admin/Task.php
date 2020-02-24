@@ -72,10 +72,11 @@ class Task extends Admin
         });
         
 
+        $mpsel = '';
         if (isset($params['tag'])) {
-            $map['tag'][0] = 'eq';
-            $map['tag'][1] = $params['tag'];
+            $mpsel = $params['tag'];
         }
+        // print_r($map);exit;
 
         // 分页数据
         $page = $data_list->render();
@@ -117,7 +118,7 @@ class Task extends Admin
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearchArea([
-                ['select', 'tag', '类型', '', '', $msel],
+                ['select', 'tag', '类型', '', $mpsel, $msel],
 
             ])
             ->addColumns([ // 批量添加数据列
