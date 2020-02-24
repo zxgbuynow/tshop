@@ -36,9 +36,9 @@ class Payment extends Admin
             ->setSearch(['brank_account' => '客户账号'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['trade', '订单'],
+                ['trade', '合同'],
                 ['price', '金额'],
-                ['type', '回款类型',['','订金','货款','尾款']],
+                ['type', '回款类型',['','首付款','货款','尾款']],
                 ['brank_account', '客户账号'],
                 ['is_notice', '是否提醒',['否','是']],
                 ['sign_time', '回款时间','datetime'],
@@ -87,9 +87,9 @@ class Payment extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['select', 'trade_id', '订单','',$list_trade],
+                ['select', 'trade_id', '合同','',$list_trade],
                 ['text', 'price', '回款金额'],
-                ['radio', 'type', '回款方式', '', [1=>'订金', 2=>'货款', 3=>'尾款'], 1],
+                ['radio', 'type', '回款方式', '', [1=>'首付款', 2=>'货款', 3=>'尾款'], 1],
                 ['text', 'brank_account', '名称'],
                 ['datetime', 'sign_time', '回款时间'],
                 
@@ -122,9 +122,9 @@ class Payment extends Admin
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
-                ['select', 'trade_id', '订单','',$list_trade],
+                ['select', 'trade_id', '合同','',$list_trade],
                 ['text', 'price', '回款金额'],
-                ['radio', 'type', '回款方式', '', [1=>'订金', 2=>'货款', 3=>'尾款'], 1],
+                ['radio', 'type', '回款方式', '', [1=>'首付款', 2=>'货款', 3=>'尾款'], 1],
                 ['text', 'brank_account', '名称'],
                 ['datetime', 'sign_time', '回款时间'],
                 

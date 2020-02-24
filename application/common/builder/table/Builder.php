@@ -465,6 +465,51 @@ class Builder extends ZBuilder
         }
         return $this;
     }
+    public function addTimeFilters($field = '', $date = '', $tips = '')
+    {
+        if ($field != '') {
+            $date_start = '';
+            $date_end   = '';
+            $tips_start = '开始日期';
+            $tips_end   = '结束日期';
+
+            if (!empty($date)) {
+                if (!is_array($date)) {
+                    if (strpos($date, ',')) {
+                        list($date_start, $date_end) = explode(',', $date);
+                    } else {
+                        $date_start = $date_end = $date;
+                    }
+                } else {
+                    list($date_start, $date_end) = $date;
+                }
+            }
+
+            if (!empty($tips)) {
+                if (!is_array($tips)) {
+                    if (strpos($tips, ',')) {
+                        list($tips_start, $tips_end) = explode(',', $tips);
+                    } else {
+                        $tips_start = $tips_end = $tips;
+                    }
+                } else {
+                    list($tips_start, $tips_end) = $tips;
+                }
+            }
+
+            $this->_vars['_js_files'][]  = 'datepicker_js';
+            $this->_vars['_css_files'][] = 'datepicker_css';
+            $this->_vars['_js_init'][]   = 'datepicker';
+            $this->_vars['_filter_time'] = [
+                'field'      => $field,
+                'tips_start' => $tips_start,
+                'tips_end'   => $tips_end,
+                'date_start' => $date_start,
+                'date_end'   => $date_end,
+            ];
+        }
+        return $this;
+    }
 
     /**
      * 添加快捷编辑的验证器

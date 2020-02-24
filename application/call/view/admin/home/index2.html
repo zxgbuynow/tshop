@@ -57,6 +57,7 @@
     font-style: normal;
     text-align: left;
     line-height: 32px;
+    cursor:pointer;
     }
     .layui-card-body-right p{
         margin-bottom:0px;
@@ -77,7 +78,7 @@
         position: absolute;
         border-radius: 50%;
         background: #00aacc;
-        margin: -10px 40px;
+        margin: -10px -90px;
     }
     .pie_left,
     .pie_right {
@@ -130,42 +131,42 @@
         <div class="layui-card-body">
 
             <div class="layui-row">
-                <div class="layui-col-md3 u12">
+                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'will_contact_custom_count'])}">
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u26.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">新任务未联系客户</p>
-                        <p class="layui-card-body-right-p2">217</p>
+                        <p class="layui-card-body-right-p2">{$info.will_contact_custom_count}</p>
                     </div>
-                </div>
-                <div class="layui-col-md3 u12">
+                </a>
+                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'pass_second_contact_custom_count'])}">
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u30.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">超2天未联系客户</p>
-                        <p class="layui-card-body-right-p2">19</p>
+                        <p class="layui-card-body-right-p2">{$info.pass_second_contact_custom_count}</p>
                     </div>
-                </div>
-                <div class="layui-col-md3 u12">
+                </a>
+                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'no_contact_custom_count'])}">
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u20.svg">
                     </div>
                     <div class="layui-card-body-right" >
-                        <p class="layui-card-body-right-p1">新任务未接通未达标客户</p>
-                        <p class="layui-card-body-right-p2">23</p>
+                        <p class="layui-card-body-right-p1">新任务未接通客户</p>
+                        <p class="layui-card-body-right-p2">{$info.no_contact_custom_count}</p>
                     </div>
-                </div>
-                <div class="layui-col-md3 u12">
+                </a>
+                <a class="layui-col-md3 u12" href="{:url('call/ondate/index',['group' => 'no'])}">
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u29.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">预约提醒</p>
-                        <p class="layui-card-body-right-p2">6</p>
+                        <p class="layui-card-body-right-p2">{$info.ondate_count}</p>
                     </div>
-                </div>
+                </a>
 
               </div>
             
@@ -187,22 +188,30 @@
                 <tr>
                   <th>排名</th>
                   <th>姓名</th>
-                  <th>通话（呼出）总数</th>
+                  <th colspan="2">通话（呼出）总数</th>
                 </tr> 
               </thead>
               <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>张小刚</td>
-                    <td>
-                        <div class="layui-progress" style="background-color:#fff">
-                            <div class="layui-progress-bar"  style="width: 70%; background-color: rgba(251, 98, 96, 1)"></div>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
+                {notempty name="call"}
+                {volist name="call" id="vo"}
+                  <tr>
+                    <td>{$vo.aa}</td>
+                    <td>{$vo.user}</td>
+                    <td width="10px">{$vo.times}</td>
+                      <td>
+                          <div class="layui-progress" style="background-color:#fff">
+                              <div class="layui-progress-bar"  style="width: {$vo.width}%; {$vo.color}"></div>
+                          </div>
+                      </td>
+                  </tr>
+                {/volist}
+                {else/}
+                <tr ><td colspan="3" style="    text-align: center;">暂无排名</td></tr>
+                {/notempty}
+                <!-- <tr>
                   <td>2</td>
                   <td>李小红</td>
+                  <td>100</td>
                   <td>
                         <div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 60%;background-color: rgba(255, 169, 76, 1)"></div>
@@ -212,6 +221,7 @@
                 <tr>
                   <td>3</td>
                   <td>王小明</td>
+                  <td>100</td>
                   <td>
                       <div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 50%;background-color: rgba(75, 206, 208, 1)"></div>
@@ -221,6 +231,7 @@
                 <tr>
                   <td>4</td>
                   <td>周小伟</td>
+                  <td>100</td>
                   <td><div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 40%;"></div>
                         </div></td>
@@ -228,6 +239,7 @@
                 <tr>
                   <td>5</td>
                   <td>郭小涛</td>
+                  <td>100</td>
                   <td><div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 39%;"></div>
                         </div></td>
@@ -235,6 +247,7 @@
                 <tr>
                   <td>6</td>
                   <td>张小刚</td>
+                  <td>100</td>
                   <td><div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 38%;"></div>
                         </div></td>
@@ -242,6 +255,7 @@
                 <tr>
                   <td>7</td>
                   <td>李小红</td>
+                  <td>100</td>
                   <td><div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 35%;"></div>
                         </div></td>
@@ -249,13 +263,14 @@
                 <tr>
                   <td>8</td>
                   <td>王小明</td>
+                  <td>100</td>
                     <td>
                         
                         <div class="layui-progress" style="background-color:#fff">
                             <div class="layui-progress-bar"  style="width: 30%;"></div>
                         </div>
                     </td>
-                </tr>
+                </tr> -->
 
               </tbody>
             </table>
@@ -276,13 +291,36 @@
                 <tr>
                   <th>排名</th>
                   <th>姓名</th>
-                  <th>成单总数</th>
+                  <th colspan="2">成单总数</th>
                 </tr> 
               </thead>
               <tbody>
-                <tr>
+                {notempty name="alloc"}
+                {volist name="alloc" id="vo"}
+                  <tr>
+                    <td>{$vo.index}</td>
+                    <td>{$vo.user}</td>
+                    <td>{$vo.num}</td>
+                      <td>
+                          <div class="circle" style="left:0">
+                              <div class="pie_left">
+                                  <div class="left"></div>
+                              </div>
+                              <div class="pie_right">
+                                  <div class="right"></div>
+                              </div>
+                              <div class="mask"><span style="display: none;">{$vo.percent}</span></div>
+                          </div>
+                      </td>
+                  </tr>
+                {/volist}
+                {else/}
+                <tr ><td colspan="3" style="    text-align: center;">暂无排名</td></tr>
+                {/notempty}
+                <!-- <tr>
                   <td>1</td>
                   <td>张小刚</td>
+                  <td>100</td>
                     <td>
                         <div class="circle" style="left:0">
                             <div class="pie_left">
@@ -298,6 +336,7 @@
                 <tr>
                   <td>2</td>
                   <td>李小红</td>
+                  <td>100</td>
                   <td>
                         <div class="circle" style="left:0">
                             <div class="pie_left">
@@ -313,6 +352,7 @@
                 <tr>
                   <td>3</td>
                   <td>王小明</td>
+                  <td>100</td>
                   <td>
                       <div class="circle" style="left:0">
                             <div class="pie_left">
@@ -328,6 +368,7 @@
                 <tr>
                   <td>4</td>
                   <td>周小伟</td>
+                  <td>100</td>
                   <td>
                     <div class="circle" style="left:0">
                             <div class="pie_left">
@@ -343,6 +384,7 @@
                 <tr>
                   <td>5</td>
                   <td>郭小涛</td>
+                  <td>100</td>
                   <td><div class="circle" style="left:0">
                             <div class="pie_left">
                                 <div class="left"></div>
@@ -356,6 +398,7 @@
                 <tr>
                   <td>6</td>
                   <td>张小刚</td>
+                  <td>100</td>
                   <td><div class="circle" style="left:0">
                             <div class="pie_left">
                                 <div class="left"></div>
@@ -369,6 +412,7 @@
                 <tr>
                   <td>7</td>
                   <td>李小红</td>
+                  <td>100</td>
                   <td><div class="circle" style="left:0">
                             <div class="pie_left">
                                 <div class="left"></div>
@@ -382,6 +426,7 @@
                 <tr>
                   <td>8</td>
                   <td>王小明</td>
+                  <td>100</td>
                   <td>
                         <div class="circle" style="left:0">
                             <div class="pie_left">
@@ -393,7 +438,7 @@
                             <div class="mask"><span style="display: none;">20</span></div>
                         </div>
                   </td>
-                </tr>
+                </tr> -->
 
               </tbody>
             </table>

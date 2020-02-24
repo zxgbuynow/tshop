@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:48:{s:71:"/data/httpd/tshop/public/../application/common/builder/form/layout.html";i:1564111365;s:62:"/data/httpd/tshop/public/../application/admin/view/layout.html";i:1580694020;s:47:"../application/common/builder/aside/layout.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/recent.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/online.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/switch.html";i:1564111365;s:53:"../application/common/builder/form/items/archive.html";i:1564111365;s:54:"../application/common/builder/form/items/archives.html";i:1564111365;s:50:"../application/common/builder/form/items/bmap.html";i:1564111365;s:52:"../application/common/builder/form/items/button.html";i:1564111365;s:54:"../application/common/builder/form/items/checkbox.html";i:1564111365;s:54:"../application/common/builder/form/items/ckeditor.html";i:1564111365;s:57:"../application/common/builder/form/items/colorpicker.html";i:1564111365;s:50:"../application/common/builder/form/items/date.html";i:1564111365;s:55:"../application/common/builder/form/items/daterange.html";i:1564111365;s:54:"../application/common/builder/form/items/datetime.html";i:1564111365;s:54:"../application/common/builder/form/items/editormd.html";i:1564111365;s:50:"../application/common/builder/form/items/file.html";i:1564111365;s:51:"../application/common/builder/form/items/files.html";i:1564111365;s:53:"../application/common/builder/form/items/gallery.html";i:1564111365;s:51:"../application/common/builder/form/items/group.html";i:1564111365;s:52:"../application/common/builder/form/items/hidden.html";i:1564111365;s:50:"../application/common/builder/form/items/icon.html";i:1564111365;s:51:"../application/common/builder/form/items/image.html";i:1564111365;s:52:"../application/common/builder/form/items/images.html";i:1564111365;s:51:"../application/common/builder/form/items/jcrop.html";i:1564111365;s:53:"../application/common/builder/form/items/linkage.html";i:1564111365;s:54:"../application/common/builder/form/items/linkages.html";i:1564111365;s:52:"../application/common/builder/form/items/masked.html";i:1564111365;s:52:"../application/common/builder/form/items/number.html";i:1564111365;s:54:"../application/common/builder/form/items/password.html";i:1564111365;s:51:"../application/common/builder/form/items/radio.html";i:1564111365;s:51:"../application/common/builder/form/items/range.html";i:1564111365;s:52:"../application/common/builder/form/items/select.html";i:1564111365;s:53:"../application/common/builder/form/items/select2.html";i:1564111365;s:50:"../application/common/builder/form/items/sort.html";i:1564111365;s:52:"../application/common/builder/form/items/static.html";i:1564111365;s:56:"../application/common/builder/form/items/summernote.html";i:1564111365;s:52:"../application/common/builder/form/items/switch.html";i:1564111365;s:50:"../application/common/builder/form/items/tags.html";i:1564111365;s:50:"../application/common/builder/form/items/text.html";i:1564111365;s:50:"../application/common/builder/form/items/time.html";i:1564111365;s:54:"../application/common/builder/form/items/textarea.html";i:1564111365;s:53:"../application/common/builder/form/items/ueditor.html";i:1564111365;s:56:"../application/common/builder/form/items/wangeditor.html";i:1564111365;s:47:"../application/common/builder/form/icon/fa.html";i:1564111365;s:47:"../application/common/builder/form/icon/gl.html";i:1564111365;s:47:"../application/common/builder/form/icon/sl.html";i:1564111365;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:48:{s:71:"/data/httpd/tshop/public/../application/common/builder/form/layout.html";i:1564111365;s:62:"/data/httpd/tshop/public/../application/admin/view/layout.html";i:1582174118;s:47:"../application/common/builder/aside/layout.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/recent.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/online.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/switch.html";i:1564111365;s:53:"../application/common/builder/form/items/archive.html";i:1564111365;s:54:"../application/common/builder/form/items/archives.html";i:1564111365;s:50:"../application/common/builder/form/items/bmap.html";i:1564111365;s:52:"../application/common/builder/form/items/button.html";i:1564111365;s:54:"../application/common/builder/form/items/checkbox.html";i:1564111365;s:54:"../application/common/builder/form/items/ckeditor.html";i:1564111365;s:57:"../application/common/builder/form/items/colorpicker.html";i:1564111365;s:50:"../application/common/builder/form/items/date.html";i:1564111365;s:55:"../application/common/builder/form/items/daterange.html";i:1564111365;s:54:"../application/common/builder/form/items/datetime.html";i:1564111365;s:54:"../application/common/builder/form/items/editormd.html";i:1564111365;s:50:"../application/common/builder/form/items/file.html";i:1564111365;s:51:"../application/common/builder/form/items/files.html";i:1564111365;s:53:"../application/common/builder/form/items/gallery.html";i:1564111365;s:51:"../application/common/builder/form/items/group.html";i:1564111365;s:52:"../application/common/builder/form/items/hidden.html";i:1564111365;s:50:"../application/common/builder/form/items/icon.html";i:1564111365;s:51:"../application/common/builder/form/items/image.html";i:1564111365;s:52:"../application/common/builder/form/items/images.html";i:1564111365;s:51:"../application/common/builder/form/items/jcrop.html";i:1564111365;s:53:"../application/common/builder/form/items/linkage.html";i:1564111365;s:54:"../application/common/builder/form/items/linkages.html";i:1564111365;s:52:"../application/common/builder/form/items/masked.html";i:1564111365;s:52:"../application/common/builder/form/items/number.html";i:1564111365;s:54:"../application/common/builder/form/items/password.html";i:1564111365;s:51:"../application/common/builder/form/items/radio.html";i:1564111365;s:51:"../application/common/builder/form/items/range.html";i:1564111365;s:52:"../application/common/builder/form/items/select.html";i:1564111365;s:53:"../application/common/builder/form/items/select2.html";i:1564111365;s:50:"../application/common/builder/form/items/sort.html";i:1564111365;s:52:"../application/common/builder/form/items/static.html";i:1564111365;s:56:"../application/common/builder/form/items/summernote.html";i:1564111365;s:52:"../application/common/builder/form/items/switch.html";i:1564111365;s:50:"../application/common/builder/form/items/tags.html";i:1564111365;s:50:"../application/common/builder/form/items/text.html";i:1564111365;s:50:"../application/common/builder/form/items/time.html";i:1564111365;s:54:"../application/common/builder/form/items/textarea.html";i:1564111365;s:53:"../application/common/builder/form/items/ueditor.html";i:1564111365;s:56:"../application/common/builder/form/items/wangeditor.html";i:1564111365;s:47:"../application/common/builder/form/icon/fa.html";i:1564111365;s:47:"../application/common/builder/form/icon/gl.html";i:1564111365;s:47:"../application/common/builder/form/icon/sl.html";i:1564111365;}*/ ?>
 <!DOCTYPE html>
 <!--[if IE 9]>         <html class="ie9 no-focus" lang="zh"> <![endif]-->
 <!--[if gt IE 9]><!--> <html class="no-focus" lang="zh"> <!--<![endif]-->
@@ -501,9 +501,30 @@
                                 <i class="si si-logout pull-right"></i>退出帐号
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </li>
+            <?php if(\think\Session::get('user_auth.uid') != '1'): ?>
+            <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="extension-no"><?php echo (isset($_auth_sign) && ($_auth_sign !== '')?$_auth_sign:'签入分机'); ?></span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <?php if(is_array($_extens) || $_extens instanceof \think\Collection || $_extens instanceof \think\Paginator): $i = 0; $__LIST__ = $_extens;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$_exten): $mod = ($i % 2 );++$i;?>
+                            <li>
+                                <a tabindex="-1" href="javascript:void(0)" class="extension-toggle" data-id="<?php echo $_exten['id']; ?>">
+                                    <?php echo $_exten['title']; ?>
+                                </a>
+                            </li>
+                        
+                        <?php endforeach; endif; else: echo "" ;endif; ?>
+                    </ul>
+                </div>
+            </li>
+            <?php endif; ?>
             <li>
                 <a class="btn btn-default ajax-get" href="<?php echo url('admin/index/wipeCache'); ?>" data-toggle="tooltip" data-placement="bottom" data-original-title="清空缓存">
                     <i class="fa fa-trash"></i>
@@ -2189,6 +2210,22 @@
     // 后端推送来在线数据时
     socket.on('update_online_count', function(online_stat){
         console.log(online_stat);
+    });
+
+    // 签入
+    $('.extension-toggle').click(function(e){
+        // Dolphin.loading();
+        var id = $(this).attr('data-id');
+        $.post("<?php echo url('call/ajax/getEextensionSt'); ?>", {id:id}, function(data) {
+            Dolphin.loading('hide');
+            console.log(data);
+            if (data.code) {
+                $('.extension-no').text(data.list.id);
+                Dolphin.notify(data.msg, 'success');
+            } else {
+                Dolphin.notify(data.msg, 'danger');
+            }
+        });
     });
 
 </script>

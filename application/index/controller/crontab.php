@@ -40,6 +40,7 @@ class Crontab
      */
     public function recoverTask()
     {
+        // echo 'succ';exit;
         //分配日志
         $recoverHour = config('recover_data_hour')?config('recover_data_hour'):0;
         if (!$recoverHour) {
@@ -48,7 +49,12 @@ class Crontab
         }
         //回收数据 分配任务状态修改 客户状态修改
         $diff = time()-$recoverHour*60*60;
-        $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
+
+        // $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
+        $m['a.status'] = 1;
+        $m['c.timeLength'] = array('eq',0);
+        $userInfo = Db::name('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->whereTime('a.create_time','<',$diff)->where($m)->select();
+        //新数据过滤
         if (!$userInfo) {
             error_log('NOT MODIF CUSTOM RECOVERTASK_'.time(),3,'/data/httpd/tshop/public/task.log');
             echo 'succ';exit;
@@ -70,6 +76,513 @@ class Crontab
         notice_log('recover',1);
     }
 
+    /**
+     * [timeLengthTash description todo]
+     * @return [type] [description]
+     */
+    public function timeLengthTash()
+    {
+
+        $info = [
+            'timeLength'=>isset(plugin_config('wechat')['timeLength'])?plugin_config('wechat')['timeLength']:''
+        ];
+        //如果设置了时间点
+        if ($info['timeLength']) {
+            $times = explode('|', $info['timeLength']);
+            $h = date('H',time());
+            if (in_array($h, $times)) {
+                //[李四|员工]，[180秒|呼出通话时长]，[2020-2-6|时间段] 前五 后五
+                $top5 = db('call_log')->where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->limit(5)->select();
+                $bottom5 = db('call_log')->where($map)->field('*,SUM(timeLength) as times')->order('times ASC')->group('user_id')->limit(5)->select();
+
+                //时间段
+                $range = '';
+                $p = array_search($h,$times);
+
+                if ($p==0) {
+                    $range ='9点至'.$p.'点';
+                }else{
+
+                    $range = $times[$p-1].'至'.$p.'点';
+                }
+                //内容处理
+                $msg = '排名前五：'.'\n';
+                foreach ($top5 as $key => $value) {
+                    $msg .= get_nickname($value['user_id']).',呼出通话时长'.$value['times'].',统计时间段'.$range.'\n';
+                }
+
+                $msg = '排名后五：'.'\n';
+                foreach ($bottom5 as $key => $value) {
+                    $msg .= get_nickname($value['user_id']).',呼出通话时长'.$value['times'].',统计时间段'.$range.'\n';
+                }
+                _sendMaster($msg);
+                echo 'succ';exit;
+                // $touser = db('admin_user')->where(['id'=>1])->find();
+                // //push
+                // $toparty = [];
+                // $totag = [];
+                // $user = [];
+                // array_push($user, $touser['wechat_name']);
+
+                // $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $msg]);
+                // if($result['code']){
+                //     echo 'succ';exit;
+                // } else {
+                //     echo 'fail';exit;
+                // }
+            }
+            echo '不在执行时间段';exit;
+        }
+
+    }
+
+    /**
+     * [FunctionName A类客户1周平均成本统计 周一中午12点 管理员]
+     * @param string $value [description]
+     */
+    public function classareportTast()
+    {
+        //取配置
+        $info = [
+            'classAReport'=>isset(plugin_config('wechat')['classAReport'])?plugin_config('wechat')['classAReport']:''
+        ];
+        //取得数据
+        $map['category'] = 1;
+        $data_list = db('call_custom')->where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->select();
+        if (!$info['classAReport']) {
+            echo '执行失败，没有配置安全值';exit;
+        }
+        //项目
+        $pj =[];
+        foreach ($data_list as $key => $value) {
+
+            if ($value['fees']>$info['classAReport']) {
+                $pj[$value['project_id']][] = $value['source'].'('.$value['fees'].')';
+            }
+        }
+        if (!$pj) {
+            echo '执行成功，无匹配数据';exit;
+        }
+        $content = '';
+        //项目
+        if (count($pj)>1) {//多项目组成
+            foreach ($pj as $key => $value) {
+                //取项目 取平均值
+                $pjnm = db('call_project_list')->where(['id'=>$key])->value('col1');
+                $map['project_id'] = $key;
+                $pjavg = number_format(db('call_custom')->where($map)->avg('fee'),1) ;
+                $content = $pjnm.'上周的A类客户成本为'.$pjavg.'，（安全值为'.$info['classAReport'].'元），其中:'.implode('，', $pj[$key]);
+                _sendMaster($content);
+            }
+            echo 'succ';
+            exit;
+        }else{
+            //取项目 取平均值
+            $pj_id = key($pj);
+            $pjnm = db('call_project_list')->where(['id'=>$pj_id])->value('col1');
+            $pjavg = number_format(db('call_custom')->where($map)->avg('fee'),1) ;
+            $content .= $pjnm.'上周的A类客户成本为'.$pjavg.'，（安全值为'.$info['classAReport'].'元），其中:'.implode('，', $pj[$pj_id]);
+        }
+
+        _sendMaster($content);
+        echo 'succ';exit;
+
+    }
+
+    /**
+     * [classnreport 单条客户平均成本 周一中午 管理员]
+     * @return [type] [description]
+     */
+    public function classnreport()
+    {
+        //取配置
+        $info = [
+            'classNReport'=>isset(plugin_config('wechat')['classNReport'])?plugin_config('wechat')['classNReport']:''
+        ];
+        $data_list = db('call_custom')->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->select();
+        if (!$info['classNReport']) {
+            echo '执行失败，没有配置安全值';exit;
+        }
+        //项目
+        $pj =[];
+        foreach ($data_list as $key => $value) {
+
+            if ($value['fees']>$info['classNReport']) {
+                $pj[$value['project_id']][] = $value['source'].'('.$value['fees'].')';
+            }
+        }
+        if (!$pj) {
+            echo '执行成功，无匹配数据';exit;
+        }
+        $content = '';
+        //项目
+        if (count($pj)>1) {//多项目组成
+            foreach ($pj as $key => $value) {
+                //取项目 取平均值
+                $pjnm = db('call_project_list')->where(['id'=>$key])->value('col1');
+                $map['project_id'] = $key;
+                $pjavg = number_format(db('call_custom')->avg('fee'),1) ;
+                $content = $pjnm.'上周的单条客户平均成本为'.$pjavg.'，（安全值为'.$info['classNReport'].'元），其中:'.implode('，', $pj[$key]);
+                _sendMaster($content);
+            }
+            echo 'succ';
+            exit;
+        }else{
+            //取项目 取平均值
+            $pj_id = key($pj);
+            $pjnm = db('call_project_list')->where(['id'=>$pj_id])->value('col1');
+            $pjavg = number_format(db('call_custom')->avg('fee'),1) ;
+            $content .= $pjnm.'上周的单条客户平均成本为'.$pjavg.'，（安全值为'.$info['classNReport'].'元），其中:'.implode('，', $pj[$pj_id]);
+        }
+
+        _sendMaster($content);
+        echo 'succ';exit;
+    }
+
+    /**
+     * [classfreportTask 当月签约客户平均成本 月4号中午12点 管理员]
+     * @return [type] [description]
+     */
+    public function classfreportTask()
+    {
+        //取配置
+        $info = [
+            'classFReport'=>isset(plugin_config('wechat')['classFReport'])?plugin_config('wechat')['classFReport']:''
+        ];
+        if (!$info['classFReport']) {
+            echo '执行失败，没有配置安全值';exit;
+        }
+        //当月数当月签单
+        $map =[];
+
+        $data_list = db('call_custom')->whereTime('note_time','last month')->where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->select();
+
+
+        //好奇小屋上月数据总数量为100条，签约5单，平均签约成本为1000元，签约成本安全值为200元，其中抖音300条，平均单条成本90元，头条400条，平均单条成本80元
+        //项目
+        $pj =[];
+        foreach ($data_list as $key => $value) {
+
+            $pj[$value['project_id']][] = $value['source'].$value['counts'].'条，平均单条成本'.$value['avgffee'].'元';
+        }
+        if (!$pj) {
+            echo '执行成功，无匹配数据';exit;
+        }
+        $content = '';
+        //项目
+        if (count($pj)>1) {//多项目组成
+            foreach ($pj as $key => $value) {
+                //取项目 取平均值
+                $pjnm = db('call_project_list')->where(['id'=>$key])->value('col1');
+                $map['project_id'] = $key;
+                $pjavg = number_format(db('call_custom')->where($map)->whereTime('note_time','last month')->avg('fee'),1) ;
+                $pjsum = db('call_custom')->where($map)->whereTime('note_time','last month')->count();
+                $pjsucc = db('call_custom')->where($map)->whereTime('note_time','last month')->where(['category'=>6])->count();
+                //好奇小屋上月数据总数量为100条，签约5单，平均签约成本为1000元，签约成本安全值为200元，其中抖音300条，平均单条成本90元，头条400条，平均单条成本80元
+                $content = $pjnm.'上月数据总数量为'.$pjsum.'，签约'.$pjsucc.'单，平均签约成本为'.$pjavg.'元，签约成本安全值为'.$info['classFReport'].'元，其中'.implode('，', $pj[$key]);
+
+                _sendMaster($content);
+            }
+            echo 'succ';
+            exit;
+        }else{
+            //取项目 签约单 总数量 平均签约成本
+            $pj_id = key($pj);
+            $pjnm = db('call_project_list')->where(['id'=>$pj_id])->value('col1');
+            $pjavg = number_format(db('call_custom')->whereTime('note_time','last month')->avg('fee'),1) ;
+            $pjsum = db('call_custom')->whereTime('note_time','last month')->count();
+            $pjsucc = db('call_custom')->whereTime('note_time','last month')->where(['category'=>6])->count();
+            //好奇小屋上月数据总数量为100条，签约5单，平均签约成本为1000元，签约成本安全值为200元，其中抖音300条，平均单条成本90元，头条400条，平均单条成本80元
+            $content = $pjnm.'上月数据总数量为'.$pjsum.'，签约'.$pjsucc.'单，平均签约成本为'.$pjavg.'元，签约成本安全值为'.$info['classFReport'].'元，其中'.implode('，', $pj[$pj_id]);
+        }
+
+        _sendMaster($content);
+        echo 'succ';exit;
+    }
+
+    /**
+     * [classf15reportTask 15天签约数量统计 每月二次16号 30 31号 12点 管理员]
+     * @return [type] [description]
+     */
+    public function classf15reportTask()
+    {
+        $map = [];
+
+        //是否本月最后一天并且大于16号
+        $today = date('t', time());
+        if ($today>16) {
+            $lastd = date('t', strtotime('-1 month'));
+            if ($lastd!=28&&$today==28) {//2月28天
+                echo 'succ28';exit;
+            }
+            if ($lastd!=30&&$today==30) {//本月30天
+                echo 'succ30';exit;
+            }
+        }
+        
+
+        
+        $data_list = db('call_custom')->where($map)->whereTime('note_time','-15 days')->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->select();
+
+        $pj =[];
+        foreach ($data_list as $key => $value) {
+            $succ = db('call_custom')->where(['project_id'=>$value['project_id'],'source'=>$value['source']])->whereTime('note_time','-15 days')->where(['category'=>6])->count();
+            $pj[$value['project_id']][] = $value['source'].' 为'.$value['counts'].'条，签单'.$succ;
+        }
+        if (!$pj) {
+            echo '执行成功，无匹配数据';exit;
+        }
+        $content = '';
+        //项目
+        if (count($pj)>1) {//多项目组成
+            foreach ($pj as $key => $value) {
+                //取项目 取平均值
+                $pjnm = db('call_project_list')->where(['id'=>$key])->value('col1');
+                $map['project_id'] = $key;
+
+                $pjsum = db('call_custom')->where($map)->whereTime('note_time','-15 days')->count();
+                $pjsucc = db('call_custom')->where($map)->whereTime('note_time','-15 days')->where(['category'=>6])->count();
+                
+                //好奇小屋前15留言数据总数量为100条，其中签单数量为2条，UC 为50条，签单0，百度为50条签单2.
+                $content = $pjnm.'15天留言数据总数量为'.$pjsum.'条，其中签单数量为'.$pjsucc.'条，'.implode('，', $pj[$key]);
+
+                _sendMaster($content);
+            }
+            // echo $content;exit;
+            echo 'succ';
+            exit;
+        }else{
+            //取项目 签约单 总数量 平均签约成本
+            $pj_id = key($pj);
+            $map['project_id'] = $pj_id;
+            $pjnm = db('call_project_list')->where(['id'=>$pj_id])->value('col1');
+            $pjsum = db('call_custom')->where($map)->whereTime('note_time','-15 days')->count();
+            $pjsucc = db('call_custom')->where($map)->whereTime('note_time','-15 days')->where(['category'=>6])->count();
+
+            //好奇小屋前15留言数据总数量为100条，其中签单数量为2条，UC 为50条，签单0，百度为50条签单2.
+            $content .= $pjnm.'15天留言数据总数量为'.$pjsum.'其中签单数量为'.$pjsucc.'条，'.implode('，', $pj[$pj_id]);
+        }
+
+        _sendMaster($content);
+        echo 'succ';exit;
+
+
+    }
+
+    /**
+     * [previousfeereportTask 往年同期成本分析 月1号 管理员]
+     * @return [type] [description]
+     */
+    public function previousfeereportTask()
+    {
+        $map = [];
+        //去年的这个时间的下一个月 如：去年的3月
+        // $lasty =date('Y-m-d H:i:s', strtotime("-1 year"));
+        $lasty =date('Y-m-d H:i:s', time()-86400*8);
+        $lastyam = strtotime("$lasty+1 months");
+        $mtime[0] = $lasty;
+        $mtime[1] = date('Y-m-d H:i:s',$lastyam);
+
+        $data_list = db('call_custom')->where($map)->whereTime('note_time','between',$mtime)->field('*,avg(fee) as fees')->group('project_id')->select();
+        //好奇小屋，往年同期单条数据平均成本为100元，包含节日：元宵节
+        $pj =[];
+        foreach ($data_list as $key => $value) {
+            $pj[$value['project_id']][] = $value;
+        }
+        if (!$pj) {
+            echo '执行成功，无匹配数据';exit;
+        }
+        $content = '';
+        //项目
+        if (count($pj)>1) {//多项目组成
+            foreach ($pj as $key => $value) {
+                //好奇小屋，往年同期单条数据平均成本为100元，包含节日：元宵节
+                $pjnm = db('call_project_list')->where(['id'=>$key])->value('col1');
+                $map['project_id'] = $key;
+
+                $m1['GregorianDateTime'][0] = 'between time';
+                $m1['GregorianDateTime'][1][0] = $mtime[0];
+                $m1['GregorianDateTime'][1][1] = $mtime[1];
+                $festivals = db('call_calendar')->field('GROUP_CONCAT(GJie) as GJies ,GROUP_CONCAT(LJie) as LJies ')->where($m1)->group('LYear')->select();
+                $festival = '';
+                foreach ($festivals as $k => $v) {
+                    $festival .= str_replace(',',' ', $v['GJies'].$v['LJies']) ;
+                }
+
+                $content = $pjnm.'，往年同期单条数据平均成本为'.number_format($value[0]['fees'],1).'元，包含节日：'.$festival;
+
+                _sendMaster($content);
+            }
+            // echo $content;exit;
+            echo 'succ';
+            exit;
+        }else{
+            //往年同期单条数据平均成本为100元，包含节日：元宵节
+            $pj_id = key($pj);
+            $map['project_id'] = $pj_id;
+            $pjnm = db('call_project_list')->where(['id'=>$pj_id])->value('col1');
+
+            $m1['GregorianDateTime'][0] = 'between time';
+            $m1['GregorianDateTime'][1][0] = $mtime[0];
+            $m1['GregorianDateTime'][1][1] = $mtime[1];
+            $festivals = db('call_calendar')->field('GROUP_CONCAT(GJie) as GJies ,GROUP_CONCAT(LJie) as LJies ')->where($m1)->group('LYear')->select();
+            $festival = '';
+            foreach ($festivals as $k => $v) {
+                $festival .= str_replace(',',' ', $v['GJies'].$v['LJies']) ;
+            }
+
+            $content = $pjnm.'，往年同期单条数据平均成本为'.number_format($pj[$pj_id][0]['fees'],1).'元，包含节日：'.$festival;
+        }
+        _sendMaster($content);
+        echo 'succ';exit;
+    }
+    /**
+     * [customAreaTask 地区补充]
+     * @return [type] [description]
+     */
+    public function customAreaTask()
+    {
+        $map['city'] = null;
+        $area = db('call_custom')->field('id,name,note_area,province,city')->where($map)->select();
+        foreach ($area as $key => $value) {
+            if (strpos($value['note_area'],'省')) {
+                $areas = explode('省', $value['note_area']);
+            }
+            $mm['area_name'] = array('like','%'.$areas[1].'%');
+            $citycode = db('packet_common_area')->where($mm)->value('area_code');
+            $m['id'] = $value['id'];
+            $data['city'] = $citycode;
+            $data['province'] = db('packet_common_area')->where(['area_code'=>$citycode])->value('parent_code');
+
+            db('call_custom')->where($m)->update($data);
+        }
+        echo 'succ';exit;
+    }
+
+    /**
+     * [updateCallLog 更新呼叫日志]
+     * @return [type] [description]
+     */
+    public function updateCallLog()
+    {
+        //查找要更新的数据
+        $map['status'] = 0;
+        $map['code'] = array('neq','');
+        $info = db('call_log')->where($map)->select();
+
+        //拉接口
+        foreach ($info as $key => $value) {
+            $params['transactionId'] = $value['code'];
+            $status = ring_up_new('getOneRecord',$params);
+            $ret = json_decode($status,true);
+            if ($ret['status']==0) {
+                continue;
+            }
+            if ($ret['status']==true&&!isset($ret['data'])) {
+                continue;
+            }
+            //处理更新
+            switch ($ret['list']['calltype']) {
+                case 'outcall':
+                    $type = '2';
+                    break;
+                case 'from-internal':
+                    $type = '4';
+                    break;
+                
+                default:
+                    break;
+            }
+            $s['callType'] = $type;
+            $s['timeLength'] = $ret['list']['billsec'];
+            $s['addtime'] = $ret['list']['startTime'];
+            $s['recordURL'] = $ret['list']['userfield'];
+            db('call_log')->insert($s);
+        }
+        echo 'succ';exit;
+        
+    }
+
+    /**
+     * [updateCallRecord 录音下载]
+     * @return [type] [description]
+     */
+    // public function updateCallRecord()
+    // {
+
+    // }
+
+    /**
+     * [employTask 分配任务提醒]
+     * @return [type] [description]
+     */
+    public function employTask()
+    {
+        //分配任务
+        //提醒 第一、二天 3次 第三、四、五提醒1次
+        $m['status'] = 1;
+        $ent = time();
+        $date=floor((strtotime($enddate)-strtotime($startdate))/86400);
+        $task = db('call_alloc_log')->where($m)->select();
+        $currH = date('t',time());
+        foreach ($task as $key => $value) {
+            if (floor(($ent-$value['create_time'])/86400 <= 5) {
+                $diff = floor(($ent-$value['create_time'])/86400;
+                switch ($diff) {
+                    case 1:
+                        // 9点 12点 17点
+                        notice_log('task',$value['user_id'],['custom'=>$value['custom_id']],true);
+                        break;
+                    case 2:
+                        // 9点 12点 17点
+                        notice_log('task',$value['user_id'],['custom'=>$value['custom_id']],true);
+                        break;
+                    case 3:
+                        // 12点 
+                        if ($currH>10&&$currH<17) {
+                            notice_log('task',$value['user_id'],['custom'=>$value['custom_id']],true);
+                        }
+
+                        break;
+                    case 4:
+                        // 12点 
+                        if ($currH>10&&$currH<17) {
+                            notice_log('task',$value['user_id'],['custom'=>$value['custom_id']],true);
+                        }
+                        break;
+                    case 5:
+                        // 12点 
+                        if ($currH>10&&$currH<17) {
+                            notice_log('task',$value['user_id'],['custom'=>$value['custom_id']],true);
+                        }
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }
+            }
+        }
+    }
+
+
+    /**
+     * [_sendMaster 通用发送方法]
+     * @param  [type] $msg [description]
+     * @return [type]       [description]
+     */
+    function _sendMaster($msg)
+    {
+        $touser = db('admin_user')->where(['id'=>1])->find();
+        //push
+        $toparty = [];
+        $totag = [];
+        $user = [];
+        array_push($user, $touser['wechat_name']);
+
+        $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $msg]);
+
+    }
     public function testask()
     {
         // notice_log('recover',1,['custom'=>'1','project'=>1],true);

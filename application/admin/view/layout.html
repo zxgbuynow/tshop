@@ -276,9 +276,30 @@
                                 <i class="si si-logout pull-right"></i>退出帐号
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </li>
+            {neq name="Think.session.user_auth.uid" value="1"}
+            <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="extension-no">{$_auth_sign|default='签入分机'}</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        {volist name="_extens" id="_exten"}
+                            <li>
+                                <a tabindex="-1" href="javascript:void(0)" class="extension-toggle" data-id="{$_exten.id}">
+                                    {$_exten.title}
+                                </a>
+                            </li>
+                        
+                        {/volist}
+                    </ul>
+                </div>
+            </li>
+            {/neq}
             <li>
                 <a class="btn btn-default ajax-get" href="{:url('admin/index/wipeCache')}" data-toggle="tooltip" data-placement="bottom" data-original-title="清空缓存">
                     <i class="fa fa-trash"></i>
@@ -514,6 +535,22 @@
     // 后端推送来在线数据时
     socket.on('update_online_count', function(online_stat){
         console.log(online_stat);
+    });
+
+    // 签入
+    $('.extension-toggle').click(function(e){
+        // Dolphin.loading();
+        var id = $(this).attr('data-id');
+        $.post("{:url('call/ajax/getEextensionSt')}", {id:id}, function(data) {
+            Dolphin.loading('hide');
+            console.log(data);
+            if (data.code) {
+                $('.extension-no').text(data.list.id);
+                Dolphin.notify(data.msg, 'success');
+            } else {
+                Dolphin.notify(data.msg, 'danger');
+            }
+        });
     });
 
 </script>

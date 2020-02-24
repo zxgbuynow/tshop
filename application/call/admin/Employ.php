@@ -31,8 +31,25 @@ class Employ extends Admin
         $map = $this->getMap();
 
         $map['id'] = array('NEQ','1');
+        //分机状态
+        $exst = [];
+        $status = ring_up_new('getAllExtensStatus');
+        $ret = json_decode($status,true);
+
+        if ($ret['status']==true&&!isset($ret['data'])) {
+            $exst = array_column($ret['data'], 'id','status');
+        }
         // 数据列表
-        $data_list = UserModel::where($map)->order('sort,id desc')->paginate();
+        $data_list = UserModel::where($map)->order('sort,id desc')->paginate()->each(function($item, $key) use ($exst){
+            $item->extension = db('call_extension_log')->where(['user_id'=>$item['id']])->whereTime('create_time', 'today')->order('id DESC')->value('extension');
+            if ($item->extension) {
+                $item->extensionst = $exst[$item->extension];
+            }else{
+                $item->extensionst = '未签入';
+            }
+            
+
+        });
 
         // 分页数据
         $page = $data_list->render();
@@ -40,7 +57,8 @@ class Employ extends Admin
         // 授权按钮
         $btn_access = [
             'title' => '推送消息',
-            'icon'  => 'fa fa-fw fa-comment',
+            'icon'  => 'fa fa-fw fa-comment ',
+            'class' => 'ajax-get',
             'href'  => url('push', ['wechatnm' => '__wechat_name__'])
         ];
 
@@ -56,13 +74,16 @@ class Employ extends Admin
                 ['role', '角色', 'select', RoleModel::getTree(null, false)],
                 ['email', '邮箱'],
                 ['mobile', '手机号'],
+                ['extension', '签入分机号'],
+                ['extensionst', '分机状态'],
                 ['wechat_name', '微信企业用户名','text.edit'],
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
-                ['right_button', '操作', 'btn']
+                ['is_maner', '主管', 'switch'],
+                // ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
-            ->addRightButton('custom', $btn_access) // 添加授权按钮
+            // ->addRightButton('custom', $btn_access) // 添加授权按钮
             ->addRightButtons('edit,delete') // 批量添加右侧按钮
             ->setRowList($data_list) // 设置表格数据
             ->setPages($page) // 设置分页数据
@@ -399,7 +420,20 @@ class Employ extends Admin
      */
     public function quickEdit($record = [])
     {
+        $data = $this->request->post();
         $id = input('post.pk', '');
+        if ($data['name']=='is_maner') {
+            $role = db('admin_user')->where(['id'=>$id])->value('role');
+            //是否有其他主管
+            if (db('admin_user')->where(['role'=>$role,'is_maner'=>1])->find()) {
+                //有
+                db('admin_user')->where(['role'=>$role])->update(['is_maner'=>0]);
+                db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
+            }else{
+                db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
+            }
+            $this->success('操作成功', url('index'));exit;
+        }
         return parent::quickEdit(['Employ_edit', 'call', 0, UID, $id]);
     }
     // public function quickEdit($record = [])

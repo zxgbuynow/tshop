@@ -7,6 +7,9 @@ use app\call\model\Custom as CustomModel;
 use app\call\model\CustomEXLog as CustomEXLogModel;
 use app\call\model\Recoverdt as RecoverdtModel;
 use app\admin\model\Config as ConfigModel;
+use app\call\model\Cat as CatModel;
+use app\call\model\Alloclg as AlloclgModel;
+use app\call\model\Alloc as AllocModel;
 use think\Cache;
 use think\Db;
 /**
@@ -29,11 +32,22 @@ class Custom extends Admin
 
 
         // 数据列表
-        $data_list = CustomModel::where($map)->order('id desc')->paginate();
+        $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key){
+            $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+
+        });
 
         // 分页数据
         $page = $data_list->render();
 
+        $btn_access = [
+            'title' => '设置客户分类',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('cat',['id'=>'__id__'])
+        ];
+
+        $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
 
@@ -43,6 +57,7 @@ class Custom extends Admin
                 ['name', '客户名称'],
                 ['tel', '客户电话'],
                 ['mobile', '客户手机'],
+                ['categorys', '分类'],
                 ['source', '来源'],
                 ['email', '邮箱'],
                 ['address', '地址'],
@@ -54,13 +69,40 @@ class Custom extends Admin
                 // ['status', '状态', 'switch'],
                 // ['right_button', '操作', 'btn']
             ])
-            // ->addTopButton('add', ['href' => url('add')])
+            ->addTopButton('custom', $btn_access,true)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [cat description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function cat($id = null)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            if ($props = CatModel::create($data)) {
+                $this->success('新增成功', null,'_close_pop');
+            } else {
+                $this->error('新增失败',null,'_close_pop');
+            }
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['text', 'title', '分类标题'],
+                ['text', 'desc', '说明'],
+                ['radio', 'status', '立即启用', '', ['否', '是'], 1]
+            ])
+            ->fetch();
+    }
     /**
      * [import 导入日志]
      * @return [type] [description]
@@ -255,6 +297,18 @@ class Custom extends Admin
             'tab2' => ['title' => '公海列表', 'url' => url('gtback', ['group' => 'tab2'])],
         ];
 
+        $sources = db('call_custom')->column('source');
+        foreach ($sources as $key => $value) {
+            $list_source[$value] = $value;
+        }
+
+        $btn_alloc = [
+            'title' => '分配',
+            'icon'  => 'fa fa-fw fa-stack-overflow',
+            'class' => 'btn btn-default ajax-post',
+            'href' => url('alloc')
+        ];
+
         if ($group=='tab1') {
             $map['status'] = 1;
             // 数据列表
@@ -263,30 +317,45 @@ class Custom extends Admin
             // 分页数据
             $page = $data_list->render();
 
-      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
-      // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-      // `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
-      // `create_time` int(10) unsigned DEFAULT NULL,
-      // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
+     
             // 使用ZBuilder快速创建数据表格
             return ZBuilder::make('table')
-                ->hideCheckbox()
+                // ->hideCheckbox()
                 ->setPageTitle('回收列表') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
-                // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+                ->setSearchArea([
+                    ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['select', 'source', '平台来源', '', '', $list_source],
+
+                ])
                 ->addColumns([ // 批量添加数据列
                     ['id', 'ID'],
                     ['project', '项目'],
-                    ['custom', '客户'],
-                    ['create_time', '创建时间','datetime'],
-                    ['status', '状态', 'switch'],
-                    ['right_button', '操作', 'btn']
+                    ['source', '客户来源'],
+                    ['custom', '客户名称'],
+                    ['note_time', '留言时间'],
+                    ['mobile', '电话'],
+                    ['alloc_time', '分配时间','datetime'],
+                    ['call_count', '呼叫次数'],
+                    ['alloc_count', '分配次数'],
+
+                    ['first_standard', '第1天达标情况'],
+                    ['second_standard', '第2天达标情况'],
+                    ['third_standard', '第3天达标情况'],
+                    ['fourth_standard', '第4天达标情况'],
+                    ['fifth_standard', '第5天达标情况'],
+
+                    ['create_time', '加入公海时间','datetime'],
+                    ['user', '操作人'],
+                    // ['status', '状态', 'switch'],
+                    // ['right_button', '操作', 'btn']
                 ])
 
-                // ->addTopButton('add', ['href' => url('add')])
-                ->addRightButton('delete')
+                ->addTopButton('custom', $btn_alloc,['title' => '分配员工'])
+                // ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
-                ->raw('project,custom') // 使用原值
+                ->raw('project,user') // 使用原值
                 ->fetch(); // 渲染模板
         }
         
@@ -298,34 +367,116 @@ class Custom extends Admin
 
             // 分页数据
             $page = $data_list->render();
-
-      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '品牌id',
-      // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-      // `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
-      // `create_time` int(10) unsigned DEFAULT NULL,
-      // `status` tinyint(1) DEFAULT '1' COMMENT '9公海1回收',
             // 使用ZBuilder快速创建数据表格
             return ZBuilder::make('table')
-                ->hideCheckbox()
+                // ->hideCheckbox()
                 ->setPageTitle('公海列表') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
-                // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+                ->setSearchArea([
+                    ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['select', 'source', '平台来源', '', '', $list_source],
+
+                ])
                 ->addColumns([ // 批量添加数据列
                     ['id', 'ID'],
                     ['project', '项目'],
-                    ['custom', '客户'],
-                    ['create_time', '创建时间','datetime'],
-                    ['status', '状态', 'switch'],
-                    ['right_button', '操作', 'btn']
-                ])
+                    ['source', '客户来源'],
+                    ['custom', '客户名称'],
+                    ['note_time', '留言时间'],
+                    ['mobile', '电话'],
+                    ['alloc_time', '分配时间','datetime'],
+                    ['call_count', '呼叫次数'],
+                    ['alloc_count', '分配次数'],
 
+                    ['first_standard', '第1天达标情况'],
+                    ['second_standard', '第2天达标情况'],
+                    ['third_standard', '第3天达标情况'],
+                    ['fourth_standard', '第4天达标情况'],
+                    ['fifth_standard', '第5天达标情况'],
+
+                    ['create_time', '加入公海时间','datetime'],
+                    ['user', '操作人'],
+                ])
+                ->addTopButton('custom', $btn_alloc,['title' => '分配员工'])
                 // ->addTopButton('add', ['href' => url('add')])
-                ->addRightButton('delete')
+                // ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
-                ->raw('project,custom') // 使用原值
+                ->raw('project,user') // 使用原值
                 ->fetch(); // 渲染模板
         }
 
+    }
+
+    /**
+     * [alloc 分配]
+     * @return [type] [description]
+     */
+    public function alloc()
+    {
+        // $ids = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            if (!$data['ids']) {
+                $this->error('数据缺失',  null,'_close_pop');
+            }
+            //user_id ids 
+            $s['op_id'] = UID;
+            $s['alloc_count'] = 1;
+            $s['create_time'] = time();
+            $s['way'] = 2;
+            if ($props = AllocModel::create($s)) {
+
+                $insert_id = $props->id;
+                //log
+                $sl = [];
+                $ids = explode(',', $data['ids']);
+                foreach ($ids as $key => $value) {
+                    //回收数据id
+                    db('call_recover_data')->where(['id'=>$value])->update(['status'=>0]);
+                    $custom_id = db('call_recover_data')->where(['id'=>$value])->value('custom_id');
+                    $sl[$key]['alloc_id'] = $insert_id;
+                    $sl[$key]['custom_id'] = $custom_id;
+                    $sl[$key]['create_time'] = time();
+                    $sl[$key]['alloc_count'] = 1;
+                }
+                $RoleModel = new AlloclgModel();
+                $RoleModel->saveAll($sl);
+
+                $this->success('分配成功', null, '_parent_reload');
+            } else {
+                $this->error('分配失败',  null,'_close_pop');
+            }
+        }  
+
+        $m['id'] = array('gt',1);
+        $ls = db('admin_user')->where($m)->column('id,nickname');
+        $js = <<<EOF
+            <script type="text/javascript">
+                $(function(){
+                    var abc = parent.document.getElementsByName('ids[]');
+                    var ids = [];
+                    for(j=0;j<abc.length;j++)
+                    {
+                        if(abc[j].checked==true){ids.push(abc[j].value);}
+                         
+                    }
+
+                    $('#ids').val(ids)
+                });
+            </script>
+EOF;
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['select', 'employ_id', '员工','',$ls],
+                ['hidden', 'ids'],
+            ])
+            ->setExtraJs($js)
+            ->fetch();
     }
 
     /**
@@ -421,6 +572,42 @@ class Custom extends Admin
     public function quickEdit($record = [])
     {
         $id = input('post.pk', '');
+
+        //分类设置
+        // $data = $this->request->post();
+        // if ($data['name']=='category') {
+        //     if ($data['value']==6) {//签约
+        //         $toparty = [];
+        //         $totag = [];
+        //         $msgtype = 'text';
+        //         $touser = db('admin_user')->where(['id'=>UID])->find();
+        //         $info = db('call_custom')->where(['id'=>$data['pk']])->find();
+        //         $content = $info['name'].'已签约,操作员工'.$touser['nickname'].date('Y-m-d H:i',time());//张三|客户名称]已签约，操作员工[李四|操作人]，[2020-2-6|修改时间
+        //         $user = [];
+        //         array_push($user, $touser['wechat_name']);
+        //         $result = plugin_action('Wechat/Wechat/send',[$user , $toparty , $totag , $msgtype  , $content]);
+        //         // $isTrue = push_24_report_msg($touser['wechat_name'] , $toparty , $totag , $msgtype  , $content);         
+        //         if ($result['code']) {
+        //             //生成日志
+        //             $s['create_time'] = time();
+        //             $s['category'] = $data['value'];
+        //             $s['custom_id'] = $data['pk'];
+        //             $s['export_time'] = $info['create_time'];
+        //             $s['employ_id'] = UID;
+        //             db('call_report_custom_cat')->insert($s);
+        //         }
+        //     }
+        //     // $info = db('call_custom')->where(['id'=>$data['pk']])->find();
+        //     //ts
+        //     // $s['create_time'] = time();
+        //     // $s['category'] = $data['value'];
+        //     // $s['custom_id'] = $data['pk'];
+        //     // $s['export_time'] = $info['create_time'];
+        //     // $s['employ_id'] = UID;
+        //     // db('call_report_custom_cat')->insert($s);
+        // }
+        // db('call_custom')->where(['id'=>$data['pk']])->update(['update_time'=>time()]);
+        
         return parent::quickEdit(['call_auth_edit', 'call', 0, UID, $id]);
     }
    

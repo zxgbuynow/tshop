@@ -309,6 +309,20 @@ CREATE TABLE `zg_call_custom_cat` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='客户分类表';
 
+DROP TABLE IF EXISTS `zg_call_report_custom_cat`;
+CREATE TABLE `zg_call_report_custom_cat` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
+  `category` int(10) unsigned DEFAULT '0' COMMENT '分类id',
+  `export_time` int(10) unsigned DEFAULT NULL,
+  `employ_id` int(10) unsigned DEFAULT '0' COMMENT '员工id',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT  CHARSET=utf8mb4  COMMENT='客户分类报表';
+
+
+
 DROP TABLE IF EXISTS `zg_call_webchat`;
 CREATE TABLE `zg_call_webchat` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '授权id',

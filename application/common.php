@@ -60,7 +60,17 @@ if (!function_exists('data_auth_sign')) {
         return $sign;
     }
 }
-
+if (!function_exists('get_auth_call_sign')) {
+    /**
+     * [get_auth_call_sign 呼叫签名]
+     * @param  array  $data [description]
+     * @return [type]       [description]
+     */
+    function get_auth_call_sign($data = [])
+    {
+       return data_auth_sign($data);
+    }
+}
 if (!function_exists('get_file_path')) {
     /**
      * 获取附件路径
@@ -1560,6 +1570,40 @@ return 'cb_callout({"status":1,"Info":{ "result":"success", "phone":"18321271831
     }
 }
 
+if (!function_exists('ring_up_new')) {
+
+    /**
+     * [ring_up 呼叫]
+     * @param  [type] $aciton [description]
+     * @param  [type] $params [description]
+     * @return [type]         [description]
+     */
+    function ring_up_new($aciton, $params = [])
+    {
+
+        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        if (!$ser) {
+            return false;
+        }
+        if ($params) {
+        
+            $serv_url = $ser.'?model='.$aciton.'&';
+            $serv_url .=http_build_query($params);
+        }else{
+            $serv_url = $ser.'?model='.$aciton;
+        }
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $serv_url );
+        // curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        // curl_setopt ( $ch, CURLOPT_POSTFIELDS, $params );
+        // curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
 
 if (!function_exists('notice_log')) {
     /**
@@ -1679,5 +1723,46 @@ if (!function_exists('get_employ')) {
             return '';
         }
         return $info['nickname'];
+    }
+}
+
+if (!function_exists('push_24_report_msg')) {
+    function push_24_report_msg($touser = [], $toparty = [], $totag = [], $msgtype = 'text' , $content)
+    {
+        //张三|客户名称]已签约，操作员工[李四|操作人]，[2020-2-6|修改时间
+        $user = [];
+        array_push($user, $touser);
+        $toparty = [];
+        $totag = [];
+        $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $content]);
+        if($result['code']){
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+if (!function_exists('make_crontab')) {
+    /**
+     * [make_crontab 生成任务]
+     * @param  [type] $tag     [description]
+     * @param  [type] $aciton  [description]
+     * @param  [type] $content [description]
+     * @return [type]          [description]
+     */
+    function make_crontab($tag,$action,$content,$touser)
+    {
+        $data['content'] = $content;
+        $data['tag'] = $tag;
+        $data['action'] = $action;
+        $data['webchat'] = $touser;
+        db('call_crontab')->insert($data);
+    }
+}
+if (!function_exists('replaceTel')) {
+    function replaceTel($tels) {
+        $new_tels = substr_replace($tels, '****', 3, 4);
+        return $new_tels;
     }
 }

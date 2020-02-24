@@ -26,4 +26,8 @@ class Alloclg extends Model
         
         return db('call_custom')->where(['id'=>$data['custom_id']])->value('name');
     }
+
+    public function getTimerangeAttr($value, $data){
+        return '';
+    }
 }

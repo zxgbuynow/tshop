@@ -52,6 +52,9 @@ class Admin extends Common
         $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;',$_advpush ) ;
         // $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;', array_column($_advList, 'content')) ;
         $this->assign('swiperAdvList', $_advstr);
+
+
+
         // 设置分页参数
         $this->setPageParam();
         // 如果不是ajax请求，则读取菜单
@@ -65,7 +68,13 @@ class Admin extends Common
             // 获取面包屑导航
             $this->assign('_location', MenuModel::getLocation('', true));
 
+            //分机
+            $_exten['status'] = 1;
+            $_extens = db('call_extension')->where($_exten)->select();
+            $this->assign('_extens', $_extens);
 
+            //当前签入
+            $this->assign('_auth_sign', session('user_auth_extension')?session('user_auth_extension')['exten']:'');
 
             // 构建侧栏
             // $data = [

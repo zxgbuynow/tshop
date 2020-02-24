@@ -1,0 +1,19 @@
+<div>
+	<p style="text-align: center;padding: 50px 0px;">呼叫成功！</p>
+</div>
+<script src="__ADMIN_JS__/core/jquery.min.js"></script>
+<script src="__ADMIN_JS__/core/bootstrap.min.js"></script>
+<script type="text/javascript">
+    $(function(){
+    	//父级页面客户信息
+    	setTimeout(function(){
+    		$('.get-user-info',window.parent.document)[0].click();
+    		var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+			parent.layer.close(index); //再执行关闭
+    	},1000)
+    	//关闭当前页
+    	// setTimeout(function(){
+    	// 	$('.get-user-info',window.parent.document)[0].click();
+    	// },1100)
+    });
+</script>
