@@ -49,7 +49,7 @@ class Ondate extends Admin
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['custom', '客户'],
-                ['ondate', '预约时间'],
+                ['ondate', '预约时间','datetime'],
                 ['sign_time', '录入时间','datetime'],
                 ['create_time', '创建时间','datetime'],
                 ['status', '状态', 'switch'],

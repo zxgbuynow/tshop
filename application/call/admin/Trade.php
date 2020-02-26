@@ -29,7 +29,9 @@ class Trade extends Admin
         $map = $this->getMap();
 
         // 数据列表
-        $data_list = TradeModel::where($map)->order('id desc')->paginate();
+        $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->menger = db('admin_user')->where(['id'=>$item['menger']])->value('nickname');
+        });;
 
         // 分页数据
         $page = $data_list->render();
@@ -63,6 +65,7 @@ class Trade extends Admin
                 ['sign_time', '签约时间','datetime'],
                 ['create_time', '创建时间','datetime'],
                 ['statustx', '状态'],
+                ['menger', '负责人'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
@@ -91,6 +94,7 @@ class Trade extends Admin
         // 数据列表
         $data_list = TradelogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->trade = db('call_trade')->where(['id'=>$item['trade_id']])->value('title');
+            $item->oper = db('admin_user')->where(['id'=>$item['oper']])->value('nickname');
         });
 
         // 分页数据
@@ -104,6 +108,7 @@ class Trade extends Admin
                 ['id', 'ID'],
                 ['trade', '合同'],
                 ['node', '日志'],
+                ['oper', '操作人'],
             ])
             ->setRowList($data_list) // 设置表格数据
             ->setPages($page) // 设置分页数据
