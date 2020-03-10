@@ -103,7 +103,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate();
         if (isset($map['create_time'])) {
@@ -122,6 +122,22 @@ class Report extends Admin
             'class' => 'btn btn-default ajax-get',
             'href' => url('trangeSetting',['tag'=>'timeLength'])
         ];
+        if (isset($map['create_time'])) {
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('timeLenthexport',['timerange'=>json_encode($map)])
+            ];
+        }else{
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('timeLenthexport')
+            ];
+        }
+        
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addTimeFilter('create_time') // 添加时间段筛选
@@ -134,9 +150,40 @@ class Report extends Admin
                 ['timerange', '时间段'],
             ])
             ->addTopButton('custom', $btn_access,true)
+            ->addTopButton('custom', $btnexport)
             ->setRowList($data_list)// 设置表格数据
             ->raw('user') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [timeLenthexport 导出]
+     * @return [type] [description]
+     */
+    public function timeLenthexport($timerange = [])
+    {
+        
+        //查询数据
+        if (!$timerange) $this->error('缺少参数');
+        $map = object_to_array(json_decode(str_replace('+',' ',urldecode($timerange))));
+
+        if (isset($map['create_time'])) {
+            $data = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+                    $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
+                    $item->__INDEX__ = $key+1;
+                });
+        }
+       
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['user','auto', '员工'],
+            ['times','auto', '呼出通话时长'],
+            ['__INDEX__','auto', '时长排名'],
+            ['timerange','auto', '时间段'],
+
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['呼出时长报表', $cellName, $data]);
     }
 
     /**
@@ -177,17 +224,14 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 1;
         $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->paginate();
-        // if (isset($map['update_time'])) {
-        //     $data_list = CalllogModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->paginate();
-        // }
+        
         
         // 分页数据
         $page = $data_list->render();
-
 
         $btn_access = [
             'title' => '配置',
@@ -195,6 +239,22 @@ class Report extends Admin
             'class' => 'btn btn-default ajax-get',
             'href' => url('classasetting',['tag'=>'classAReport'])
         ];
+
+        if (isset($map['update_time'])) {
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('classAReportexport',['timerange'=>json_encode($map)])
+            ];
+        }else{
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('classAReportexport')
+            ];
+        }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addTimeFilter('update_time') // 添加时间段筛选
@@ -207,9 +267,41 @@ class Report extends Admin
                 ['employ', '操作人'],
             ])
             ->addTopButton('custom', $btn_access,true)
+            ->addTopButton('custom', $btnexport)
             ->setRowList($data_list)// 设置表格数据
             ->raw('project,categorys,employ') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classAReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classAReportexport($timerange = [])
+    {
+        
+        //查询数据
+        if (!$timerange) $this->error('缺少参数');
+        $map = object_to_array(json_decode(str_replace('+',' ',urldecode($timerange))));
+
+        if (isset($map['update_time'])) {
+            $map['category'] = 1;
+            $data = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    $item->timerange = $map['update_time'][1][0].'~'.$map['update_time'][1][1];
+                });
+        }
+       
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source','auto', '客户来源'],
+            ['fees','auto', '成本'],
+            ['categorys','auto', '客户分类'],
+            ['employ','auto', '操作人'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['A类周平均成本', $cellName, $data]);
     }
 
     /**
@@ -250,7 +342,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->paginate();
        
@@ -264,6 +356,21 @@ class Report extends Admin
             'href' => url('classnsetting',['tag'=>'classNReport'])
         ];
 
+        if (isset($map['update_time'])) {
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('classNReportexport',['timerange'=>json_encode($map)])
+            ];
+        }else{
+            $btnexport = [
+                // 'class' => 'btn btn-info',
+                'title' => '导出',
+                'icon'  => 'fa fa-fw fa-file-excel-o',
+                'href'  => url('classNReportexport')
+            ];
+        }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addTimeFilter('update_time') // 添加时间段筛选
@@ -278,8 +385,37 @@ class Report extends Admin
             // ->addTopButton('custom', $btn_access,true)
             ->setRowList($data_list)// 设置表格数据
             ->addTopButton('custom', $btn_access,true)
+            ->addTopButton('custom', $btnexport)
             ->raw('project,categorys,employ') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classNReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classNReportexport($timerange = [])
+    {
+        
+        //查询数据
+        if (!$timerange) $this->error('缺少参数');
+        $map = object_to_array(json_decode(str_replace('+',' ',urldecode($timerange))));
+
+        if (isset($map['update_time'])) {
+            $data = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    $item->timerange = $map['update_time'][1][0].'~'.$map['update_time'][1][1];
+                });
+        }
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source','auto', '客户来源'],
+            ['fees','auto', '成本'],
+            ['timerange','auto', '查询时间段'],
+            // ['employ','auto', '操作人'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['单条客户平均成本', $cellName, $data]);
     }
 
     /**
@@ -320,22 +456,21 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 6;
-        // print_r($map);exit;
         if (isset($map['sign_time'])) {
             $m['create_time'] = $map['sign_time'];
             $ids = ReportcatModel::where($m)->column('custom_id');
             $map['id'] = array('in',array_unique($ids));
             unset($map['sign_time']);
         }
-        
         if (!isset($map['note_time'])) {
-            $map['id'] = 99999;//无时间查询过滤
+            $map['id'] = '';//无时间查询过滤
             $data_list = CustomModel::where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->paginate();
         }else{
             $data_list = CustomModel::where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    $item->avgffee = number_format($item['avgffee'],1);
                     unset($m1);
                     unset($m2);
                     $m1['note_time'] = $map['note_time']; 
@@ -343,16 +478,16 @@ class Report extends Admin
                     $m1['source'] = $item['source'];
                     $item->total =  CustomModel::where($m1)->count();//当前查询总量
 
-                    $item->avgfee =  CustomModel::where($m1)->avg('fee');//当月单条平均成本
+                    $item->avgfee =  number_format(CustomModel::where($m1)->avg('fee'),1);//当月单条平均成本
                     $m2 = $m1;
                     $m2['note_time'][0] = '< time';
                     $m2['note_time'][1] = $m1['note_time'][1][0];
 
                     $item->ftotal =  CustomModel::where($m2)->count();//往期数据总数量
-                    $item->favgfee =  CustomModel::where($m2)->avg('fee');//往期单条客户成本
+                    $item->favgfee =  number_format(CustomModel::where($m2)->avg('fee'),1);//往期单条客户成本
                     $m2['category'] = 6;
                     $item->fcounts =  CustomModel::where($m2)->count();//往期签单数量
-                    $item->favgffee =  CustomModel::where($m2)->avg('fee');//往期签约平均成本
+                    $item->favgffee =  number_format(CustomModel::where($m2)->avg('fee'),1) ;//往期签约平均成本
                 });
         }
         
@@ -371,6 +506,14 @@ class Report extends Admin
             'class' => 'btn btn-default ajax-get',
             'href' => url('classfsetting',['tag'=>'classFReport'])
         ];
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classFReportexport',http_build_query($this->request->param()))
+        ];
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             // ->addTimeFilter('note_time','','留言开始时间,留言结束时间') // 添加时间段筛选
@@ -395,9 +538,74 @@ class Report extends Admin
                 
             ])
             ->addTopButton('custom', $btn_access,true)
+            ->addTopButton('custom', $btnexport)
             ->setRowList($data_list)// 设置表格数据
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classNReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classFReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $map = deep_array_map($map);
+        $map['category'] = 6;
+        if (isset($map['sign_time'])) {
+            $m['create_time'] = $map['sign_time'];
+            $ids = ReportcatModel::where($m)->column('custom_id');
+            $map['id'] = array('in',array_unique($ids));
+            unset($map['sign_time']);
+        }
+        
+        if (!isset($map['note_time'])) {
+            $map['id'] = '';//无时间查询过滤
+            $data_list = CustomModel::where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->paginate();
+        }else{
+            $data = CustomModel::where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    $item->avgffee = number_format($item['avgffee'],1);
+                    unset($m1);
+                    unset($m2);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+
+                    $item->avgfee =  number_format(CustomModel::where($m1)->avg('fee'),1);//当月单条平均成本
+                    $m2 = $m1;
+                    $m2['note_time'][0] = '< time';
+                    $m2['note_time'][1] = $m1['note_time'][1][0];
+
+                    $item->ftotal =  CustomModel::where($m2)->count();//往期数据总数量
+                    $item->favgfee =  number_format(CustomModel::where($m2)->avg('fee'),1);//往期单条客户成本
+                    $m2['category'] = 6;
+                    $item->fcounts =  CustomModel::where($m2)->count();//往期签单数量
+                    $item->favgffee =  number_format(CustomModel::where($m2)->avg('fee'),1) ;//往期签约平均成本
+
+                    // $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+                });
+        }
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source', 'auto', '客户来源'],
+            ['total', 'auto', '当月数据总数量'],
+            ['counts', 'auto', '当月签单数量'],
+            ['avgfee', 'auto', '当月单条平均成本'],
+            ['avgffee', 'auto', '当月签约平均成本'],
+            ['favgfee', 'auto', '往期单条客户成本'],
+            ['ftotal', 'auto', '往期数据总数量'],
+            ['fcounts', 'auto', '往期签单数量'],
+            ['favgffee','auto',  '往期签约平均成本'],
+            // ['timerange','auto', '留言时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['当月签约客户平均成本', $cellName, $data]);
     }
 
     /**
@@ -437,7 +645,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 6;
 
@@ -451,7 +659,7 @@ class Report extends Admin
 
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -463,6 +671,13 @@ class Report extends Admin
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classf15Reportexport',http_build_query($this->request->param()))
+        ];
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -479,10 +694,48 @@ class Report extends Admin
                 ['counts', '签单数量'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
     }
 
+    /**
+     * [classNReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classf15Reportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $map['category'] = 6;
+        if (isset($map['note_time'])) {
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    unset($m1);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+
+
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source', 'auto', '客户来源'],
+            ['total', 'auto', '留言总数量'],
+            ['counts', 'auto', '签单数量'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['15天签约数量统计', $cellName, $data]);
+    }
     /**
      * [classFweekReport 每周所有平台签约数量]
      * @return [type] [description]
@@ -495,7 +748,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 6;
 
@@ -510,7 +763,7 @@ class Report extends Admin
 
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -522,6 +775,12 @@ class Report extends Admin
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classFweekReportexport',http_build_query($this->request->param()))
+        ];
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -539,8 +798,55 @@ class Report extends Admin
                 ['rate', '签单数量占比'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classFweekReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $map['category'] = 6;
+        if (isset($map['note_time'])) {
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    unset($m1);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+                    $item->rate = (number_format($item['counts']/$item->total,1)*100).'%';
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classFweekReportexport',http_build_query($this->request->param()))
+        ];
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source','auto', '客户来源'],
+            ['total', 'auto','留言总数量'],
+            ['counts', 'auto','签单数量'],
+            ['rate', 'auto','签单数量占比'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['周所有平台签约数量', $cellName, $data]);
     }
 
     /**
@@ -556,7 +862,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 6;
 
@@ -577,7 +883,7 @@ class Report extends Admin
 
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -589,7 +895,12 @@ class Report extends Admin
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
-
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classFWeekTimelgReportexport',http_build_query($this->request->param()))
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearchArea([
@@ -607,8 +918,57 @@ class Report extends Admin
                 ['pec', '每单的分钟数'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classFWeekTimelgReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $map['category'] = 6;
+
+        if (isset($map['note_time'])) {
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    unset($m1);
+                    unset($m2);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+                    $mbs = CustomModel::where($m1)->column('mobile');
+                    $m2['create_time'] = $map['note_time'];
+                    $m2['calledNum'] = array('in',$mbs);
+                    // print_r($mbs);exit;
+                    $item->timeLg = ceil(CalllogModel::where($m2)->sum('timeLength')/60);
+                    $item->pec = ceil($item->timeLg/$item['counts']);
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source', 'auto','客户来源'],
+            ['total', 'auto','留言总数量'],
+            ['timeLg', 'auto','平台通话时长(分)'],
+            ['counts','auto', '签单数量'],
+            ['pec', 'auto','每单的分钟数'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['周所有平台通话时长签约', $cellName, $data]);
     }
 
     /**
@@ -622,7 +982,7 @@ class Report extends Admin
 
         // 数据列表
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         $map['category'] = 6;
         
@@ -651,7 +1011,7 @@ class Report extends Admin
 
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -664,6 +1024,12 @@ class Report extends Admin
             $list_source[$value] = $value;
         }
 
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('classFRateReportexport',http_build_query($this->request->param()))
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearchArea([
@@ -682,8 +1048,65 @@ class Report extends Admin
                 ['rate', '签约率'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+     /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function classFRateReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $map['category'] = 6;
+        
+
+        if (isset($map['area'])) {
+            if (strpos($map['area'][1],'省')) {
+                $map['area'][1] = explode('省', $map['area'][1])[1];
+            }
+            $mm['area_name'] = array('like','%'.$map['area'][1].'%');
+            $citycode = db('packet_common_area')->where($mm)->value('area_code');
+            $map['city'] = $citycode;
+            unset($map['area']);
+        }
+        
+        if (isset($map['note_time'])) {
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source,city')->paginate()->each(function($item, $key) use ($map){
+                    unset($m1);
+                    unset($m2);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+                    $parent = db('packet_common_area')->where(['area_code'=>$item['province']])->value('area_name');
+                    $item->citys = $parent.' '.db('packet_common_area')->where(['area_code'=>$item['city']])->value('area_name');
+                    $item->rate = (number_format($item['counts']/$item->total,1)*100).'%';
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source','auto', '客户来源'],
+            ['citys', 'auto','留言地区'],
+            ['total','auto', '留言数量'],
+            ['counts', 'auto','签单数量'],
+            ['rate','auto', '签约率'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['平台分时签约率', $cellName, $data_list]);
     }
 
     /**
@@ -698,7 +1121,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
 
         if (isset($map['note_time'])) {
@@ -720,7 +1143,7 @@ class Report extends Admin
 
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -732,7 +1155,12 @@ class Report extends Admin
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
-
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('platformConRateReportexport',http_build_query($this->request->param()))
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearchArea([
@@ -750,8 +1178,56 @@ class Report extends Admin
                 ['conrate', '接通率'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function platformConRateReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        if (isset($map['note_time'])) {
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    unset($m1);
+                    unset($m2);
+                    $m1['note_time'] = $map['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $item->total =  CustomModel::where($m1)->count();//当前查询总量
+                    $mbs = CustomModel::where($m1)->column('mobile');
+                    $m2['create_time'] = $map['note_time'];
+                    $m2['calledNum'] = array('in',$mbs);
+
+                    $item->calltimes = CalllogModel::where($m2)->count();
+                    $item->contacts = CalllogModel::where($m2)->group('calledNum')->count();
+
+                    $item->conrate = (number_format($item->contacts/$item->total,1)*100).'%';
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source','auto', '客户来源'],
+            ['total', 'auto','留言总数量'],
+            ['calltimes','auto', '呼叫数量（打1次算1次）'],
+            ['contacts', 'auto','接通数(1号码只算1次)'],
+            ['conrate', 'auto','接通率'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['平台数据接通率', $cellName, $data_list]);
     }
 
     /**
@@ -766,7 +1242,7 @@ class Report extends Admin
         // 数据列表
         
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
 
         $colArr = [];
@@ -798,7 +1274,7 @@ class Report extends Admin
                     }
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -812,7 +1288,12 @@ class Report extends Admin
             // 'class' => 'btn btn-default',
             'href' => url('feeStatisRowsReport')
         ];
-
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('feeStatisReportexport',http_build_query($this->request->param()))
+        ];
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -834,9 +1315,69 @@ class Report extends Admin
             ->addColumns($colArr)
             // ->addRightButton('custom',$btn_access)
             ->addTopButton('custom',$btn_access)
+            ->addTopButton('custom', $btnexport)
             ->setRowList($data_list)// 设置表格数据
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function feeStatisReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $lableArr = db('call_custom_cat')->column('id,title');
+
+        if (isset($map['note_time'])) {
+            $udata = [];
+            $udata['note_time'] = $map['note_time'];
+            $udata['lableArr'] = $lableArr;
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts,sum(fee) as totalfee')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($udata){
+                    unset($m1);
+                    $m1['note_time'] = $udata['note_time']; 
+                    $m1['project_id'] = $item['project_id'];
+                    $m1['source'] = $item['source'];
+                    $m1['category'] = 6;
+                    $item->succs =  CustomModel::where($m1)->count();//成交数
+                    //成交率
+                    $item->succrate =  (number_format($item->succs/$item['counts'],1)*100).'%';
+
+                    $m2 = $m1;
+                    unset($m2['category']);
+                    foreach ($udata['lableArr'] as $key => $value) {
+                        $m2['category'] = $key;
+                        $item['category'.$key] = db('call_custom')->where($m2)->count();
+                    }
+                    $item->timerange = $udata['note_time'][1][0].'~'.$udata['note_time'][1][1];
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source', 'auto','客户来源'],
+            ['counts', 'auto','留言总数量'],
+            ['totalfee', 'auto','留言成本'],
+            ['succs', 'auto','成交数'],
+            ['succrate', 'auto','成交率'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        
+        foreach ($lableArr as $key => $value) {
+            $tmp = ['category'.$key,'auto',$value];
+            array_push($cellName, $tmp);
+        }
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['员工产出成本统计', $cellName, $data_list]);
     }
 
     /**
@@ -928,116 +1469,7 @@ class Report extends Admin
             // ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
     }
-    /**
-     * [feeStatisRowsReport description]
-     * @return [type] [description]
-     */
-    // public function feeStatisRowsReport($id = null)
-    // {
 
-    //     cookie('__forward__', $_SERVER['REQUEST_URI']);
-    //     // if ($id === null) $this->error('缺少参数');
-
-    //     // 获取查询条件
-    //     $map = $this->getMap();
-
-    //     //查看组和项目
-    //     $cond  = db('call_custom')->where(['id'=>$id])->find();
-    //     if ($cond) {
-    //         $map['project_id'] = $cond['project_id'];
-    //         $map['source'] = $cond['source'];
-    //     }
-    //     // 数据列表
-    //     if (!$map) {
-    //         $map['id'] = '999999';//过滤所有数据
-    //     }
-
-    //     if (isset($map['note_time'])) {
-
-    //         $data_list = UserModel::where()->group()->paginate();
-
-    //         $data_list = Db::view('call_custom','*')
-    //                         ->view('call_report_custom_cat','custom_id','call_report_custom_cat.custom_id = call_custom.id')
-    //                         ->view('admin_user','role','call_report_custom_cat.employ_id = admin_user.id')
-    //                         ->where($map)
-    //                         ->group('admin_user.role')
-    //                         ->paginate()->toArray();
-    //                         // ->each(function($item, $key) use ($map){
-    //                         //     unset($m1);
-    //                         //     $m1['note_time'] = $map['note_time']; 
-    //                         //     $m1['project_id'] = $map['project_id'];
-    //                         //     $m1['source'] = $map['source'];
-    //                         //     $m1['category'] = 6;
-    //                         //     $item->id = $item['id'];
-    //                         //     // $item->succs =  Db::name('call_custom')->where($m1)->count();//成交数
-    //                         //     // print_r($item->succs);exit;
-    //                         //     //成交率
-    //                         //     // $item->succrate =  (number_format($item->succs/$item['counts'],1)*100).'%';
-    //                         // });
-    //         // $data_list = Db::name('call_custom')->field('call_custom.*,admin_user.role, count(*) as counts')->join(' call_report_custom_cat ',' call_report_custom_cat.custom_id = call_custom.id','LEFT')->join('admin_user ',' call_report_custom_cat.employ_id = admin_user.id','LEFT')->where($map)->order('counts desc')->group('admin_user.role')->paginate()->each(function($item, $key) use ($map){
-    //         //             unset($m1);
-    //         //         $m1['note_time'] = $map['note_time']; 
-    //         //         $m1['project_id'] = $map['project_id'];
-    //         //         $m1['source'] = $map['source'];
-    //         //         $m1['category'] = 6;
-    //         //         // $item->succs =  Db::name('call_custom')->where($m1)->count();//成交数
-    //         //         // print_r($item->succs);exit;
-    //         //         //成交率
-    //         //         // $item->succrate =  (number_format($item->succs/$item['counts'],1)*100).'%';
-    //         // });
-    //         // $data_list = CustomModel::where($map)->field('*,count(*) as counts,sum(fee) as totalfee')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
-    //         //         unset($m1);
-    //         //         $m1['note_time'] = $map['note_time']; 
-    //         //         $m1['project_id'] = $item['project_id'];
-    //         //         $m1['source'] = $item['source'];
-    //         //         $m1['category'] = 6;
-    //         //         $item->succs =  CustomModel::where($m1)->count();//成交数
-    //         //         //成交率
-    //         //         $item->succrate =  (number_format($item->succs/$item['counts'],1)*100).'%';
-    //         // });
-    //     }else{
-    //         $map['id'] = 9999;//过滤数据
-    //         $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
-    //     }
-    //     print_r($data_list);exit;
-        
-    //     // 分页数据
-    //     $page = $data_list->render();
-
-    //     $btn_access = [
-    //         'title' => '员工明细',
-    //         'icon'  => 'fa fa-fw fa-file-excel-o',
-    //         'class' => 'btn btn-default',
-    //         'href' => url('feeStatisEmpolyReport',['id'=>'__id__'])
-    //     ];
-
-    //     // 使用ZBuilder快速创建数据表格
-    //     return ZBuilder::make('table')
-    //         ->setSearchArea([
-    //             ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
-
-    //         ])
-    //         ->hideCheckbox()
-    //         ->addTopButton('back', [
-    //             'title' => '返回列表',
-    //             'icon'  => 'fa fa-reply',
-    //             'href'  => url('index')
-    //         ])
-    //         ->addColumns([ // 批量添加数据列
-    //             ['project', '项目'],
-    //             ['source', '客户来源'],
-    //             ['role', '销售组'],
-    //             ['counts', '留言总数量'],
-    //             ['totalfee', '留言成本'],
-    //             ['succs', '成交数'],
-    //             ['succrate', '成交率'],
-    //             ['right_button', '操作', 'btn']
-    //         ])
-    //         ->addRightButton('custom',$btn_access)
-    //         ->setRowList($data_list)// 设置表格数据
-    //         // ->raw('project') // 使用原值
-    //         ->fetch(); // 渲染模板
-    // }
 
     /**
      * [feeStatisEmpolyReport description]
@@ -1055,7 +1487,7 @@ class Report extends Admin
 
         // 数据列表
         if (!$map) {
-            $map['id'] = '999999';//过滤所有数据
+            $map['id'] = '';//过滤所有数据
         }
         if (isset($map['note_time'])) {
             $map['role'] = $role;
@@ -1167,7 +1599,7 @@ class Report extends Admin
                     $item->festival = $festival;
             });
         }else{
-            $map['id'] = 9999;//过滤数据
+            $map['id'] = '';//过滤数据
             $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
         }
         
@@ -1179,6 +1611,13 @@ class Report extends Admin
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('previousFeeReportexport',http_build_query($this->request->param()))
+        ];
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -1198,8 +1637,70 @@ class Report extends Admin
                 ['festival', '本年所含节日'],
             ])
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->raw('project') // 使用原值
             ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function previousFeeReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        if (isset($map['note_time'])) {
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts,sum(fee) as total')->order('counts DESC')->group('project_id,source')->paginate()->each(function($item, $key) use ($map){
+                    $item->avg = number_format($item['total']/$item['counts'],1);
+                    unset($m1);
+                    //往年节日
+                    $m2['GregorianDateTime'] = $map['note_time'];
+                    $start = date('Y-m-d H:i:s', strtotime($m2['GregorianDateTime'][1][0])) ;
+                    $m2['GregorianDateTime'][1][0] = date('Y-m-d H:i:s',strtotime("$start-1year"));
+                    $end = date('Y-m-d H:i:s', strtotime($m2['GregorianDateTime'][1][1])) ;
+                    $m2['GregorianDateTime'][1][1] = date('Y-m-d H:i:s',strtotime("$end-1year"));
+
+                    $ffestivals = db('call_calendar')->field('GROUP_CONCAT(GJie) as GJies ,GROUP_CONCAT(LJie) as LJies ')->where($m2)->group('LYear')->select();
+                    $ffestival = '';
+                    foreach ($ffestivals as $key => $value) {
+                        $ffestival .= str_replace(',','', $value['GJies'].$value['LJies']) ;
+                    }
+                    $item->ffestival = $ffestival;
+                    //本年节日
+                    $m1['GregorianDateTime'] = $map['note_time'];
+                    $festivals = db('call_calendar')->field('GROUP_CONCAT(GJie) as GJies ,GROUP_CONCAT(LJie) as LJies ')->where($m1)->group('LYear')->select();
+                    $festival = '';
+                    foreach ($festivals as $key => $value) {
+                        $festival .= str_replace(',','', $value['GJies'].$value['LJies']) ;
+                    }
+
+                    $item->festival = $festival;
+                    $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+            });
+        }else{
+            $map['id'] = '';//过滤数据
+            $data_list = CustomModel::where($map)->field('*,count(*) as counts')->order('counts DESC')->group('project_id,source')->paginate();
+        }
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['project','auto', '项目'],
+            ['source', 'auto','客户来源'],
+            ['counts','auto', '留言总数量'],
+            ['avg', 'auto','单条平均成本'],
+            ['total', 'auto','总费用'],
+            ['ffestival', 'auto','往年所含节日'],
+            ['festival', 'auto','本年所含节日'],
+            ['timerange','auto', '查询时间段'],
+        ];
+        
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['往年同期成本', $cellName, $data_list]);
     }
 
     /**
@@ -1224,11 +1725,7 @@ class Report extends Admin
             $map['custom_id'] = array('in',db('call_custom')->where($m2)->column('id'));
             unset($map['custom']);
         }
-        // if (isset($map['contactMobile'])) {
-        //     $m3['mobile'] =  $map['contactMobile'];
-        //     $map['custom_id'] = array('in',db('call_custom')->where($m3)->column('id'));
-        //     unset($map['contactMobile']);
-        // }
+        
         // 数据列表
         $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
                     unset($m);
@@ -1249,7 +1746,12 @@ class Report extends Admin
 
         // 分页数据
         $page = $data_list->render();
-
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('tradeDetReportexport',http_build_query($this->request->param()))
+        ];
         $tradeLog = ['icon' => 'fa  fa-fw fa-envelope-o', 'title' => '变更合同日志', 'href' => url('tradeLog',['id'=>'__id__'])];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -1285,8 +1787,76 @@ class Report extends Admin
             ])
             ->setRowList($data_list)// 设置表格数据
             ->addRightButton('custom', $tradeLog,true)
+            ->addTopButton('custom', $btnexport)
             ->raw('signcity') // 使用原值
             ->fetch(); // 渲染模板
+    }
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function tradeDetReportexport()
+    {
+        $map = $this->getMaps();
+        //查询数据
+
+        if (isset($map['sign_time'])) {
+            $m1['sign_time'] = $map['sign_time'];
+            $map['custom_id'] = array('in',db('call_custom')->where($m1)->column('id')) ;
+            unset($map['sign_time']);
+        }
+        if (isset($map['custom'])) {
+            $m2['name'] = array('like','%'.$map['custom'][1].'%') ;
+            $map['custom_id'] = array('in',db('call_custom')->where($m2)->column('id'));
+            unset($map['custom']);
+        }
+        
+        // 数据列表
+        $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+                    unset($m);
+                    $item->type = db('call_trade_cat')->where(['id'=>$item['type']])->value('title');
+                    $item->menger = get_nickname($item['menger']);
+                    $item->role = db('admin_role')->where(['id'=>$item['role']])->value('name');
+                    $item->note_time = db('call_custom')->where(['id'=>$item['custom_id']])->value('note_time');
+                    $item->payment = db('call_payment')->where(['trade_id'=>$item['id'],'type'=>1])->value('price');
+                    
+                    $m['trade_id'] = $item['id'];
+                    $m['type'] = array('gt',1);
+                    $item->reality = db('call_payment')->where($m)->order('id desc')->value('sign_time')?date('Y-m-d',db('call_payment')->where($m)->order('id desc')->value('sign_time')):'无' ;
+                    $item->exceed = strtotime($item->reality)-$item['should_time']>0?'-'.floor((strtotime($item->reality)-$item['should_time'])/86400):floor((strtotime($item['should_time']-$item->reality))/86400);
+                    $item->receipts = db('call_payment')->where($m)->order('id desc')->sum('price');
+                    $item->receivable = $item['total'] - $item->payment - $item->receipts;
+                    $item->custom = db('call_custom')->where(['id'=>$item['custom_id']])->value('name').'【'.db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile').'】';
+                    // $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+                });
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['id','auto', 'ID'],
+            ['serialNO', 'auto','合同编号'],
+            ['title', 'auto','合同名'],
+            ['type', 'auto','类型'],
+            ['sign_time', 'auto','签约日期','date'],
+            ['signcity', 'auto','地区'],
+            ['note_time', 'auto','留言时间'],
+            ['custom', 'auto','客户系统名'],
+            ['contactMobile', 'auto','手机号'],
+            ['total', 'auto','合同金额'],
+            ['payment', 'auto','已付金额'],
+            ['receivable', 'auto','应收余款'],
+            ['should_time', 'auto','应收日期','date'],
+            ['receipts','auto', '实收余款'],
+            ['reality', 'auto','实际日期'],
+            ['exceed', 'auto','逾期天数'],
+            ['role', 'auto','部门'],
+            ['menger', 'auto','负责人'],
+            // ['timerange','auto', '查询时间段'],
+        ];
+        
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['合同回款', $cellName, $data_list]);
     }
     /**
      * [tradeLog 日志]

@@ -116,7 +116,7 @@ class Admin extends Common
             }
 
             //技巧
-            $_speechs = db('call_speechcraft')->where(['status'=>1])->select(); 
+            $_speechs = db('call_speechcraft')->where(['status'=>1])->order('sort ASC')->select(); 
             $speech_list = [];
             foreach ($_speechs as $key => $value) {
                 $speech_list[$key]['title'] = $value['title'];

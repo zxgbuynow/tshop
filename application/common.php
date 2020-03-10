@@ -1766,3 +1766,29 @@ if (!function_exists('replaceTel')) {
         return $new_tels;
     }
 }
+if (!function_exists('object_to_array')) {
+    function object_to_array($obj) {
+        $obj = (array)$obj;
+        foreach ($obj as $k => $v) {
+            if (gettype($v) == 'resource') {
+                return;
+            }
+            if (gettype($v) == 'object' || gettype($v) == 'array') {
+                $obj[$k] = (array)object_to_array($v);
+            }
+        }
+     
+        return $obj;
+    }
+}
+if (!function_exists('deep_array_map')) {
+
+    function deep_array_map($arr){
+        return array_map(function(&$v){
+            if(is_array($v)){
+                return deep_array_map($v);
+            }
+            return str_replace('%2B',' ',$v);
+        },$arr);
+    }
+}

@@ -348,8 +348,16 @@ class Task extends Admin
             $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
             $value['category'] = $category[$value['category']];
         }
+        $aba = db('call_speechcraft')->where(['status'=>1])->order('sort ASC')->select(); 
+        foreach ($aba as $key => &$value) {
+            $value['custom'] = $value['title'];
+            $value['create_time'] = $value['tags'];
+            $value['category'] = $value['content'];
+        }
         $custom['calllog']['body'] = $calllog;
         $custom['calllog']['header'] = ['客户','分类','时间'];
+        $custom['aba']['body'] = $aba;
+        $custom['aba']['header'] = ['标题','内容','标识'];
         // print_r($calllog);exit;
         //用户信息
         return ZBuilder::make('form')
@@ -363,7 +371,8 @@ class Task extends Admin
                 ['static','note_time', '记录时间'],
                 ['static','note_area', '记录地区'],
                 ['select', 'category', '设置客户分类', '', $category],
-                ['mtable', 'calllog', '客户分类轨迹']
+                ['mtable', 'calllog', '客户分类轨迹'],
+                ['mtable', 'aba', '销售话术']
                 
             ])
             ->setFormData($custom)

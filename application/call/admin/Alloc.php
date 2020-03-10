@@ -47,11 +47,11 @@ class Alloc extends Admin
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['oper', '操作员'],
-                ['call_count', '呼叫次数'],
+                // ['call_count', '呼叫次数'],
                 // ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
                 ['way', '分配方式',['','平均分配','选配']],
-                ['status', '状态', 'switch'],
+                // ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
@@ -83,12 +83,7 @@ class Alloc extends Admin
 
         // 分页数据
         $page = $data_list->render();
-        
-// `alloc_id` int(10) unsigned DEFAULT '0' COMMENT '分配id',
-//   `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
-//   `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户id',
-//   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
-//   `alloc_count` int(10) unsigned DEFAULT '1' COMMENT '分配次数',
+ 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addTopButton('back', [
@@ -102,7 +97,7 @@ class Alloc extends Admin
                 ['user', '员工'],
                 ['custom', '客户'],
                 // ['call_count', '呼叫次数'],
-                ['alloc_count', '分配次数'],
+                // ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
                 // ['right_button', '操作', 'btn']
             ])
@@ -225,6 +220,7 @@ class Alloc extends Admin
         $map['id'] = array('>',1);
         $user =  UserModel::where($map)->column('id,username');
 
+        $tips = db('call_custom')->where(['status'=>1])->count();
         // $columns = [
         //     'id'=>'ID',
         //     'name'=>'客户名称',
@@ -234,10 +230,11 @@ class Alloc extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
-                ['text', 'call_count', '呼叫次数'],
+                // ['text', 'call_count', '呼叫次数'],
                 ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
                 // ['number', 'alloc_count', '设置分配数量'],
-                ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                // ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
                 ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
 
                 ['select', 'user_id', '选择员工', '', $user],

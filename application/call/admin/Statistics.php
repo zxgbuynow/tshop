@@ -101,7 +101,12 @@ class Statistics extends Admin
             ];
         }
         
-
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('export',http_build_query($this->request->param()))
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearchArea([
@@ -121,10 +126,78 @@ class Statistics extends Admin
             ->addRightButton('custom',$fee_btn)
             ->addRightButton('custom',$employ_btn)
             ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [classFweekReportexport 导出]
+     * @return [type] [description]
+     */
+    public function export()
+    {
+        $map = $this->getMaps();
+        //查询数据
+
+       if (isset($map['note_time'])) {
+            //总推广费用
+            $totalfee = CustomModel::where($map)->sum('fee');
+            //签单量
+            $map1['category'] = 6;
+            $map1['create_time'] = $map['note_time'];
+            $signtots = db('call_report_custom_cat')->where($map1)->group('custom_id')->count();
+
+            $custom_ids = db('call_report_custom_cat')->where($map1)->column('custom_id');
+            foreach ($custom_ids as $key => $value) {
+                if (!db('call_custom')->where(['category'=>6,'id'=>$value])->find()) {
+                    unset($custom_ids[$key]);
+                    $signtots--;
+                }
+            }
+
+            //当期签单量
+            $map2['note_time'] = $map['note_time'];
+            $map2['id'] = array('in',$custom_ids);
+            $signcurrs = CustomModel::where($map2)->count();
+            //往期追回签单量
+            $map3['note_time'][0] = '< time';
+            $map3['note_time'][1] = $map['note_time'][1][0];
+            $map3['id'] = array('in',$custom_ids);
+            $signfogs = CustomModel::where($map3)->count();
+            //当期1单成单成本
+            $costcurr = number_format($totalfee/$signcurrs,1); 
+            //当期+往期成单成本
+            $cost = number_format($totalfee/$signtots,1);
+            // //数据
+            $data_list[0]['id'] = 1;
+            $data_list[0]['cost'] = $cost;
+            $data_list[0]['costcurr'] = $costcurr;
+            $data_list[0]['signfogs'] = $signfogs;
+            $data_list[0]['signcurrs'] = $signcurrs;
+            $data_list[0]['signtots'] = $signtots;
+            $data_list[0]['totalfee'] = $totalfee;
+            $data_list[0]['timerange'] = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
+        }else{
+            $data_list = [];
+        }
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['totalfee', 'auto','总推广费用'],
+            ['signtots', 'auto','签单量'],
+            ['signcurrs','auto', '当期签单量'],
+            ['signfogs', 'auto','往期追回签单量'],
+            ['costcurr', 'auto','当期1单成单成本'],
+            ['cost', 'auto','当期+往期成单成本'],
+            // ['timerange','auto', '查询时间段'],
+        ];
+        
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['开单成本统计', $cellName, $data_list]);
+    }
     /**
      * [feeDeail 费用明细]
      * @return [type] [description]

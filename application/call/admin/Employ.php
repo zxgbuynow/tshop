@@ -423,15 +423,16 @@ class Employ extends Admin
         $data = $this->request->post();
         $id = input('post.pk', '');
         if ($data['name']=='is_maner') {
-            $role = db('admin_user')->where(['id'=>$id])->value('role');
+            // $role = db('admin_user')->where(['id'=>$id])->value('role');
             //是否有其他主管
-            if (db('admin_user')->where(['role'=>$role,'is_maner'=>1])->find()) {
-                //有
-                db('admin_user')->where(['role'=>$role])->update(['is_maner'=>0]);
-                db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
-            }else{
-                db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
-            }
+            // if (db('admin_user')->where(['role'=>$role,'is_maner'=>1])->find()) {
+            //     //有
+            //     db('admin_user')->where(['role'=>$role])->update(['is_maner'=>0]);
+            //     db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
+            // }else{
+            //     db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
+            // }
+            db('admin_user')->where(['id'=>$id])->update(['is_maner'=>1]);
             $this->success('操作成功', url('index'));exit;
         }
         return parent::quickEdit(['Employ_edit', 'call', 0, UID, $id]);
