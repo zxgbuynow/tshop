@@ -37,12 +37,6 @@ class Ondate extends Admin
         // 分页数据
         $page = $data_list->render();
 
-  //       `custom_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `ondate` int(10) unsigned DEFAULT NULL,
-  // `sign_time` int(10) unsigned DEFAULT NULL,
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '0' COMMENT '0待回1已回',
-
         return ZBuilder::make('table')
             ->setTabNav($list_tab,  $group)
             ->setSearch(['custom'=>'客户'])// 设置搜索框
@@ -53,12 +47,13 @@ class Ondate extends Admin
                 ['sign_time', '录入时间','datetime'],
                 ['create_time', '创建时间','datetime'],
                 ['status', '状态', 'switch'],
+                ['user', '操作人'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->setRowList($data_list)// 设置表格数据
-            ->raw('custom') // 使用原值
+            ->raw('custom,user') // 使用原值
             ->fetch(); // 渲染模板
 
         
@@ -94,6 +89,7 @@ class Ondate extends Admin
                 ['select', 'custom_id', '客户','',$userList],
                 ['datetime', 'sign_time', '录入时间'],
                 ['datetime', 'ondate', '预约时间'],
+                ['textarea', 'note', '备注'],
                 ['radio', 'status', '立即启用', '', ['待回访', '已回访'], 1],
             ])
             ->fetch();
@@ -130,6 +126,7 @@ class Ondate extends Admin
                 ['select', 'custom_id', '客户','',$userList],
                 ['datetime', 'sign_time', '录入时间'],
                 ['datetime', 'ondate', '预约时间'],
+                ['textarea', 'note', '备注'],
                 ['radio', 'status', '立即启用', '', ['待回访', '已回访'], 1],
             ])
             ->setFormData(OndateModel::get($id))

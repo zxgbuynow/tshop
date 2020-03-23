@@ -30,10 +30,14 @@ class Custom extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
+        //读取权限
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
 
         // 数据列表
-        $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key){
+        $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
             $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $item->access_mobile = $access_moblie;
 
         });
 
@@ -46,36 +50,227 @@ class Custom extends Admin
             'class' => 'btn btn-default ajax-get',
             'href' => url('cat',['id'=>'__id__'])
         ];
+        $catelsbt = [
+            'title' => '客户分类列表',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'href' => url('catls',['id'=>'__id__'])
+        ];
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('export',http_build_query($this->request->param()))
+        ];
 
         $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
+
+
+        if (UID==1) {
+            $searchArr = [
+                ['text:6', 'name', '客户名称', 'like'],
+                ['text:6', 'mobile', '客户手机', 'like'],
+                ['text:6', 'source', '来源', 'like'],
+                ['text:6', 'email', '邮箱', 'like'],
+                ['text:6', 'address', '地址', 'like'],
+                ['text:6', 'note_area', '记录地区', 'like'],
+                ['text:6', 'fee', '成本', 'like'],
+                ['text:6', 'extend_url', '推广链接', 'like'],
+                ['text:6', 'policy', '政策', 'like'],
+                ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+
+            ]
+        }else{
+            $searchArr = [
+                ['text:6', 'name', '客户名称', 'like'],
+                ['text:6', 'mobile', '客户手机', 'like'],
+                ['text:6', 'source', '来源', 'like'],
+                ['text:6', 'email', '邮箱', 'like'],
+                ['text:6', 'address', '地址', 'like'],
+                ['text:6', 'note_area', '记录地区', 'like'],
+                ['text:6', 'extend_url', '推广链接', 'like'],
+                ['text:6', 'policy', '政策', 'like'],
+                ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+
+            ]
+        }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
 
-            ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+            // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
+
+            ->setSearchArea($searchArr)
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['name', '客户名称'],
-                ['tel', '客户电话'],
-                ['mobile', '客户手机'],
+                // ['tel', '客户电话'],
+                ['mobile', '客户手机','callback',function($value, $data){
+                    if (!$data['access_mobile']) {
+                        return replaceTel($value);
+                    }
+                }, '__data__'],
                 ['categorys', '分类'],
                 ['source', '来源'],
                 ['email', '邮箱'],
                 ['address', '地址'],
                 ['note_time', '记录时间'],
                 ['note_area', '记录地区'],
-                ['fee', '成本'],
+                ['fee', '成本','callback',function($value, $data){
+                    if (UID !=1) {
+                        return '无权限';
+                    }
+                }, '__data__'],
                 ['extend_url', '推广链接'],
+                ['policy', '政策'],
                 ['create_time', '创建时间','datetime'],
                 // ['status', '状态', 'switch'],
                 // ['right_button', '操作', 'btn']
             ])
             ->addTopButton('custom', $btn_access,true)
+            ->addTopButton('custom', $catelsbt)
+            ->addTopButton('custom', $btnexport)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [classNReportexport 导出]
+     * @return [type] [description]
+     */
+    public function export()
+    {
+        $map = $this->getMaps();
+        //查询数据
+        if (!$map) $this->error('缺少参数');
+
+        $data =  CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
+            $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $item->mobile = $access_moblie?$item['mobile']:'无权限';
+            $item->fee = UID==1?$item['fee']:'无权限';
+
+        });
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['name','auto', '客户名称'],
+            ['tel', 'auto','客户电话'],
+            ['mobile', 'auto','客户手机'],
+            ['categorys','auto', '分类'],
+            ['source','auto', '来源'],
+            ['email', 'auto','邮箱'],
+            ['address', 'auto','地址'],
+            ['note_time', 'auto','记录时间'],
+            ['note_area','auto', '记录地区'],
+            ['fee', 'auto','成本'],
+            ['extend_url', 'auto','推广链接'],
+            ['create_time', 'auto','创建时间','datetime'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['客户数据', $cellName, $data]);
+    }
+    /**
+     * [catls 分类列表]
+     * @return [type] [description]
+     */
+    public function catls()
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        // 数据列表
+        $data_list = CatModel::where($map)->order('id desc')->paginate();
+
+        // 分页数据
+        $page = $data_list->render();
+
+
+        $catedit_bt = [
+            'title' => '编辑客户分类',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('catedit',['id'=>'__id__'])
+        ];
+
+        $catdel_bt = [
+            'title' => '删删除客户分类',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'class' => 'btn btn-default ajax-get confirm',
+            'href' => url('catdelete',['id'=>'__id__']),
+            'data-title' => '删除后无法恢复'
+        ];
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->setSearch(['brand_name' => '标题'])// 设置搜索框
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['title', '标题'],
+                ['desc', '说明'],
+                ['right_button', '操作', 'btn']
+            ])
+            // ->addTopButton('add', ['href' => url('add')])
+            ->addRightButton('custom',$catedit_bt,true)
+            ->addRightButton('custom',$catdel_bt)
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [catedit 编辑]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function catedit($id=null)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            
+            if ($props = CatModel::update($data)) {
+                $this->success('编辑成功', null,'_close_pop');
+            } else {
+                $this->error('编辑失败',null,'_close_pop');
+            }
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['text', 'title', '分类标题'],
+                ['text', 'desc', '说明'],
+                ['radio', 'status', '立即启用', '', ['否', '是'], 1]
+            ])
+            ->setFormData(AuthModel::get($id))
+            ->fetch();
+    }
+
+    /**
+     * [catdelete 删了]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function catdelete($id=null)
+    {
+        if ($id==6) {
+            $this->error('已签约不能删除',null,'_close_pop');
+        }
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data['id'] = $id;
+            if ($props = CatModel::where($data)->delete()) {
+                $this->success('删除成功', null);
+            } else {
+                $this->error('删除失败',null);
+            }
+        }
+    }
+    
     /**
      * [cat description]
      * @param  [type] $id [description]

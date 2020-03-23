@@ -33,7 +33,13 @@ class Payment extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['brank_account' => '客户账号'])// 设置搜索框
+            // ->setSearch(['brank_account' => '客户账号'])// 设置搜索框
+            ->setSearchArea([
+                ['daterange', 'sign_time', '回款时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'notice_time', '提醒时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['select', 'status', '是否到账', '', '', ['1'=>'到账','0'=>'未到账']],
+
+            ])
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['trade', '合同'],
@@ -72,16 +78,6 @@ class Payment extends Admin
             }
         }
 
-        //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '订单回款id',
-  // `trade_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `price` decimal(20,3) NOT NULL COMMENT '回款金额',
-  // `type` tinyint(1) DEFAULT '1' COMMENT '1订金 2货款 3尾款',
-  // `brank_account` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
-  // `is_notice` tinyint(1) DEFAULT '0' COMMENT '1已提醒',
-  // `notice_time` int(10) unsigned DEFAULT NULL,
-  // `sign_time` int(10) unsigned DEFAULT NULL,
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
 
         $list_trade = db('call_trade')->where(['status'=>'progress'])->column('id,title');
         // 显示添加页面

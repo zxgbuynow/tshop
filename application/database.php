@@ -5,9 +5,9 @@ return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '127.0.0.1',
+    'hostname'        => '47.102.102.37',
     // 数据库名
-    'database'        => 'tshop',
+    'database'        => 'tshop1',
     // 用户名
     'username'        => 'zg',
     // 密码

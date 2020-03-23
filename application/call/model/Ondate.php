@@ -18,5 +18,13 @@ class Ondate extends Model
         
         return db('call_custom')->where(['id'=>$data['custom_id']])->value('name');
     }
+
+    public function getUserAttr($value, $data){
+        if (!$data['user_id']) {
+            return '';
+        }
+        
+        return db('admin_user')->where(['id'=>$data['user_id']])->value('username');
+    }
     
 }

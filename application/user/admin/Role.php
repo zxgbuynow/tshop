@@ -42,6 +42,7 @@ class Role extends Admin
                 ['create_time', '创建时间', 'datetime'],
                 ['access', '是否可登录后台', 'switch'],
                 ['status', '状态', 'switch'],
+                ['access_moblie', '是否可查看手机号', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
