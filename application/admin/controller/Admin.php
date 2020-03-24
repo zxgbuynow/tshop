@@ -73,6 +73,12 @@ class Admin extends Common
             $_extens = db('call_extension')->where($_exten)->select();
             $this->assign('_extens', $_extens);
 
+            $_newmessagemp['user_id'] = UID;
+            $_newmessagemp['is_read'] = 0;
+            $_newmessage = db('call_extension')->where($_newmessagemp)->count();
+            $this->assign('_newmessage', $_newmessage);
+
+
             //当前签入
             $this->assign('_auth_sign', session('user_auth_extension')?session('user_auth_extension')['exten']:'');
 

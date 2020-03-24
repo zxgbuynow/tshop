@@ -1679,6 +1679,17 @@ if (!function_exists('get_mobile')) {
     }
 }
 
+if (!function_exists('get_extension')) {
+    /**
+     * [get_extension description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    function get_extension($user_id)
+    {
+        return model('call/custom')->field('extension')->find($user_id);
+    }
+}
 if (!function_exists('get_projectnm')) {
     /**
      * [get_projectnm description]

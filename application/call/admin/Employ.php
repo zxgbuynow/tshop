@@ -41,7 +41,7 @@ class Employ extends Admin
         }
         // 数据列表
         $data_list = UserModel::where($map)->order('sort,id desc')->paginate()->each(function($item, $key) use ($exst){
-            $item->extension = db('call_extension_log')->where(['user_id'=>$item['id']])->whereTime('create_time', 'today')->order('id DESC')->value('extension');
+            // $item->extension = db('call_extension_log')->where(['user_id'=>$item['id']])->whereTime('create_time', 'today')->order('id DESC')->value('extension');
             if ($item->extension) {
                 $item->extensionst = $exst[$item->extension];
             }else{
@@ -74,9 +74,10 @@ class Employ extends Admin
                 ['role', '角色', 'select', RoleModel::getTree(null, false)],
                 ['email', '邮箱'],
                 ['mobile', '手机号'],
-                ['extension', '签入分机号'],
-                ['extensionst', '分机状态'],
+                // ['extension', '签入分机号'],
                 ['wechat_name', '微信企业用户名','text.edit'],
+                ['extension', '绑定分机','text.edit'],
+                ['extensionst', '分机状态'],
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
                 ['is_maner', '主管', 'switch'],

@@ -63,6 +63,13 @@ class Custom extends Admin
             'href'  => url('export',http_build_query($this->request->param()))
         ];
 
+        $btn_call = [
+            'title' => '呼叫',
+            'icon'  => 'fa fa-fw fa-phone',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('ringup',['id'=>'__id__'])
+        ];
+
         $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
 
 
@@ -129,10 +136,68 @@ class Custom extends Admin
             ->addTopButton('custom', $btn_access,true)
             ->addTopButton('custom', $catelsbt)
             ->addTopButton('custom', $btnexport)
+            ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
+    }
+
+    /**
+     * [ringup 呼叫]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function ringup($id = null)
+    {
+        if ($id === null) $this->error('缺少参数');
+
+
+        $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
+        //手机号
+        $params['telNum'] = get_mobile($custom_id)['mobile'];
+        if (!$params['telNum']) {
+            $this->error('手机号不对');
+        }
+        // $params['telNum'] = '17321023222';
+        //呼叫 telNum=135xxxxxxxx&extNum=801&transactionId=xxxxxxxxxxx
+        // $params['extNum'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
+        // $params['extNum'] = '8801';
+        $params['extNum'] = get_extension($custom_id)['extension'];
+        if (!$params['extNum']) {
+            $this->error('没有绑定分机号');
+        }
+        $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
+        // $params['transactionId'] = UID.time();
+        // print_r($params);exit;
+        $status = ring_up_new('ClickCall',$params);
+        //弹框
+        $ret = json_decode($status,true);
+        if ($ret['status']==0) {
+            // return json(['code' => 0, 'msg' => $ret['msg']]);
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        if ($ret['status']==true&&!isset($ret['data'])) {
+            // return json(['code' => 1, 'msg' => $ret['msg'] ]);
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        //创建空的通话记录
+        $s['alloc_log_id'] = $id;
+        $s['user_id'] = UID;
+        $s['callType'] = 2;//按实际更新
+        $s['calledNum'] = $params['telNum'];
+        $s['create_time'] = time();
+        $s['custom_id'] = $custom_id;
+        $s['extension'] = $params['extNum'];
+        $s['code'] = $params['transactionId'];
+
+        db('call_log')->insert($s);
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->fetch('ringup');
+
+
     }
 
     /**
@@ -369,11 +434,13 @@ class Custom extends Admin
             ['source', 'auto','来源'],
             ['email', 'auto','邮箱'],
             ['address', 'auto','地址'],
-            ['note_time', 'auto','记录时间'],
+            ['note_time', 'auto','留言时间'],
             ['note_area','auto', '记录地区'],
             ['fee', 'auto','成本'],
             ['extend_url', 'auto','推广链接'],
             ['create_time', 'auto','创建时间']
+            ['record_time', 'auto','记录时间']
+            ['call_time', 'auto','最后一次通话时间']
         ];
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
         plugin_action('Excel/Excel/export', ['客户模板表', $cellName, $data]);
@@ -400,14 +467,16 @@ class Custom extends Admin
                 'name' => '客户名称',
                 'tel' => '客户电话',
                 'mobile' => '客户手机',
-                'note_time' => '记录时间',
+                'note_time' => '留言时间',
                 'note_area' => '记录地区',
                 'source' => '来源',
                 'extend_url' => '推广链接',
                 'policy' => '政策',
                 'fee' => '成本',
                 'address' => '地址',
-                'email' => '邮箱'
+                'email' => '邮箱',
+                'record_time' => '记录时间',
+                'call_time' => '最后一次通话时间'
             ];
             // 调用插件('插件',[路径,导入表名,字段限制,类型,条件,重复数据检测字段])
             $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile'], $second_field = 'project_id');

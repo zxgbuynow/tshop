@@ -107,11 +107,44 @@ class Alloc extends Admin
             ->raw('user,custom') // 使用原值
             ->fetch(); // 渲染模板
     }
+
+    /**
+     * [add 新增]
+     */
+    public function add()
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            
+        }
+        $custom =  CustomModel::where(['status'=>1])->column('id,name');
+        $map['id'] = array('>',1);
+        $user =  UserModel::where($map)->column('id,username');
+
+        $tips = db('call_custom')->where(['status'=>1])->count();
+        
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+                ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
+                ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+                ['select', 'user_id', '选择员工', '', $user],
+                ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+            ])
+
+            ->setTrigger('way', 1, 'custom_id,user_id')
+            ->setTrigger('way', 0, 'custom_ids,user_ids')
+            ->fetch();
+    }
     /**
      * 新增
      * @return mixed
      */
-    public function add()
+    public function add1()
     {
         // 保存数据
         if ($this->request->isPost()) {

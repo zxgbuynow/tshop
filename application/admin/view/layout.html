@@ -265,11 +265,11 @@
                                 <i class="si si-settings pull-right"></i>个人设置
                             </a>
                         </li>
-                        <!-- <li>
-                            <a tabindex="-1" href="{:url('admin/message/index')}">
-                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_message|default=0}</span>消息中心
+                        <li>
+                            <a tabindex="-1" href="{:url('call/message/log')}">
+                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>消息中心
                             </a>
-                        </li> -->
+                        </li>
                         <li class="divider"></li>
                         <li>
                             <a tabindex="-1" href="{:url('user/publics/signout')}">
@@ -281,7 +281,7 @@
                 </div>
             </li>
             {neq name="Think.session.user_auth.uid" value="1"}
-            <li>
+            <!-- <li>
                 <div class="btn-group">
                     <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
                         <span class="extension-no">{$_auth_sign|default='签入分机'}</span>
@@ -298,7 +298,7 @@
                         {/volist}
                     </ul>
                 </div>
-            </li>
+            </li> -->
             {/neq}
             <li>
                 <a class="btn btn-default ajax-get" href="{:url('admin/index/wipeCache')}" data-toggle="tooltip" data-placement="bottom" data-original-title="清空缓存">

@@ -96,6 +96,13 @@ class Task extends Admin
             'href' => url('discard',['id'=>'__id__'])
         ];
 
+        $btn_getback = [
+            'title' => '回收',
+            'icon'  => 'fa fa-fw  fa-trash-o',
+            'class' => 'btn btn-xs btn-default ajax-get confirm',
+            'href' => url('getback')
+        ];
+
         $btn_call = [
             'title' => '呼叫',
             'icon'  => 'fa fa-fw fa-phone',
@@ -131,7 +138,7 @@ class Task extends Admin
                 ['right_button', '操作', 'btn']
             ])
             ->hideCheckbox()
-            // ->addTopButton('add', ['href' => url('add')])
+            ->addTopButton('custom', $btn_getback)
             ->addRightButton('custom',$btn_access, ['title' => '客户信息'])
             ->addRightButton('custom',$btn_discard)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
@@ -140,6 +147,25 @@ class Task extends Admin
             ->raw('custom') // 使用原值
             ->fetch(); // 渲染模板
         
+    }
+    /**
+     * 回收
+     * @return [type] [description]
+     */
+    public function getback()
+    {
+        $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        //为空判断
+        if ($ids === null) $this->error('缺少参数')
+        //客户状态修改
+        $map['id'] = array('in',$ids);
+        $cids = db('call_alloc_log')->where($map)->column('custom_id');
+        $map1['id'] = array('in',$cids);
+        db('call_custom')->where($map1)->update(['status'=>1]);
+        //清空分配日志
+        db('call_alloc_log')->where($map)->update(['status'=>2]);//2为特殊处理掉的分配
+
+
     }
     public function hangup($id=null)
     {
@@ -175,10 +201,17 @@ class Task extends Admin
         $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
         //手机号
         $params['telNum'] = get_mobile($custom_id)['mobile'];
-        $params['telNum'] = '17321023222';
+        if (!$params['telNum']) {
+            $this->error('手机号不对');
+        }
+        // $params['telNum'] = '17321023222';
         //呼叫 telNum=135xxxxxxxx&extNum=801&transactionId=xxxxxxxxxxx
-        $params['extNum'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
-        $params['extNum'] = '8801';
+        // $params['extNum'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
+        // $params['extNum'] = '8801';
+        $params['extNum'] = get_extension($custom_id)['extension'];
+        if (!$params['extNum']) {
+            $this->error('没有绑定分机号');
+        }
         $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
         // $params['transactionId'] = UID.time();
         // print_r($params);exit;
