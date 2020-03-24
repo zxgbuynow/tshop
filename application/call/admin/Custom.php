@@ -131,12 +131,13 @@ class Custom extends Admin
                 ['policy', '政策'],
                 ['create_time', '创建时间','datetime'],
                 // ['status', '状态', 'switch'],
-                // ['right_button', '操作', 'btn']
+                ['right_button', '操作', 'btn']
             ])
             ->addTopButton('custom', $btn_access,true)
             ->addTopButton('custom', $catelsbt)
             ->addTopButton('custom', $btnexport)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
+            // ->addRightButton('custom', $btn_call)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
@@ -152,20 +153,21 @@ class Custom extends Admin
     {
         if ($id === null) $this->error('缺少参数');
 
-
-        $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
+        $custom_id = $id;
+        // $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
         //手机号
         $params['telNum'] = get_mobile($custom_id)['mobile'];
         if (!$params['telNum']) {
-            $this->error('手机号不对');
+            $this->error('手机号不对', null, '_close_pop');
         }
         // $params['telNum'] = '17321023222';
         //呼叫 telNum=135xxxxxxxx&extNum=801&transactionId=xxxxxxxxxxx
         // $params['extNum'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
         // $params['extNum'] = '8801';
-        $params['extNum'] = get_extension($custom_id)['extension'];
+        $params['extNum'] = get_extension(UID)['extension'];
+
         if (!$params['extNum']) {
-            $this->error('没有绑定分机号');
+            $this->error('没有绑定分机号', null, '_close_pop');
         }
         $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
         // $params['transactionId'] = UID.time();

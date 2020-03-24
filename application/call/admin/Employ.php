@@ -43,7 +43,7 @@ class Employ extends Admin
         $data_list = UserModel::where($map)->order('sort,id desc')->paginate()->each(function($item, $key) use ($exst){
             // $item->extension = db('call_extension_log')->where(['user_id'=>$item['id']])->whereTime('create_time', 'today')->order('id DESC')->value('extension');
             if ($item->extension) {
-                $item->extensionst = $exst[$item->extension];
+                $item->extensionst = $exst?$exst[$item->extension]:'';
             }else{
                 $item->extensionst = '未签入';
             }

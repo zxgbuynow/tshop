@@ -1687,7 +1687,7 @@ if (!function_exists('get_extension')) {
      */
     function get_extension($user_id)
     {
-        return model('call/custom')->field('extension')->find($user_id);
+        return model('user/user')->field('extension')->find($user_id);
     }
 }
 if (!function_exists('get_projectnm')) {
