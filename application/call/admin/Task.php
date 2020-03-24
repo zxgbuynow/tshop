@@ -156,7 +156,7 @@ class Task extends Admin
     {
         $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
         //为空判断
-        if ($ids === null) $this->error('缺少参数')
+        if ($ids === null) $this->error('缺少参数');
         //客户状态修改
         $map['id'] = array('in',$ids);
         $cids = db('call_alloc_log')->where($map)->column('custom_id');

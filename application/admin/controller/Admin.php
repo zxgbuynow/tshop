@@ -75,7 +75,7 @@ class Admin extends Common
 
             $_newmessagemp['user_id'] = UID;
             $_newmessagemp['is_read'] = 0;
-            $_newmessage = db('call_extension')->where($_newmessagemp)->count();
+            $_newmessage = db('call_message_log')->where($_newmessagemp)->count();
             $this->assign('_newmessage', $_newmessage);
 
 

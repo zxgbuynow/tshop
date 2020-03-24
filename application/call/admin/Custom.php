@@ -84,9 +84,9 @@ class Custom extends Admin
                 ['text:6', 'fee', '成本', 'like'],
                 ['text:6', 'extend_url', '推广链接', 'like'],
                 ['text:6', 'policy', '政策', 'like'],
-                ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']]
 
-            ]
+            ];
         }else{
             $searchArr = [
                 ['text:6', 'name', '客户名称', 'like'],
@@ -99,13 +99,13 @@ class Custom extends Admin
                 ['text:6', 'policy', '政策', 'like'],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
-            ]
+            ];
         }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
 
             // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
-
+            ->hideCheckbox()
             ->setSearchArea($searchArr)
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
@@ -207,8 +207,11 @@ class Custom extends Admin
     public function export()
     {
         $map = $this->getMaps();
+
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
         //查询数据
-        if (!$map) $this->error('缺少参数');
+        // if (!$map) $this->error('缺少参数');
 
         $data =  CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
             $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
@@ -261,7 +264,7 @@ class Custom extends Admin
         ];
 
         $catdel_bt = [
-            'title' => '删删除客户分类',
+            'title' => '删除客户分类',
             'icon'  => 'fa fa-fw fa-navicon ',
             'class' => 'btn btn-default ajax-get confirm',
             'href' => url('catdelete',['id'=>'__id__']),
@@ -310,7 +313,7 @@ class Custom extends Admin
                 ['text', 'desc', '说明'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1]
             ])
-            ->setFormData(AuthModel::get($id))
+            ->setFormData(CatModel::get($id))
             ->fetch();
     }
 
@@ -438,8 +441,8 @@ class Custom extends Admin
             ['note_area','auto', '记录地区'],
             ['fee', 'auto','成本'],
             ['extend_url', 'auto','推广链接'],
-            ['create_time', 'auto','创建时间']
-            ['record_time', 'auto','记录时间']
+            ['create_time', 'auto','创建时间'],
+            ['record_time', 'auto','记录时间'],
             ['call_time', 'auto','最后一次通话时间']
         ];
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）

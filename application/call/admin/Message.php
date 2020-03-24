@@ -6,6 +6,7 @@ use app\common\builder\ZBuilder;
 use app\call\model\Message as MessageModel;
 use app\call\model\MessageLg as MessageLgModel;
 use app\user\model\Role as RoleModel;
+use app\user\model\User as UserModel;
 /**
  * 品牌后台控制器
  */
@@ -49,7 +50,7 @@ class Message extends Admin
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
-            ->addTopButton('custom', $btn_access,true)
+            // ->addTopButton('custom', $btn_access,true)
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
@@ -67,14 +68,21 @@ class Message extends Admin
 
         $map['user_id'] = UID;
         // 数据列表
-        $data_list = MessageModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+        $data_list = MessageLgModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
                     $item->content = MessageModel::where(['id'=>$item['message_id']])->value('content');
+                    $item->title = MessageModel::where(['id'=>$item['message_id']])->value('title');
                     $item->is_read = $item['is_read']?'已读':'未读';
                 });
 
         // 分页数据
         $page = $data_list->render();
 
+        $btn_access = [
+            'title' => '详情',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('detail',['id'=>'__id__'])
+        ];
       
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -85,6 +93,7 @@ class Message extends Admin
                 ['is_read', '是否已读'],
                 ['right_button', '操作', 'btn']
             ])
+            ->addRightButton('custom', $btn_access,true)
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
@@ -124,7 +133,7 @@ class Message extends Admin
                     }
                     MessageLgModel::saveAll($save);
                 }
-                if ($data['touser_type']==0) {
+                if ($data['touser_type']==2) {
                     $map2['id'] = array('gt',1);
                     $users = db('admin_user')->where($map2)->column('id');
                     foreach ($users as $key => $value) {
@@ -196,7 +205,9 @@ class Message extends Admin
     public function detail($id = null)
     {
         if ($id === null) $this->error('缺少参数');
-        
+        $info = MessageLgModel::get($id);
+        $info['content'] = MessageModel::where(['id'=>$info['message_id']])->value('content');
+        $info['title'] = MessageModel::where(['id'=>$info['message_id']])->value('title');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
@@ -205,7 +216,7 @@ class Message extends Admin
                 ['static', 'content', '内容'],
             ])
             ->hideBtn('submit')
-            ->setFormData(MessageModel::get($id))
+            ->setFormData($info)
             ->fetch();
     }
 
