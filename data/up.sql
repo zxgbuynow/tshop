@@ -37,3 +37,16 @@ ADD COLUMN `oper_id` int(10) NULL COMMENT '操作人' AFTER `status`;
 ALTER TABLE `tshop1`.`call_custom` 
 ADD COLUMN `record_time` varchar(100) NULL COMMENT '记录时间' AFTER `area`,
 ADD COLUMN `call_time` varchar(100) NULL COMMENT '最后一次通话时间' AFTER `record_time`;
+
+ALTER TABLE `tshop1`.`call_alloc` 
+ADD COLUMN `name` varchar(100) NULL COMMENT '任务名称' AFTER `way`;
+
+ALTER TABLE `tshop1`.`call_custom` 
+ADD COLUMN `batch_id` varchar(100) NULL COMMENT '任务批次' AFTER `call_time`,
+ADD INDEX `ind_batch_id`(`batch_id`) USING BTREE;
+ALTER TABLE `tshop1`.`call_custom_export_log` 
+ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `create_time`,
+ADD INDEX `ind_batch_id`(`batch_id`) USING BTREE;
+
+ALTER TABLE `tshop1`.`call_alloc` 
+ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `name`;

@@ -255,6 +255,7 @@ class Excel extends Common
         $dataCover['list'] = [];
         $dataSkip['list']  = [];
         $isget = 0;
+        $batch_id = md5(time());
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -272,6 +273,9 @@ class Excel extends Common
                     foreach ($col as $index => $val) { //循环每一个单元格
                         if (isset($firstRow[$index])) {
                             $data[$firstRow[$index]] = trim($val);
+                            if ($index=='batch_id') {
+                                 $data[$firstRow[$index]] = $batch_id;
+                            }
                         }
                     }
                     //按second_feild过滤 妖孽代码
@@ -314,7 +318,7 @@ class Excel extends Common
                 cache('dataCover', $dataCover);
                 cache('dataSkip', $dataSkip);
                 cache('nextUrl', null);
-                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name,'rate'=>round(count($data_list)/$i*100,2).'%'];
+                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name, 'batch_id'=>$batch_id,'rate'=>round(count($data_list)/$i*100,2).'%'];
             } else {
                 return ["error" => 9, 'message' => '导入失败!请重新导入。'];
             }

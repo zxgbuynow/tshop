@@ -121,6 +121,13 @@ class Task extends Admin
             'pass_second_contact_custom_count'=>'超2天未联系客户',
             'no_contact_custom_count'=>'新任务未接通客户'
         ];
+
+        $btn_msg = [
+            'title' => '短信',
+            'icon'  => 'fa fa-fw fa-navicon',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('msg',['id'=>'__id__'])
+        ];
         // print_r($msel);exit;
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -143,10 +150,50 @@ class Task extends Admin
             ->addRightButton('custom',$btn_discard)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
             ->addRightButton('custom',$btn_hangup,['title'=>'分机挂断','area' => ['200px', '200px']])
+            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
             ->setRowList($data_list)// 设置表格数据
             ->raw('custom') // 使用原值
             ->fetch(); // 渲染模板
         
+    }
+
+    /**
+     * [msg 短信]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function msg($id)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            $mobile = db('admin_custom')->where(['id'=>$id])->value('mobile');
+            if (!$mobile) {
+                $this->error('手机号不对',null,'_close_pop');
+            }
+            $content['content'] = $data['title'];
+            if (!$content['content']) {
+                $this->error('短信内容不对',null,'_close_pop');
+            }
+            //发送
+            $result = plugin_action('Sms/Sms/send', [$mobile, $content, 'SMS_186599008']);
+            if($result['code']){
+                $this->error('发送失败，错误代码：'. $result['code']. ' 错误信息：'. $result['msg'],null,'_close_pop');
+            } else {
+                $this->success('发送成功',null,'_close_pop');
+            }
+            
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['text', 'title', '内容'],
+            ])
+            ->setBtnTitle('submit', '发送')
+            ->setFormData()
+            ->fetch();
     }
     /**
      * 回收
@@ -175,7 +222,7 @@ class Task extends Admin
         // $params['agent'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
         // $params['agent'] = '8801';
         $params['agent'] = get_extension(UID)['extension'];
-        if (!$params['extNum']) {
+        if (!$params['agent']) {
             $this->error('没有绑定分机号');
         }
         $status = ring_up_new('hangUp',$params);

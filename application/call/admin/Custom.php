@@ -70,6 +70,15 @@ class Custom extends Admin
             'href' => url('ringup',['id'=>'__id__'])
         ];
 
+        $btn_msg = [
+            'title' => '短信',
+            'icon'  => 'fa fa-fw fa-navicon',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('msg',['id'=>'__id__'])
+        ];
+
+        
+
         $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
 
 
@@ -137,11 +146,52 @@ class Custom extends Admin
             ->addTopButton('custom', $catelsbt)
             ->addTopButton('custom', $btnexport)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
+            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
             // ->addRightButton('custom', $btn_call)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
+    }
+
+    
+    /**
+     * [msg 短信]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function msg($id)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            $mobile = db('admin_custom')->where(['id'=>$id])->value('mobile');
+            if (!$mobile) {
+                $this->error('手机号不对',null,'_close_pop');
+            }
+            $content['content'] = $data['title'];
+            if (!$content['content']) {
+                $this->error('短信内容不对',null,'_close_pop');
+            }
+            //发送
+            $result = plugin_action('Sms/Sms/send', [$mobile, $content, 'SMS_186599008']);
+            if($result['code']){
+                $this->error('发送失败，错误代码：'. $result['code']. ' 错误信息：'. $result['msg'],null,'_close_pop');
+            } else {
+                $this->success('发送成功',null,'_close_pop');
+            }
+            
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['text', 'title', '内容'],
+            ])
+            ->setBtnTitle('submit', '发送')
+            ->setFormData()
+            ->fetch();
     }
 
     /**
@@ -397,10 +447,6 @@ class Custom extends Admin
             'href' => url('downtmp')
         ];
 
-  //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '客户导入日志id',
-  // `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '客户导入日志表',
-  // `rate` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT '净得率',
-  // `create_time` int(10) unsigned DEFAULT NULL,
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -481,7 +527,8 @@ class Custom extends Admin
                 'address' => '地址',
                 'email' => '邮箱',
                 'record_time' => '记录时间',
-                'call_time' => '最后一次通话时间'
+                'call_time' => '最后一次通话时间',
+                'batch_id' => '分批Id',
             ];
             // 调用插件('插件',[路径,导入表名,字段限制,类型,条件,重复数据检测字段])
             $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile'], $second_field = 'project_id');
@@ -492,6 +539,7 @@ class Custom extends Admin
                 if ($import['error']==10) {
                     $s['rate'] = $import['rate'];
                     // $s['title'] = $import['tabNm'];
+                    $s['batch_id'] = $import['batch_id'];
                     $s['title'] = get_file_name($excel_file);
                     CustomEXLogModel::create($s);
                 }
@@ -500,6 +548,7 @@ class Custom extends Admin
 
             $s['rate'] = '100%';
             $s['title'] = get_file_name($excel_file);
+            $s['batch_id'] = $import['batch_id'];
             CustomEXLogModel::create($s);
             // 导入成功
             $this->success($import['message'], url('import'));

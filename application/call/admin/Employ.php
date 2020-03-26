@@ -62,6 +62,21 @@ class Employ extends Admin
             'href'  => url('push', ['wechatnm' => '__wechat_name__'])
         ];
 
+        //转移
+         $btn_transfer = [
+            'title' => '转移',
+            'icon'  => 'fa fa-fw fa-navicon',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('transfer',['id'=>'__id__'])
+        ];
+        //监控
+         $btn_contrl = [
+            'title' => '监控',
+            'icon'  => 'fa fa-fw fa-navicon',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('contrl',['id'=>'__id__'])
+        ];
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setPageTitle('员工管理') // 设置页面标题
@@ -81,16 +96,89 @@ class Employ extends Admin
                 ['create_time', '创建时间', 'datetime'],
                 ['status', '状态', 'switch'],
                 ['is_maner', '主管', 'switch'],
-                // ['right_button', '操作', 'btn']
+                ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
-            // ->addRightButton('custom', $btn_access) // 添加授权按钮
+            ->addRightButton('custom', $btn_transfer) // 添加授权按钮
+            ->addRightButton('custom', $btn_contrl) // 添加授权按钮
             ->addRightButtons('edit,delete') // 批量添加右侧按钮
             ->setRowList($data_list) // 设置表格数据
             ->setPages($page) // 设置分页数据
             ->fetch(); // 渲染页面
     }
 
+    /**
+     * [transfer 转移]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function transfer($id='')
+    {
+        //http://xxx.xxx.xxx.xxx/http_uncall_api.php?model=transferCall&extenTo=801&extenFrom=802
+        //extenFrom 空闲
+        if ($id === null) $this->error('缺少参数');
+
+        //extenTo
+        $params['extenTo'] = UserModel::where(['id'=>$id])->value('extension');
+        if (!$params['extenTo']) {
+            $this->error('被转移分机号缺失', null, '_close_pop');
+        }
+
+        $params['extenFrom'] = get_extension(UID)['extension'];
+        if (!$params['extenFrom']) {
+            $this->error('转移分机号缺失', null, '_close_pop');
+        }
+
+        $status = ring_up_new('transferCall',$params);
+        //弹框
+        $ret = json_decode($status,true);
+        if ($ret['status']==0) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        if ($ret['status']==true&&!isset($ret['data'])) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->fetch('transfer');
+    }
+
+    /**
+     * [contrl 监控]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function contrl($id='')
+    {
+        //http://xxx.xxx.xxx.xxx/http_uncall_api.php?model=listenCall&extenTo=801&extenFrom=802
+        //extenFrom 空闲 
+        if ($id === null) $this->error('缺少参数');
+
+        //extenTo
+        $params['extenTo'] = UserModel::where(['id'=>$id])->value('extension');
+        if (!$params['extenTo']) {
+            $this->error('被转移分机号缺失', null, '_close_pop');
+        }
+
+        $params['extenFrom'] = get_extension(UID)['extension'];
+        if (!$params['extenFrom']) {
+            $this->error('转移分机号缺失', null, '_close_pop');
+        }
+
+        $status = ring_up_new('listenCall',$params);
+        //弹框
+        $ret = json_decode($status,true);
+        if ($ret['status']==0) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        if ($ret['status']==true&&!isset($ret['data'])) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->fetch('contrl');
+    }
     /**
      * 新增
      * @author zg

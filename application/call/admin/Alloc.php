@@ -7,6 +7,7 @@ use app\call\model\Alloc as AllocModel;
 use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Custom as CustomModel;
 use app\user\model\User as UserModel;
+use app\user\model\Role as RoleModel;
 /**
  * 首页后台控制器
  */
@@ -35,14 +36,16 @@ class Alloc extends Admin
             'icon'  => 'fa fa-fw fa-file-excel-o',
             'href'  => url('alloclg', ['id' => '__id__'])
         ];
-// `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '分配id',
-//   `op_id` int(10) unsigned DEFAULT '0' COMMENT '操作员id',
-//   `call_count` int(10) unsigned DEFAULT '0' COMMENT '呼叫次数',
-//   `alloc_count` int(10) unsigned DEFAULT '0' COMMENT '分配次数',
-//   `create_time` int(10) unsigned DEFAULT NULL,
-//   `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+
+        
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+            ->hideCheckbox([
+                ['text:12', 'id', '任务ID', 'eq'],
+                ['text:12', 'name', '任务名称', 'like'],
+
+            ])
             // ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
@@ -57,11 +60,14 @@ class Alloc extends Admin
             ->addTopButton('add', ['href' => url('add')])
 
             ->addRightButton('custom',$btn_access)
+            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
             ->setRowList($data_list)// 设置表格数据
             ->raw('oper') // 使用原值
             ->fetch(); // 渲染模板
         
     }
+
+    
 
     /**
      * [alloclg 分配日志]
@@ -111,7 +117,7 @@ class Alloc extends Admin
     /**
      * [add 新增]
      */
-    public function add()
+    public function add1()
     {
         // 保存数据
         if ($this->request->isPost()) {
@@ -125,26 +131,70 @@ class Alloc extends Admin
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
+        $checkSchedule_url = url('checkSchedule');
+        $getScheduleFuture_url = url('getScheduleFuture');
+        $js = <<<EOF
+            <script type="text/javascript">
+                 function checkSchedule() {
+                    var schedule = $("#schedule").val();
+                    $.post("{$checkSchedule_url}", { "schedule": schedule },
+                    function(data){
+                        if (data.status == false){
+                            Dolphin.notify('Cron 表达式错误', 'danger', 'glyphicon glyphicon-warning-sign');
+                            return false;
+                        }
+                        var days = $("#pickdays").val();
+                        var begin_time = $("#begin_time").val();
+                        $.post("{$getScheduleFuture_url}", { "schedule": schedule, "begin_time": begin_time, "days": days },
+                            function(data){
+                                if (data.status == true){
+                                    var html = '';
+                                    for(var i=0; i<data.time.length; i++){
+                                        html += '<li class="list-group-item">'+data.time[i]+'<span class="badge">'+(i+1)+'</span></li>';
+                                        //console.log(data.time[i]);
+                                    }
+                                    $('#scheduleresult').html(html);
+                                }
+                            }, "json");
+                    }, "json");
+                }
+            
+                $(function(){
+                    checkSchedule();    // 页面加载后就执行一次
+            
+                    // 检查 Cron 表达式是否正确，如果正确，则获取预计执行时间
+                    $("#schedule,#pickdays,#begin_time").blur(function(){
+                        checkSchedule();
+                    });
+                });
+            </script>
+EOF;
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
-                ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
-                ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
-                ['select', 'user_id', '选择员工', '', $user],
-                ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                ['text', 'task_id', '输入任务id'],
+                ['text', 'task', '输入任务名称'],
+                ['text', 'export_id', '输入导入id'],
+                ['text', 'export_tab', '输入导入表名'],
+                ['text', 'export_time', '输入导入时间'],
+                ['static', 'custom_ids', '待客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
+                // ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
+                // ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+                // ['select', 'user_id', '选择员工', '', $user],
+                // ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
             ])
 
             ->setTrigger('way', 1, 'custom_id,user_id')
-            ->setTrigger('way', 0, 'custom_ids,user_ids')
-            ->fetch();
+            ->setTrigger('way', 0, 'custom_ids,export_time,export_tab,export_id,task,task_id')
+            ->fetch('add');
     }
     /**
      * 新增
      * @return mixed
      */
-    public function add1()
+    public function add()
     {
         // 保存数据
         if ($this->request->isPost()) {
@@ -155,93 +205,133 @@ class Alloc extends Admin
             $sdata['op_id'] = UID;
             $sdata['way'] = $data['way']==0?1:2;
             $sdata['call_count'] = $data['call_count'];
-            // if ($sdata['way']==1) {
-            //         //平均分处理
-            //     $userCts = count($data['user_ids']);
-            //     $custCts = count($data['custom_ids']);
-            //     $average = ceil($custCts/$userCts);
-            //     $custCtarr = array_chunk($data['custom_ids'], $average);
-            //     // $s = [];
-            //     $r = [];
-            //     foreach ($custCtarr as $key => $value) {
-            //         // $s[$key]['user_id'] = $data['user_ids'][$key];
-            //         // $s[$key]['custom_id'] = $value;
-            //         $cc = count($value);
-            //         for ($i=0; $i < $cc; $i++) { 
-            //             $rs['custom_id'] = $value[$i];
-            //             $rs['user_id'] = $data['user_ids'][$key];
-            //             $rs['alloc_id'] = 1;
-            //             $rs['call_count'] = $data['call_count'];
-            //             $rs['create_time'] = time();
-            //             array_push($r,$rs);
-            //         }
-            //     }
-                
-                
-            // }
-            // if ($sdata['way']==2) {
-            //     $custCts = count($data['custom_id']);
-            //     $r = [];
-            //     for ($i=0; $i < $custCts; $i++) { 
-            //         $r[$i]['custom_id'] = $data['custom_id'][$i];
-            //         $r[$i]['user_id'] = $data['user_id'];
-            //         $r[$i]['alloc_id'] = 1;
-            //         $r[$i]['call_count'] = $data['call_count'];
-            //         $r[$i]['create_time'] = time();
-            //     } 
-            // }
-
-            // print_r($r);exit;
+            $sdata['name'] = $data['name'];
+            $sdata['batch_id'] = $data['batch_id'];
+            //必填字段
+            if (!$sdata['name']) {
+                $this->error('任务名称必填');
+            }
+            if (!$sdata['batch_id']) {
+                $this->error('导入批次必填');
+            }
+            if ($data['custom_ids']>$data['cusids']) {
+                $this->error('不能大于可分配总数');
+            }
             if ($props = AllocModel::create($sdata)) {
                 $insert_id = $props->id;
                 //分配处理
-                
                 if ($sdata['way']==1) {
-                    //平均分处理
-                    $userCts = count($data['user_ids']);
-                    $custCts = count($data['custom_ids']);
-                    $average = ceil($custCts/$userCts);
-                    $custCtarr = array_chunk($data['custom_ids'], $average);
-                    // $s = [];
+                    if (!$data['user_id']) {
+                        $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
+
+                    }
+                    $userCts = count($data['user_id']);
+                    $custCts = $data['custom_ids'];
+
+                    //取其中数量
+                    $m['status'] = 1;
+                    $m['batch_id'] = $data['batch_id'];
+                    $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
+
+                    $average = ceil($custCts/$custCts);
+
+                    $custCtarr = array_chunk($customs, $average);
+
                     $r = [];
                     foreach ($custCtarr as $key => $value) {
-                        // $s[$key]['user_id'] = $data['user_ids'][$key];
-                        // $s[$key]['custom_id'] = $value;
                         $cc = count($value);
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
                             $rs['user_id'] = $data['user_ids'][$key];
                             $rs['alloc_id'] = $insert_id;
-                            // $rs['call_count'] = $data['call_count'];
                             $rs['create_time'] = time();
                             array_push($r,$rs);
                         }
                     }
-                    
-                    
-                }
+
+                }//平均
                 if ($sdata['way']==2) {
+                    if (!$data['user_id']) {
+                        $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
+
+                    }
+
+                    $userCts = count($data['user_id']);
                     $custCts = count($data['custom_id']);
+                    $average = ceil($custCts/$userCts);
+                    $custCtarr = array_chunk($data['custom_id'], $average);
+
+
                     $r = [];
-                    for ($i=0; $i < $custCts; $i++) { 
-                        $r[$i]['custom_id'] = $data['custom_id'][$i];
-                        $r[$i]['user_id'] = $data['user_id'];
-                        $r[$i]['alloc_id'] = $insert_id;
-                        // $r[$i]['call_count'] = $data['call_count'];
-                        $r[$i]['create_time'] = time();
-                    } 
-                }
+                    foreach ($custCtarr as $key => $value) {
+                        $cc = count($value);
+                        for ($i=0; $i < $cc; $i++) { 
+                            $rs['custom_id'] = $value[$i];
+                            $rs['user_id'] = $data['user_ids'][$key];
+                            $rs['alloc_id'] = $insert_id;
+                            $rs['create_time'] = time();
+                            array_push($r,$rs);
+                        }
+                    }
+
+                }//选择
                 $Alloclg = new AlloclgModel;
                 $Alloclg->saveAll($r);
 
                 if ($sdata['way']==1) {
-                    $mp['id'] = array('in',$data['custom_ids']);
+                    $mp['id'] = array('in',implode(',', $customs) );
                     CustomModel::where($mp)->update(['status'=>2]);
                 }
                 if ($sdata['way']==2) {
                      $mp['id'] = array('in',$data['custom_id']);
                     CustomModel::where($mp)->update(['status'=>2]);
                 }
+                // if ($sdata['way']==1) {
+                //     //平均分处理
+                //     $userCts = count($data['user_ids']);
+                //     $custCts = count($data['custom_ids']);
+                //     $average = ceil($custCts/$userCts);
+                //     $custCtarr = array_chunk($data['custom_ids'], $average);
+                //     // $s = [];
+                //     $r = [];
+                //     foreach ($custCtarr as $key => $value) {
+                //         // $s[$key]['user_id'] = $data['user_ids'][$key];
+                //         // $s[$key]['custom_id'] = $value;
+                //         $cc = count($value);
+                //         for ($i=0; $i < $cc; $i++) { 
+                //             $rs['custom_id'] = $value[$i];
+                //             $rs['user_id'] = $data['user_ids'][$key];
+                //             $rs['alloc_id'] = $insert_id;
+                //             // $rs['call_count'] = $data['call_count'];
+                //             $rs['create_time'] = time();
+                //             array_push($r,$rs);
+                //         }
+                //     }
+                    
+                    
+                // }
+                // if ($sdata['way']==2) {
+                //     $custCts = count($data['custom_id']);
+                //     $r = [];
+                //     for ($i=0; $i < $custCts; $i++) { 
+                //         $r[$i]['custom_id'] = $data['custom_id'][$i];
+                //         $r[$i]['user_id'] = $data['user_id'];
+                //         $r[$i]['alloc_id'] = $insert_id;
+                //         // $r[$i]['call_count'] = $data['call_count'];
+                //         $r[$i]['create_time'] = time();
+                //     } 
+                // }
+                // $Alloclg = new AlloclgModel;
+                // $Alloclg->saveAll($r);
+
+                // if ($sdata['way']==1) {
+                //     $mp['id'] = array('in',$data['custom_ids']);
+                //     CustomModel::where($mp)->update(['status'=>2]);
+                // }
+                // if ($sdata['way']==2) {
+                //      $mp['id'] = array('in',$data['custom_id']);
+                //     CustomModel::where($mp)->update(['status'=>2]);
+                // }
                
                 $this->success('新增成功', url('index'));
             } else {
@@ -251,35 +341,81 @@ class Alloc extends Admin
 
         $custom =  CustomModel::where(['status'=>1])->column('id,name');
         $map['id'] = array('>',1);
-        $user =  UserModel::where($map)->column('id,username');
+        $user =  UserModel::where($map)->column('id,username'); 
+
+        $role = RoleModel::where(['status'=>1])->column('id,username'); 
 
         $tips = db('call_custom')->where(['status'=>1])->count();
-        // $columns = [
-        //     'id'=>'ID',
-        //     'name'=>'客户名称',
-        //     'tel'=>'客户电话',
-        //     'mobile'=>'客户手机'
-        // ];
+        
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 // ['text', 'call_count', '呼叫次数'],
+                ['text', 'name', '任务名称'],
                 ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
                 // ['number', 'alloc_count', '设置分配数量'],
                 // ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
-                ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
-                ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+                ['static', 'cusids', '当前任务总数','',$tips],
+                ['number', 'custom_ids', '输入客户数量'],
+                // ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
 
-                ['select', 'user_id', '选择员工', '', $user],
+                // ['select', 'user_id', '选择员工', '', $user],
+                // ['select', 'role_id', '选择组', '<code>可多选</code>', $custom,'','multiple'],
                 ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
 
                 // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
             ])
-
-            ->setTrigger('way', 1, 'custom_id,user_id')
-            ->setTrigger('way', 0, 'custom_ids,user_ids')
+            ->addLinkage('role_id', '选择组', '', $role, '', url('get_user'), 'user_id')
+            ->addSelect('user_id', '选择员工','',$user,'','multiple')
+            ->addLinkage('batch_id', '选择导入任务', '', $batchs, '', url('get_batch'), 'cusids')
+            ->setTrigger('way', 1, 'custom_id')
+            ->setTrigger('way', 0, 'custom_ids')
             ->fetch();
+    }
+    /**
+     * [get_batch description]
+     * @param  string $batch_id [description]
+     * @return [type]           [description]
+     */
+    public function get_batch($batch_id='')
+    {
+        $arr['code'] = '1'; //判断状态
+        $arr['msg'] = '请求成功'; //回传信息
+
+        $map['status'] = 1;
+        $map['batch_id'] = $batch_id;
+        $count = db('call_custom')->where($map)->count();
+        $arr['value'] = $count;
+        // $arr['list'] = [];
+        // $arr['list'][0]['key'] = $value['id']; 
+        // $arr['list'][0]['value'] = $value['nickname']; 
+        // foreach ($city as $key => $value) {
+        //   $arr['list'][$key]['key'] = $value['id']; 
+        //   $arr['list'][$key]['value'] = $value['nickname']; 
+        // }
+        
+        return json($arr);
+    }
+    /**
+     * 获取组下员工
+     * @param  string $role_id [description]
+     * @return [type]          [description]
+     */
+    public function get_user($role_id = '')
+    {
+        $arr['code'] = '1'; //判断状态
+        $arr['msg'] = '请求成功'; //回传信息
+
+        $city = db('admin_user')->where(['role'=>$role_id])->field('id,username,nickname')->select();
+        $arr['list'] = [];
+        foreach ($city as $key => $value) {
+          $arr['list'][$key]['key'] = $value['id']; 
+          $arr['list'][$key]['value'] = $value['nickname']; 
+        }
+        
+        return json($arr);
     }
     /**
      * 编辑

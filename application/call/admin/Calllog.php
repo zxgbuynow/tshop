@@ -33,7 +33,9 @@ class Calllog extends Admin
         }
         $map['status'] = 1;
         // 数据列表
-        $data_list = CalllogModel::where($map)->order('id desc')->paginate();
+        $data_list = CalllogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->calledNum = UID==1?$item['calledNum']:replaceTel($item['calledNum']);
+        });
 
         // 分页数据
         $page = $data_list->render();
@@ -42,7 +44,7 @@ class Calllog extends Admin
             // 'class' => 'btn btn-info',
             'title' => '下载录音',
             'icon'  => 'fa fa-fw fa-pinterest-p',
-            'href'  => url('downCord')
+            'href'  => url('downCord',['id'=>'__id__'])
         ];
 
         // 使用ZBuilder快速创建数据表格
@@ -75,8 +77,34 @@ class Calllog extends Admin
     }
 
     
-    
+    /**
+     * [downCord 下载]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function downCord($id ='')
+    {
+        if ($id === null) $this->error('缺少参数');
 
+        //transactionId
+        $params['transactionId'] = db('call_log')->where(['id'=>$id])->value('transactionId');
+        if (!$params['transactionId']) {
+            $this->error('transactionId缺失');
+        }
+        $status = ring_up_new('downloadFile',$params);
+        //弹框
+        $ret = json_decode($status,true);
+        if ($ret['status']==0) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        if ($ret['status']==true&&!isset($ret['data'])) {
+            $this->error($ret['msg'], null, '_close_pop');
+        }
+        
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->fetch('hangup');
+    }
     /**
      * 设置用户状态：删除、禁用、启用
      * @param string $type 类型：delete/enable/disable
