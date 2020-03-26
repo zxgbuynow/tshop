@@ -172,8 +172,12 @@ class Task extends Admin
         if ($id === null) $this->error('缺少参数');
 
         //手机号
-        $params['agent'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
-        $params['agent'] = '8801';
+        // $params['agent'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
+        // $params['agent'] = '8801';
+        $params['agent'] = get_extension(UID)['extension'];
+        if (!$params['extNum']) {
+            $this->error('没有绑定分机号');
+        }
         $status = ring_up_new('hangUp',$params);
         //弹框
         // $ret = json_decode($status,true);
@@ -208,7 +212,7 @@ class Task extends Admin
         //呼叫 telNum=135xxxxxxxx&extNum=801&transactionId=xxxxxxxxxxx
         // $params['extNum'] = session('user_auth_extension')?session('user_auth_extension')['exten']:'';
         // $params['extNum'] = '8801';
-        $params['extNum'] = get_extension($custom_id)['extension'];
+        $params['extNum'] = get_extension(UID)['extension'];
         if (!$params['extNum']) {
             $this->error('没有绑定分机号');
         }
