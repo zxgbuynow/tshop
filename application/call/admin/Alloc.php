@@ -60,7 +60,7 @@ class Alloc extends Admin
             ->addTopButton('add', ['href' => url('add')])
 
             ->addRightButton('custom',$btn_access)
-            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
+            // ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
             ->setRowList($data_list)// 设置表格数据
             ->raw('oper') // 使用原值
             ->fetch(); // 渲染模板

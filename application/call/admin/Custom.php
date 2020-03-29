@@ -146,7 +146,7 @@ class Custom extends Admin
             ->addTopButton('custom', $catelsbt)
             ->addTopButton('custom', $btnexport)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
-            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
+            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '500px']])
             // ->addRightButton('custom', $btn_call)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据

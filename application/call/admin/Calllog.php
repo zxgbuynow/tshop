@@ -44,7 +44,7 @@ class Calllog extends Admin
             // 'class' => 'btn btn-info',
             'title' => '下载录音',
             'icon'  => 'fa fa-fw fa-pinterest-p',
-            'href'  => url('downCord',['id'=>'__id__'])
+            'href'  => url('downcord',['id'=>'__id__'])
         ];
 
         // 使用ZBuilder快速创建数据表格
@@ -82,7 +82,7 @@ class Calllog extends Admin
      * @param  string $id [description]
      * @return [type]     [description]
      */
-    public function downCord($id ='')
+    public function downcord($id ='')
     {
         if ($id === null) $this->error('缺少参数');
 
