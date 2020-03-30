@@ -8,7 +8,7 @@ use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Custom as CustomModel;
 use app\user\model\User as UserModel;
 use app\user\model\Role as RoleModel;//CustomEXLog
-use app\user\model\CustomEXLog as CustomEXLogModel;//CustomEXLog
+use app\call\model\CustomEXLog as CustomEXLogModel;//CustomEXLog
 /**
  * 首页后台控制器
  */
