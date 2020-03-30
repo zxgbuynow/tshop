@@ -166,7 +166,7 @@ class Custom extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $mobile = db('admin_custom')->where(['id'=>$id])->value('mobile');
+            $mobile = db('call_custom')->where(['id'=>$id])->value('mobile');
             if (!$mobile) {
                 $this->error('手机号不对',null,'_close_pop');
             }
@@ -174,11 +174,23 @@ class Custom extends Admin
             if (!$content['content']) {
                 $this->error('短信内容不对',null,'_close_pop');
             }
+            //生成日志
+                // $s['content'] = $data['title'];
+                // $s['custom_id'] = $id;
+                // $s['user_id'] = UID;
+                // $s['create_time'] = time();
+                // db('call_msg_log')->insert($s);
             //发送
             $result = plugin_action('Sms/Sms/send', [$mobile, $content, 'SMS_186599008']);
             if($result['code']){
                 $this->error('发送失败，错误代码：'. $result['code']. ' 错误信息：'. $result['msg'],null,'_close_pop');
             } else {
+                //生成日志
+                $s['content'] = $data['title'];
+                $s['custom_id'] = $id;
+                $s['user_id'] = UID;
+                $s['create_time'] = time();
+                db('call_msg_log')->insert($s);
                 $this->success('发送成功',null,'_close_pop');
             }
             

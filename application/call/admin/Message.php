@@ -5,6 +5,7 @@ use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Message as MessageModel;
 use app\call\model\MessageLg as MessageLgModel;
+use app\call\model\MsgLg as MsgLgModel;
 use app\user\model\Role as RoleModel;
 use app\user\model\User as UserModel;
 /**
@@ -218,6 +219,40 @@ class Message extends Admin
             ->hideBtn('submit')
             ->setFormData($info)
             ->fetch();
+    }
+
+    /**
+     * [log 短信]
+     * @return [type] [description]
+     */
+    public function msg()
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        $map['user_id'] = UID;
+        // 数据列表
+        $data_list = MsgLgModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+                    $item->custom_id = db('call_custom')->where(['id'=>$item['custom_id']])->value('name');
+                });;
+
+        // 分页数据
+        $page = $data_list->render();
+
+      
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['content', '短信内容'],
+                ['custom_id', '接收人'],
+                // ['right_button', '操作', 'btn']
+            ])
+            ->hideCheckbox()
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
     }
 
     /**

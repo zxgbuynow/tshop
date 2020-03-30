@@ -31,6 +31,7 @@ class Setting extends Admin
                 plugin_config('wechat.CORP_ID',$data['CORP_ID']);
                 plugin_config('wechat.APP_ID',$data['APP_ID']);
                 plugin_config('wechat.APP_SECRET',$data['APP_SECRET']);
+                plugin_config('wechat.wechat',$data['wechat']);
             }
             if ($group=='tab3') {
                 plugin_config('wechat.serv_url',$data['serv_url']);
@@ -66,6 +67,9 @@ class Setting extends Admin
                 ->fetch();
         }
         if ($group=='tab2') {
+            $map['wechat_name'] = array('neq',''); 
+            $users = db('admin_user')->where($map)->column('wechat_name,nickname');
+            $info['wechat'] = plugin_config('wechat')['wechat'];
             // 使用ZBuilder快速创建表单
             return ZBuilder::make('form')
                 ->setPageTitle('微信配置') // 设置页面标题
@@ -74,6 +78,7 @@ class Setting extends Admin
                     ['text', 'CORP_ID', 'CORP_ID', '', plugin_config('wechat')['CORP_ID']],
                     ['text', 'APP_ID', 'APP_ID', '', plugin_config('wechat')['APP_ID']],
                     ['text', 'APP_SECRET', 'APP_SECRET', '', plugin_config('wechat')['APP_SECRET']],
+                    ['select', 'wechat', '企业微信','',$users,'','multiple'],
                 ])
                 ->setFormData($info) // 设置表单数据
                 ->fetch();

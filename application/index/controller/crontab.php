@@ -579,7 +579,17 @@ class Crontab
         $toparty = [];
         $totag = [];
         $user = [];
-        array_push($user, $touser['wechat_name']);
+
+        //取配置
+        $wechat = isset(plugin_config('wechat')['wechat'])?plugin_config('wechat')['wechat']:'';
+        if (!$wechat) {
+            array_push($user, $touser['wechat_name']);
+        }else{
+            foreach ($wechat as $key => $value) {
+                array_push($user, $value);
+            }
+        }
+        
 
         $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $msg]);
 
