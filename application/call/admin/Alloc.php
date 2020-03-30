@@ -348,7 +348,7 @@ class Alloc extends Admin
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
-        $batchs = CustomEXLogModel::where(['status'=>1])->column('id,title'); 
+        $batchs = CustomEXLogModel::column('id,title'); 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
