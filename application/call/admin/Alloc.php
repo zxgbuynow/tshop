@@ -7,7 +7,8 @@ use app\call\model\Alloc as AllocModel;
 use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Custom as CustomModel;
 use app\user\model\User as UserModel;
-use app\user\model\Role as RoleModel;
+use app\user\model\Role as RoleModel;//CustomEXLog
+use app\user\model\CustomEXLog as CustomEXLogModel;//CustomEXLog
 /**
  * 首页后台控制器
  */
@@ -347,6 +348,7 @@ class Alloc extends Admin
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
+        $batchs = CustomEXLogModel::where(['status'=>1])->column('id,name'); 
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
