@@ -117,79 +117,79 @@ class Alloc extends Admin
     /**
      * [add 新增]
      */
-    public function add1()
-    {
-        // 保存数据
-        if ($this->request->isPost()) {
-            // 表单数据
-            $data = $this->request->post();
+//     public function add1()
+//     {
+//         // 保存数据
+//         if ($this->request->isPost()) {
+//             // 表单数据
+//             $data = $this->request->post();
             
-        }
-        $custom =  CustomModel::where(['status'=>1])->column('id,name');
-        $map['id'] = array('>',1);
-        $user =  UserModel::where($map)->column('id,username');
+//         }
+//         $custom =  CustomModel::where(['status'=>1])->column('id,name');
+//         $map['id'] = array('>',1);
+//         $user =  UserModel::where($map)->column('id,username');
 
-        $tips = db('call_custom')->where(['status'=>1])->count();
+//         $tips = db('call_custom')->where(['status'=>1])->count();
         
-        $checkSchedule_url = url('checkSchedule');
-        $getScheduleFuture_url = url('getScheduleFuture');
-        $js = <<<EOF
-            <script type="text/javascript">
-                 function checkSchedule() {
-                    var schedule = $("#schedule").val();
-                    $.post("{$checkSchedule_url}", { "schedule": schedule },
-                    function(data){
-                        if (data.status == false){
-                            Dolphin.notify('Cron 表达式错误', 'danger', 'glyphicon glyphicon-warning-sign');
-                            return false;
-                        }
-                        var days = $("#pickdays").val();
-                        var begin_time = $("#begin_time").val();
-                        $.post("{$getScheduleFuture_url}", { "schedule": schedule, "begin_time": begin_time, "days": days },
-                            function(data){
-                                if (data.status == true){
-                                    var html = '';
-                                    for(var i=0; i<data.time.length; i++){
-                                        html += '<li class="list-group-item">'+data.time[i]+'<span class="badge">'+(i+1)+'</span></li>';
-                                        //console.log(data.time[i]);
-                                    }
-                                    $('#scheduleresult').html(html);
-                                }
-                            }, "json");
-                    }, "json");
-                }
+//         $checkSchedule_url = url('checkSchedule');
+//         $getScheduleFuture_url = url('getScheduleFuture');
+//         $js = <<<EOF
+//             <script type="text/javascript">
+//                  function checkSchedule() {
+//                     var schedule = $("#schedule").val();
+//                     $.post("{$checkSchedule_url}", { "schedule": schedule },
+//                     function(data){
+//                         if (data.status == false){
+//                             Dolphin.notify('Cron 表达式错误', 'danger', 'glyphicon glyphicon-warning-sign');
+//                             return false;
+//                         }
+//                         var days = $("#pickdays").val();
+//                         var begin_time = $("#begin_time").val();
+//                         $.post("{$getScheduleFuture_url}", { "schedule": schedule, "begin_time": begin_time, "days": days },
+//                             function(data){
+//                                 if (data.status == true){
+//                                     var html = '';
+//                                     for(var i=0; i<data.time.length; i++){
+//                                         html += '<li class="list-group-item">'+data.time[i]+'<span class="badge">'+(i+1)+'</span></li>';
+//                                         //console.log(data.time[i]);
+//                                     }
+//                                     $('#scheduleresult').html(html);
+//                                 }
+//                             }, "json");
+//                     }, "json");
+//                 }
             
-                $(function(){
-                    checkSchedule();    // 页面加载后就执行一次
+//                 $(function(){
+//                     checkSchedule();    // 页面加载后就执行一次
             
-                    // 检查 Cron 表达式是否正确，如果正确，则获取预计执行时间
-                    $("#schedule,#pickdays,#begin_time").blur(function(){
-                        checkSchedule();
-                    });
-                });
-            </script>
-EOF;
-        // 显示添加页面
-        return ZBuilder::make('form')
-            ->addFormItems([
-                ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
-                ['text', 'task_id', '输入任务id'],
-                ['text', 'task', '输入任务名称'],
-                ['text', 'export_id', '输入导入id'],
-                ['text', 'export_tab', '输入导入表名'],
-                ['text', 'export_time', '输入导入时间'],
-                ['static', 'custom_ids', '待客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
-                // ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
-                // ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
-                // ['select', 'user_id', '选择员工', '', $user],
-                // ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
-                ['radio', 'status', '立即启用', '', ['否', '是'], 1],
-            ])
+//                     // 检查 Cron 表达式是否正确，如果正确，则获取预计执行时间
+//                     $("#schedule,#pickdays,#begin_time").blur(function(){
+//                         checkSchedule();
+//                     });
+//                 });
+//             </script>
+// EOF;
+//         // 显示添加页面
+//         return ZBuilder::make('form')
+//             ->addFormItems([
+//                 ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+//                 ['text', 'task_id', '输入任务id'],
+//                 ['text', 'task', '输入任务名称'],
+//                 ['text', 'export_id', '输入导入id'],
+//                 ['text', 'export_tab', '输入导入表名'],
+//                 ['text', 'export_time', '输入导入时间'],
+//                 ['static', 'custom_ids', '待客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
+//                 // ['number', 'custom_ids', '输入客户数量','<code>当前任务总数'.$tips.'；务必不要大于该值</code>'],
+//                 // ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+//                 // ['select', 'user_id', '选择员工', '', $user],
+//                 // ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+//                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+//             ])
 
-            ->setTrigger('way', 1, 'custom_id,user_id')
-            ->setTrigger('way', 0, 'custom_ids,export_time,export_tab,export_id,task,task_id')
-            ->fetch('add');
-    }
+//             ->setTrigger('way', 1, 'custom_id,user_id')
+//             ->setTrigger('way', 0, 'custom_ids,export_time,export_tab,export_id,task,task_id')
+//             ->fetch('add');
+//     }
     /**
      * 新增
      * @return mixed
@@ -343,7 +343,7 @@ EOF;
         $map['id'] = array('>',1);
         $user =  UserModel::where($map)->column('id,username'); 
 
-        $role = RoleModel::where(['status'=>1])->column('id,username'); 
+        $role = RoleModel::where(['status'=>1])->column('id,name'); 
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
