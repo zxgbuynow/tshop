@@ -540,6 +540,7 @@ class Custom extends Admin
                     $s['rate'] = $import['rate'];
                     // $s['title'] = $import['tabNm'];
                     $s['batch_id'] = $import['batch_id'];
+                    $s['create_time'] = time();
                     $s['title'] = get_file_name($excel_file);
                     CustomEXLogModel::create($s);
                 }
@@ -548,6 +549,7 @@ class Custom extends Admin
 
             $s['rate'] = '100%';
             $s['title'] = get_file_name($excel_file);
+            $s['create_time'] = time();
             $s['batch_id'] = $import['batch_id'];
             CustomEXLogModel::create($s);
             // 导入成功

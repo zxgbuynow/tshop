@@ -432,7 +432,9 @@ class Task extends Admin
             $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
             $value['category'] = $category[$value['category']];
         }
-        $aba = db('call_speechcraft')->where(['status'=>1])->order('sort ASC')->select(); 
+        $abam['status'] = 1;
+        $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        $aba = db('call_speechcraft')->where($abam)->order('sort ASC')->select(); 
         foreach ($aba as $key => &$value) {
             $value['custom'] = $value['title'];
             $value['create_time'] = $value['tags'];

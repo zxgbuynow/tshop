@@ -50,3 +50,6 @@ ADD INDEX `ind_batch_id`(`batch_id`) USING BTREE;
 
 ALTER TABLE `tshop1`.`call_alloc` 
 ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `name`;
+
+ALTER TABLE `tshop1`.`call_speechcraft` 
+ADD COLUMN `alloc_id` int(10) NULL COMMENT '任务id' AFTER `tags`;

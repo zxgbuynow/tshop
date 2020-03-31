@@ -29,14 +29,6 @@ class Speechcraft extends Admin
         // 分页数据
         $page = $data_list->render();
 
-  //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '话术id',
-  // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
-  // `order` int(10) unsigned DEFAULT '0' COMMENT '排序',
-  // `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
-
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setSearch(['title' => '名称'])// 设置搜索框
@@ -63,13 +55,7 @@ class Speechcraft extends Admin
      */
     public function add()
     {
-      //       `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '话术id',
-  // `project_id` int(10) unsigned DEFAULT '0' COMMENT '项目id',
-  // `title` varchar(50) COLLATE utf8_unicode_ci NOT NULL COMMENT '名称',
-  // `order` int(10) unsigned DEFAULT '0' COMMENT '排序',
-  // `content` longtext COLLATE utf8_unicode_ci COMMENT '内容',
-  // `create_time` int(10) unsigned DEFAULT NULL,
-  // `status` tinyint(1) DEFAULT '1' COMMENT '0失效',
+  
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
@@ -82,10 +68,12 @@ class Speechcraft extends Admin
             }
         }
         $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
+        $list_task = db('call_alloc')->where(['status'=>1])->column('id,name');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['select', 'project_id', '项目','',$list_project],
+                ['select', 'alloc_id', '项目','',$list_task],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],
@@ -113,12 +101,13 @@ class Speechcraft extends Admin
             }
         }
         $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
-
+        $list_task = db('call_alloc')->where(['status'=>1])->column('id,name');
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
                 ['hidden', 'id'],
                 ['select', 'project_id', '项目','',$list_project],
+                ['select', 'alloc_id', '项目','',$list_task],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],

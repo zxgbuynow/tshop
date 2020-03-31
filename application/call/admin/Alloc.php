@@ -50,6 +50,7 @@ class Alloc extends Admin
             // ->setSearch(['domain' => '域名','custom'=>'客户'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
+                ['name', '任务名称'],
                 ['oper', '操作员'],
                 // ['call_count', '呼叫次数'],
                 // ['alloc_count', '分配次数'],

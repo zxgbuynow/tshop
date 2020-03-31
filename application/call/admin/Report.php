@@ -10,6 +10,7 @@ use app\user\model\User as UserModel;
 use app\call\model\Trade as TradeModel;
 use app\call\model\Order as OrderModel;
 use app\call\model\Tradelog as TradelogModel;
+use app\call\model\CustomEXLog as CustomEXLogModel;
 use think\Db;
 
 /**
@@ -1791,6 +1792,9 @@ class Report extends Admin
             ->raw('signcity') // 使用原值
             ->fetch(); // 渲染模板
     }
+
+
+    
     /**
      * [classFweekReportexport 导出]
      * @return [type] [description]
@@ -1890,6 +1894,71 @@ class Report extends Admin
             ->setRowList($data_list) // 设置表格数据
             ->setPages($page) // 设置分页数据
             ->fetch(); // 渲染页面
+    }
+
+    /**
+     * [importReport 净得率]
+     * @return [type] [description]
+     */
+    function importReport()
+    {
+        
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        // 数据列表
+        $data_list = CustomEXLogModel::where($map)->order('id desc')->paginate();
+        
+        // 分页数据
+        $page = $data_list->render();
+        $btnexport = [
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('importReportexport',http_build_query($this->request->param()))
+        ];
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->hideCheckbox()
+            ->setSearchArea([
+                ['daterange', 'create_time', '导入日期', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+
+            ])
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['title', '分批导入表名','link',url('call/custom/import'), '_blank'],
+                ['rate', '净得率'],
+                ['create_time', '导入日期','date'],
+            ])
+            ->setRowList($data_list)// 设置表格数据
+            ->addTopButton('custom', $btnexport)
+            ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [importReportexport 净得率导出]
+     * @param  string $value [description]
+     * @return [type]        [description]
+     */
+    public function importReportexport()
+    {
+        $map = $this->getMaps();
+        
+        // 数据列表
+        $data_list = CustomEXLogModel::where($map)->order('id desc')->paginate();
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['id','auto', 'ID'],
+            ['title', 'auto','分批导入表名'],
+            ['rate', 'auto','净得率'],
+            ['create_time', 'auto','导入日期','date'],
+        ];
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['净得率报表', $cellName, $data_list]);
     }
     /**
      * 设置用户状态：删除、禁用、启用
