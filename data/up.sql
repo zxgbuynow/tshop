@@ -53,3 +53,12 @@ ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `name`;
 
 ALTER TABLE `tshop1`.`call_speechcraft` 
 ADD COLUMN `alloc_id` int(10) NULL COMMENT '任务id' AFTER `tags`;
+
+CREATE TABLE `call_msg_log` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `content` varchar(250) NOT NULL DEFAULT '' COMMENT '短信内容',
+  `custom_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '操作人ID',
+  `user_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '操作人ID',
+  `create_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='短信发送表'

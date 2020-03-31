@@ -35,8 +35,8 @@ class Payment extends Admin
         return ZBuilder::make('table')
             // ->setSearch(['brank_account' => '客户账号'])// 设置搜索框
             ->setSearchArea([
-                ['daterange', 'sign_time', '回款时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
-                ['daterange', 'notice_time', '提醒时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'sign_time', '回款到账时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'notice_time', '回款提醒时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                 ['select', 'status', '是否到账', '', '', ['1'=>'到账','0'=>'未到账']],
 
             ])

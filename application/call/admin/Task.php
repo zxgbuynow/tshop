@@ -150,7 +150,7 @@ class Task extends Admin
             ->addRightButton('custom',$btn_discard)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
             ->addRightButton('custom',$btn_hangup,['title'=>'分机挂断','area' => ['200px', '200px']])
-            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '800px']])
+            ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '500px']])
             ->setRowList($data_list)// 设置表格数据
             ->raw('custom') // 使用原值
             ->fetch(); // 渲染模板
@@ -164,11 +164,13 @@ class Task extends Admin
      */
     public function msg($id)
     {
+        $map['id'] = $id;
+        $custom_id = AlloclgModel::where($map)->value('custom_id');
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-            $mobile = db('admin_custom')->where(['id'=>$id])->value('mobile');
+            $mobile = db('call_custom')->where(['id'=>$custom_id])->value('mobile');
             if (!$mobile) {
                 $this->error('手机号不对',null,'_close_pop');
             }
@@ -181,6 +183,12 @@ class Task extends Admin
             if($result['code']){
                 $this->error('发送失败，错误代码：'. $result['code']. ' 错误信息：'. $result['msg'],null,'_close_pop');
             } else {
+                //生成日志
+                $s['content'] = $data['title'];
+                $s['custom_id'] = $custom_id;
+                $s['user_id'] = UID;
+                $s['create_time'] = time();
+                db('call_msg_log')->insert($s);
                 $this->success('发送成功',null,'_close_pop');
             }
             
