@@ -300,7 +300,86 @@ class Statistics extends Admin
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
-   
+    
+    /**
+     * [feeStatistics 所有类型客户成本]
+     * @return [type] [description]
+     */
+    public function feeStatistics()
+    {
+        // 获取查询条件
+        $map = $this->getMap();
+
+        // 数据列表
+        
+        if (!$map) {
+            $map['id'] = '';//过滤所有数据
+        }
+        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
+            $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $item->project = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
+        });
+        
+        // 分页数据
+        $page = $data_list->render();
+
+        $btnexport = [
+            // 'class' => 'btn btn-info',
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('feeexport',http_build_query($this->request->param()))
+        ];
+        $sources = db('call_custom')->column('source');
+        foreach ($sources as $key => $value) {
+            $list_source[$value] = $value;
+        }
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->setSearchArea([
+                ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['select', 'source', '平台来源', '', '', $list_source],
+
+            ])
+            ->hideCheckbox()
+            ->addColumns([ // 批量添加数据列
+                ['categorys', '客户分类'],
+                ['project', '项目'],
+                ['source', '客户来源'],
+                ['fees', '成本'],
+            ])
+            ->addTopButton('custom', $btnexport)
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [feeexport 导出]
+     * @return [type] [description]
+     */
+    public function feeexport()
+    {
+        $map = $this->getMaps();
+
+        //查询数据
+
+        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
+            $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $item->project = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
+        });
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['categorys','auto', '客户分类'],
+            ['project','auto', '项目'],
+            ['source', 'auto','客户来源'],
+            ['fees','auto', '成本'],
+        ];
+        
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['所有类型客户成本', $cellName, $data_list]);
+    }
     /**
      * 设置用户状态：删除、禁用、启用
      * @param string $type 类型：delete/enable/disable

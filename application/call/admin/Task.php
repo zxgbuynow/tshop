@@ -118,7 +118,7 @@ class Task extends Admin
 
         $msel = [
             'will_contact_custom_count'=>'新任务未联系客户',
-            'pass_second_contact_custom_count'=>'超2天未联系客户',
+            // 'pass_second_contact_custom_count'=>'超2天未联系客户',
             'no_contact_custom_count'=>'新任务未接通客户'
         ];
 

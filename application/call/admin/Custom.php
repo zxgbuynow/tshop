@@ -30,6 +30,22 @@ class Custom extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
+        $request = Request::instance();
+        $params = $request->param();
+        if (isset($params['tag'])) {
+            
+            if ($params['tag']=='pass_second_contact_custom_count') {
+
+                $m1['a.create_time'] = array('gt',time()-86400*2);
+                $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->select();
+                if ($pass_second_contact_custom_count) {
+                    $map['id'] = array('in',array_column($pass_second_contact_custom_count, 'custom_id'));
+                }
+                // $map['call_log.timeLength'] = array('eq',0);
+                // $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+            }
+            
+        }
         //读取权限
         $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');

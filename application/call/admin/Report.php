@@ -11,6 +11,7 @@ use app\call\model\Trade as TradeModel;
 use app\call\model\Order as OrderModel;
 use app\call\model\Tradelog as TradelogModel;
 use app\call\model\CustomEXLog as CustomEXLogModel;
+use app\user\model\Role as RoleModel;//CustomEXLog
 use think\Db;
 
 /**
@@ -102,17 +103,32 @@ class Report extends Admin
         $map = $this->getMap();
 
         // 数据列表
-        
-        if (!$map) {
-            $map['id'] = '';//过滤所有数据
-        }
-        $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate();
         if (isset($map['create_time'])) {
-            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+            //部门
+            if (isset($map['role_id'])) {
+                $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
+                unset($map['role_id']);
+                if ($user_ids) {
+                    $map['user_id'] = array('in',array_column($user_ids, 'id'));
+                }
+                
+            }
+            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times,count(*) as call_count')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+                    unset($m);
+                    $m['create_time'] = $map['create_time'];
+                    $m['user_id'] = $item['user_id'];
+                    $m['timeLength'] = array('gt',0);
                     $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
+                    $item->time_minu = number_format($item['times']/60,2);
+                    $item->get_count = CalllogModel::where($m)->count();
+                    $item->call_rate = (number_format($item->get_count/$item->call_count,2)*100).'%';
                 });
+        }else{
+            unset($map);
+            $map['id'] = '';
+            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate();
         }
-        
+       
         // 分页数据
         $page = $data_list->render();
 
@@ -138,15 +154,22 @@ class Report extends Admin
                 'href'  => url('timeLenthexport')
             ];
         }
-        
+        $roles = RoleModel::where(['status'=>1])->column('id,name'); 
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+            ->addFilter('role_id', $roles)
             ->addTimeFilter('create_time') // 添加时间段筛选
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
                 ['__INDEX__', '序列'],
                 ['user', '员工'],
-                ['times', '呼出通话时长'],
+                ['role', '部门'],
+                ['times', '呼出通话时长(秒)'],
+                ['time_minu', '呼出通话时长(分)'],
+                ['get_count', '接通数'],
+                ['call_count', '呼叫数'],
+                ['call_rate', '接通率'],
                 ['__INDEX__', '时长排名'],
                 ['timerange', '时间段'],
             ])
@@ -168,19 +191,50 @@ class Report extends Admin
         if (!$timerange) $this->error('缺少参数');
         $map = object_to_array(json_decode(str_replace('+',' ',urldecode($timerange))));
 
+        // if (isset($map['create_time'])) {
+        //     $data = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+        //             $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
+        //             $item->__INDEX__ = $key+1;
+        //         });
+        // }
+        
         if (isset($map['create_time'])) {
-            $data = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+            //部门
+            if (isset($map['role_id'])) {
+                $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
+                unset($map['role_id']);
+                if ($user_ids) {
+                    $map['user_id'] = array('in',array_column($user_ids, 'id'));
+                }
+                
+            }
+            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times,count(*) as call_count')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map){
+                    unset($m);
+                    $m['create_time'] = $map['create_time'];
+                    $m['user_id'] = $item['user_id'];
+                    $m['timeLength'] = array('gt',0);
                     $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
+                    $item->time_minu = number_format($item['times']/60,2);
+                    $item->get_count = CalllogModel::where($m)->count();
+                    $item->call_rate = (number_format($item->get_count/$item->call_count,2)*100).'%';
                     $item->__INDEX__ = $key+1;
                 });
+        }else{
+            unset($map);
+            $map['id'] = '';
+            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as times')->order('times DESC')->group('user_id')->paginate();
         }
-       
         // 设置表头信息（对应字段名,宽度，显示表头名称）
         $cellName = [
             ['user','auto', '员工'],
-            ['times','auto', '呼出通话时长'],
-            ['__INDEX__','auto', '时长排名'],
-            ['timerange','auto', '时间段'],
+            ['role', 'auto', '部门'],
+            ['times','auto',  '呼出通话时长(秒)'],
+            ['time_minu', 'auto', '呼出通话时长(分)'],
+            ['get_count', 'auto', '接通数'],
+            ['call_count','auto',  '呼叫数'],
+            ['call_rate', 'auto', '接通率'],
+            ['__INDEX__', 'auto', '时长排名'],
+            ['timerange', 'auto', '时间段'],
 
         ];
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
