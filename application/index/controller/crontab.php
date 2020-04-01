@@ -527,8 +527,8 @@ class Crontab
         $task = db('call_alloc_log')->where($m)->select();
         $currH = date('t',time());
         foreach ($task as $key => $value) {
-            if (floor(($ent-$value['create_time'])/86400 <= 5) {
-                $diff = floor(($ent-$value['create_time'])/86400;
+            if (floor(($ent-$value['create_time'])/86400) <= 5) {
+                $diff = floor(($ent-$value['create_time'])/86400);
                 switch ($diff) {
                     case 1:
                         // 9点 12点 17点
