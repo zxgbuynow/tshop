@@ -51,6 +51,8 @@ class Home extends Admin
             $no_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m2)->group('a.id')->count();
 
         	// $ondate_count = 0;//预约提醒
+            $m3['status'] = 0;
+            $m3['user_id'] = UID; 
             $ondate_count = db('call_ondate')->where($m3)->count();
         }else{
             $m4['a.status'] = 1;
