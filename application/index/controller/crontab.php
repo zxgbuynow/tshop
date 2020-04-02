@@ -566,7 +566,61 @@ class Crontab
         }
     }
 
+    /**
+     * [roleCallTask 部门通话]
+     * @return [type] [description]
+     */
+    public function roleCallTask()
+    {
+        
+        $m = date('m');
+        $d = date('d');
 
+        $data_list = db('call_log')->whereTime('create_time', 'today')->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->group('user_id')->select();
+
+        $ret = [];//组名 分配数 未满人 当日及时联系 7天未联系的具体人
+        foreach ($data_list as $key => $value) {
+           
+            $ret[$value['role_id']]['standard_num'] += $value['timeLengths']>99*60?1:0;
+
+            $ret[$value['role_id']]['name'] = db('admin_role')->where(['id'=>$value['role_id']])->value('name');
+
+            $ret[$value['role_id']]['alloc'] += db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count();
+
+            $ret[$value['role_id']]['standard_person'] .= ' '.$value['timeLengths']>99*60? db('admin_user')->where(['id'=>$value['user_id']])->value('nickname'):'';
+
+            $ret[$value['role_id']]['contact'] += (db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())-(db('call_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())<0?0:1;
+
+            $m3['a.create_time'] = array('gt',time()-86400*7);
+            $m3['a.user_id'] = $value['user_id'];
+            $7day_nocontact = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+
+
+            $ret[$value['role_id']]['7day_nocontact'] .= ' '.db('admin_user')->where(['id'=>$value['user_id']])->value('nickname').$7day_nocontact.'条';
+
+            
+
+        }
+
+        if ($ret) {
+            foreach ($ret as $key => $value) {
+                $content = '';
+
+
+                //例如 12月23号，张三组今日总分配新数据为60条，未满100分钟人员：李四、王二，当日数据为及时联系：1， 7天未联系数据：李刚9条
+                $content = $m.'月'.$d.'号，'.$value['name'].'今日总分配新数据为'.$value['alloc'].'条，'.'未满100分钟人员：'.$value['standard_person'].'，当日数据为及时联系'.$value['contact'].'，7天未联系数据：'.$value['7day_nocontact'];
+
+                echo $content;exit;
+                // _sendMaster($content);
+            }
+            
+        }
+        
+        echo 'succ';exit;
+
+
+
+    }
     /**
      * [_sendMaster 通用发送方法]
      * @param  [type] $msg [description]

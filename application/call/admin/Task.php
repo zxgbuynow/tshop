@@ -288,6 +288,7 @@ class Task extends Admin
         //创建空的通话记录
         $s['alloc_log_id'] = $id;
         $s['user_id'] = UID;
+        $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role_id');
         $s['callType'] = 2;//按实际更新
         $s['calledNum'] = $params['telNum'];
         $s['create_time'] = time();
