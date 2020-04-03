@@ -2024,7 +2024,7 @@ class Report extends Admin
         cookie('__forward__', $_SERVER['REQUEST_URI']);
 
         //alloc_time timeslength alloc_sum gtback 个人
-        //standard_num 7day_nocontanct
+        //standard_num day_nocontanct
         //时间 部门
         // 获取查询条件
         $map = $this->getMap();
@@ -2051,7 +2051,7 @@ class Report extends Admin
 
                 //7day
                 $m3['a.create_time'] = array('gt',time()-86400*7);
-                $data['7day_nocontanct'][$map['role_id']] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                $data['day_nocontanct'][$map['role_id']] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                 // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
                 // unset($map['role_id']);
             }else{
@@ -2073,14 +2073,14 @@ class Report extends Admin
                     $data['standard_num'][$value] = $standard_num;
 
                     $m3['a.create_time'] = array('gt',time()-86400*7);
-                    $data['7day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                    $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                 }
             }
 
             $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
                     unset($m1);
                     unset($m2);
-                    //role alloc_time  alloc_sum gtback standard_num 7day_nocontanct
+                    //role alloc_time  alloc_sum gtback standard_num day_nocontanct
                     $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
                     $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
 
@@ -2129,7 +2129,7 @@ class Report extends Admin
                 ['alloc_sum', '分配数量'],
                 ['gtback', '回收数量'],
                 ['standard_num', '部门达标数量(部门)'],
-                ['7day_nocontanct', '7天未联系客户(部门)'],
+                ['day_nocontanct', '7天未联系客户(部门)'],
                 ['create_time', '呼叫时间','datetime'],
             ])
             ->setRowList($data_list)// 设置表格数据
@@ -2168,7 +2168,7 @@ class Report extends Admin
 
                 //7day
                 $m3['a.create_time'] = array('gt',time()-86400*7);
-                $data['7day_nocontanct'][$map['role_id']] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                $data['day_nocontanct'][$map['role_id']] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                 // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
                 // unset($map['role_id']);
             }else{
@@ -2190,14 +2190,14 @@ class Report extends Admin
                     $data['standard_num'][$value] = $standard_num;
 
                     $m3['a.create_time'] = array('gt',time()-86400*7);
-                    $data['7day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                    $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                 }
             }
 
             $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
                     unset($m1);
                     unset($m2);
-                    //role alloc_time  alloc_sum gtback standard_num 7day_nocontanct
+                    //role alloc_time  alloc_sum gtback standard_num day_nocontanct
                     $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
                     $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
 
@@ -2212,7 +2212,7 @@ class Report extends Admin
 
 
                     $item->standard_num = $data['standard_num'][$item['role_id']];
-                    $item->7day_nocontanct = $data['7day_nocontanct'][$item['role_id']];
+                    $item->day_nocontanct = $data['day_nocontanct'][$item['role_id']];
 
                 });
         }else{
@@ -2231,7 +2231,7 @@ class Report extends Admin
             ['alloc_sum', 'auto','分配数量'],
             ['gtback', 'auto','回收数量'],
             ['standard_num', 'auto','部门达标数量(部门)'],
-            ['7day_nocontanct','auto', '7天未联系客户(部门)'],
+            ['day_nocontanct','auto', '7天未联系客户(部门)'],
             ['create_time','auto', '呼叫时间','datetime'],
         ];
         
