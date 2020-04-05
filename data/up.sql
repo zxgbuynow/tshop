@@ -62,3 +62,6 @@ CREATE TABLE `call_msg_log` (
   `create_time` int(11) unsigned NOT NULL DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='短信发送表'
+
+ALTER TABLE `tshop1`.`call_log` 
+ADD COLUMN `role_id` int(10) NULL COMMENT '角色ID' AFTER `extension`;

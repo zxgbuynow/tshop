@@ -33,10 +33,27 @@ class Home extends Admin
         // ]
         //待办事项
         if (UID==1) {
-        	$will_contact_custom_count = 0;//新任务未联系客户
-        	$pass_second_contact_custom_count = 0;//超2天未联系客户
-        	$no_contact_custom_count = 0;//新任务未接通未达标客户
-        	$ondate_count = 0;//预约提醒
+            $m4['a.status'] = 1;
+            $m4['c.alloc_log_id'] = array('eq','');
+            $will_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m4)->group('a.id')->count();
+
+        	// $will_contact_custom_count = 0;//新任务未联系客户
+        	// $pass_second_contact_custom_count = 0;//超2天未联系客户
+            $m1['a.status'] = 1;
+            // $m1['c.timeLength'] = array('eq',0);
+            // $m1[] = ['a.create_time','gt',time()-86400*2];
+            $m1['a.create_time'] = array('gt',time()-86400*2);
+            $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->count();
+
+        	// $no_contact_custom_count = 0;//新任务未接通未达标客户
+            $m2['a.status'] = 1;
+            $m2['c.timeLength'] = array('eq',0);
+            $no_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m2)->group('a.id')->count();
+
+        	// $ondate_count = 0;//预约提醒
+            $m3['status'] = 0;
+            $m3['user_id'] = UID; 
+            $ondate_count = db('call_ondate')->where($m3)->count();
         }else{
             $m4['a.status'] = 1;
             // $m4['c.timeLength'] = array('eq',0);
@@ -46,7 +63,7 @@ class Home extends Admin
         	// $will_contact_custom_count = 0;//新任务未联系客户 新客户是没有通话时长的
             
             $m1['a.status'] = 1;
-            $m1['c.timeLength'] = array('eq',0);
+            // $m1['c.timeLength'] = array('eq',0);
             $m1['a.user_id'] = UID;
             // $m1[] = ['a.create_time','gt',time()-86400*2];
             $m1['a.create_time'] = array('gt',time()-86400*2);
@@ -66,10 +83,14 @@ class Home extends Admin
 
         	// $ondate_count = 0;//预约提醒
         }
+        $info['user_id'] = UID;
         $info['will_contact_custom_count'] = $will_contact_custom_count;
         $info['pass_second_contact_custom_count'] = $pass_second_contact_custom_count;
         $info['no_contact_custom_count'] = $no_contact_custom_count;
         $info['ondate_count'] = $ondate_count;
+        $info['will_contact_custom_notice'] = isset(plugin_config('wechat')['will_contact_custom_notice'])?plugin_config('wechat')['will_contact_custom_notice']:'';
+        $info['pass_second_contact_custom_notice'] = isset(plugin_config('wechat')['pass_second_contact_custom_notice'])?plugin_config('wechat')['pass_second_contact_custom_notice']:'';
+        $info['no_contact_custom_notice'] = isset(plugin_config('wechat')['no_contact_custom_notice'])?plugin_config('wechat')['no_contact_custom_notice']:'';
         //排名
         $call_count = [];
         $calls = db('call_log')->whereTime('create_time', 'month')->field('sum(timeLength) as times,user_id')->order('times desc')->group('user_id')->limit(8)->select();

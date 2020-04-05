@@ -50,7 +50,7 @@
     position: absolute;
     left: 30px;
     top: 10px;
-    height: 80px;
+    height: 100px;
     display: flex;
     font-family: '微软雅黑';
     font-weight: 400;
@@ -120,6 +120,10 @@
         font-weight: bold;
         color: #00aacc;
     }
+    .layui-card-body-right-p3{
+      color: red;
+      word-break: break-all;
+    }
 </style>
 <link rel="stylesheet" href="__HOME_CSS__/layui.css">
 <div style="background-color: #F2F2F2; margin-bottom: 20px;">
@@ -131,34 +135,37 @@
         <div class="layui-card-body">
 
             <div class="layui-row">
-                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'will_contact_custom_count'])}">
+                <a class="layui-col-md3 u12" {if( $info['user_id'] != 1)}  href="{:url('call/task/index',['tag' => 'will_contact_custom_count'])}" {/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u26.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">新任务未联系客户</p>
                         <p class="layui-card-body-right-p2">{$info.will_contact_custom_count}</p>
+                        <p class="layui-card-body-right-p3" style="">{$info.will_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'pass_second_contact_custom_count'])}">
+                <a class="layui-col-md3 u12" {if( $info['user_id'] != 1)}  href="{:url('call/custom/index',['tag' => 'pass_second_contact_custom_count'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u30.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">超2天未联系客户</p>
                         <p class="layui-card-body-right-p2">{$info.pass_second_contact_custom_count}</p>
+                        <p class="layui-card-body-right-p3" style="">{$info.pass_second_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" href="{:url('call/task/index',['tag' => 'no_contact_custom_count'])}">
+                <a class="layui-col-md3 u12" {if( $info['user_id'] != 1)}  href="{:url('call/task/index',['tag' => 'no_contact_custom_count'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u20.svg">
                     </div>
                     <div class="layui-card-body-right" >
                         <p class="layui-card-body-right-p1">新任务未接通客户</p>
                         <p class="layui-card-body-right-p2">{$info.no_contact_custom_count}</p>
+                        <p class="layui-card-body-right-p3" style="">{$info.no_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" href="{:url('call/ondate/index',['group' => 'no'])}">
+                <a class="layui-col-md3 u12" {if( $info['user_id'] != 1)}  href="{:url('call/ondate/index',['group' => 'no'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u29.svg">
                     </div>

@@ -35,6 +35,9 @@ class Setting extends Admin
             }
             if ($group=='tab3') {
                 plugin_config('wechat.serv_url',$data['serv_url']);
+                plugin_config('wechat.will_contact_custom_notice',$data['will_contact_custom_notice']);
+                plugin_config('wechat.pass_second_contact_custom_notice',$data['pass_second_contact_custom_notice']);
+                plugin_config('wechat.no_contact_custom_notice',$data['no_contact_custom_notice']);
             }
             
             $this->success('操作成功', cookie('__forward__'));
@@ -46,6 +49,9 @@ class Setting extends Admin
             // 'wechat_key'=>config('wechat_key'),
             // 'APP_SECRET'=>plugin_config('APP_SECRET')
             'serv_url'=>isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:''
+            'will_contact_custom_notice'=>isset(plugin_config('wechat')['will_contact_custom_notice'])?plugin_config('wechat')['will_contact_custom_notice']:''
+            'pass_second_contact_custom_notice'=>isset(plugin_config('wechat')['pass_second_contact_custom_notice'])?plugin_config('wechat')['pass_second_contact_custom_notice']:''
+            'no_contact_custom_notice'=>isset(plugin_config('wechat')['no_contact_custom_notice'])?plugin_config('wechat')['no_contact_custom_notice']:''
         ];
         $list_tab = [
             'tab1' => ['title' => '短信配置', 'url' => url('index', ['group' => 'tab1'])],
@@ -91,6 +97,9 @@ class Setting extends Admin
                 ->setTabNav($list_tab,  $group)
                 ->addFormItems([ // 批量添加表单项
                     ['text', 'serv_url', 'serv_url'],
+                    ['text', 'will_contact_custom_notice', '新任务未联系客户提醒'],
+                    ['text', 'pass_second_contact_custom_notice', '新任务未联系客户提醒'],
+                    ['text', 'no_contact_custom_notice', '新任务未联系客户提醒'],
                 ])
                 ->setFormData($info) // 设置表单数据
                 ->fetch();
