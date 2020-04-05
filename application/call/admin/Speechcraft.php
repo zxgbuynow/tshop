@@ -73,7 +73,7 @@ class Speechcraft extends Admin
         return ZBuilder::make('form')
             ->addFormItems([
                 ['select', 'project_id', '项目','',$list_project],
-                ['select', 'alloc_id', '项目','',$list_task],
+                ['select', 'alloc_id', '任务','',$list_task],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],
@@ -107,7 +107,7 @@ class Speechcraft extends Admin
             ->addFormItems([
                 ['hidden', 'id'],
                 ['select', 'project_id', '项目','',$list_project],
-                ['select', 'alloc_id', '项目','',$list_task],
+                ['select', 'alloc_id', '任务','',$list_task],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],

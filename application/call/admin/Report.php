@@ -2035,7 +2035,7 @@ class Report extends Admin
             //处理部门
             if (isset($map['role_id'])) {
 
-                $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('user_id');
+                $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
                 // $user_ids = CalllogModel::where($map)->column('user_id');
                 //部门计总
                 $standard_num = 0;
@@ -2043,15 +2043,15 @@ class Report extends Admin
                     $m['user_id'] = $value;
                     $m['create_time'] = $map['create_time'];
                     $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                    if ($timeLengths>99) {
+                    if ($timeLengths['timeLengths']>99*60) {
                         $standard_num++;
                     }
                 }
-                $data['standard_num'][$map['role_id']] = $standard_num;
+                $data['standard_num'][$map['role_id'][1]] = intval($standard_num) ;
 
                 //7day
                 $m3['a.create_time'] = array('gt',time()-86400*7);
-                $data['day_nocontanct'][$map['role_id']] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                $data['day_nocontanct'][$map['role_id'][1]] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                 // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
                 // unset($map['role_id']);
             }else{
@@ -2059,14 +2059,14 @@ class Report extends Admin
                 $role_ids = CalllogModel::where($map)->column('role_id');
 
                 foreach ($role_ids as $key => $value) {
-                    $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('user_id');
+                    $user_ids = db('admin_user')->where(['role'=>$map['role_id'][1]])->column('user_id');
                     //部门计总
                     $standard_num = 0;
                     foreach ($user_ids as $key => $value) {
                         $m['user_id'] = $value;
                         $m['create_time'] = $map['create_time'];
                         $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                        if ($timeLengths>99) {
+                        if ($timeLengths['timeLengths']>99) {
                             $standard_num++;
                         }
                     }
@@ -2077,7 +2077,7 @@ class Report extends Admin
                 }
             }
 
-            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('times DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
+            $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('timeLengths DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
                     unset($m1);
                     unset($m2);
                     //role alloc_time  alloc_sum gtback standard_num day_nocontanct
@@ -2094,7 +2094,9 @@ class Report extends Admin
                     $item->gtback = db('call_alloc_log')->where($m2)->count();
 
                     //role_id 
-                    $item->standard_num = $item['timeLengths']>99?'':'';
+                    $item->standard_num = $item['timeLengths']>99*60?'':'';
+
+                    $item->role = db('admin_role')->where(['id'=>$data['role_id'][1]])->value('name');
 
                 });
         }else{
@@ -2160,7 +2162,7 @@ class Report extends Admin
                     $m['user_id'] = $value;
                     $m['create_time'] = $map['create_time'];
                     $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                    if ($timeLengths>99*60) {
+                    if ($timeLengths['timeLengths']>99*60) {
                         $standard_num++;
                     }
                 }
@@ -2183,7 +2185,7 @@ class Report extends Admin
                         $m['user_id'] = $value;
                         $m['create_time'] = $map['create_time'];
                         $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                        if ($timeLengths>99*60) {
+                        if ($timeLengths['timeLengths']>99*60) {
                             $standard_num++;
                         }
                     }

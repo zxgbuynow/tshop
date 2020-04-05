@@ -206,7 +206,7 @@ class Alloc extends Admin
             //UID
             $sdata['op_id'] = UID;
             $sdata['way'] = $data['way']==0?1:2;
-            $sdata['call_count'] = $data['call_count'];
+            // $sdata['call_count'] = $data['call_count'];
             $sdata['name'] = $data['name'];
             $sdata['batch_id'] = $data['batch_id'];
             //必填字段
@@ -352,6 +352,9 @@ class Alloc extends Admin
         $batchs = CustomEXLogModel::column('id,title'); 
         // 显示添加页面
         return ZBuilder::make('form')
+            ->addLinkage('role_id', '选择组', '', $role, '', url('get_user'), 'user_id')
+            ->addSelect('user_id', '选择员工','',$user,'','multiple')
+            ->addLinkage('batch_id', '选择导入任务', '', $batchs, '', url('get_batch'), 'cusids')
             ->addFormItems([
                 // ['text', 'call_count', '呼叫次数'],
                 ['text', 'name', '任务名称'],
@@ -370,9 +373,7 @@ class Alloc extends Admin
 
                 // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
             ])
-            ->addLinkage('role_id', '选择组', '', $role, '', url('get_user'), 'user_id')
-            ->addSelect('user_id', '选择员工','',$user,'','multiple')
-            ->addLinkage('batch_id', '选择导入任务', '', $batchs, '', url('get_batch'), 'cusids')
+            
             ->setTrigger('way', 1, 'custom_id')
             ->setTrigger('way', 0, 'custom_ids')
             ->fetch();

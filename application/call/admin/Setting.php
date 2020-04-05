@@ -49,9 +49,9 @@ class Setting extends Admin
             // 'wechat_key'=>config('wechat_key'),
             // 'APP_SECRET'=>plugin_config('APP_SECRET')
             'serv_url'=>isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:''
-            'will_contact_custom_notice'=>isset(plugin_config('wechat')['will_contact_custom_notice'])?plugin_config('wechat')['will_contact_custom_notice']:''
-            'pass_second_contact_custom_notice'=>isset(plugin_config('wechat')['pass_second_contact_custom_notice'])?plugin_config('wechat')['pass_second_contact_custom_notice']:''
-            'no_contact_custom_notice'=>isset(plugin_config('wechat')['no_contact_custom_notice'])?plugin_config('wechat')['no_contact_custom_notice']:''
+            // 'will_contact_custom_notice'=>isset(plugin_config('wechat')['will_contact_custom_notice'])?plugin_config('wechat')['will_contact_custom_notice']:''
+            // 'pass_second_contact_custom_notice'=>isset(plugin_config('wechat')['pass_second_contact_custom_notice'])?plugin_config('wechat')['pass_second_contact_custom_notice']:''
+            // 'no_contact_custom_notice'=>isset(plugin_config('wechat')['no_contact_custom_notice'])?plugin_config('wechat')['no_contact_custom_notice']:''
         ];
         $list_tab = [
             'tab1' => ['title' => '短信配置', 'url' => url('index', ['group' => 'tab1'])],
