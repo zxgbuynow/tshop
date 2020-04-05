@@ -12,6 +12,7 @@ use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Alloc as AllocModel;
 use think\Cache;
 use think\Db;
+use \think\Request;
 /**
  * 首页后台控制器
  */
