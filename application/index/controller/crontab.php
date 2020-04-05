@@ -581,24 +581,48 @@ class Crontab
         $ret = [];//组名 分配数 未满人 当日及时联系 7天未联系的具体人
         foreach ($data_list as $key => $value) {
            
+
+           if (isset($ret[$value['role_id']]['standard_num'])) {
             $ret[$value['role_id']]['standard_num'] += $value['timeLengths']>99*60?1:0;
+           }else{
+            $ret[$value['role_id']]['standard_num'] = 0;
+           }
+
+            
 
             $ret[$value['role_id']]['name'] = db('admin_role')->where(['id'=>$value['role_id']])->value('name');
 
-            $ret[$value['role_id']]['alloc'] += db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count();
+            if (isset($ret[$value['role_id']]['alloc'])) {
+                $ret[$value['role_id']]['alloc'] += db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count();
+            }else{
+                $ret[$value['role_id']]['alloc'] = 0;
+            }
+            
+            if (isset($ret[$value['role_id']]['standard_person'])) {
+                $ret[$value['role_id']]['standard_person'] .= ' '.$value['timeLengths']>99*60? db('admin_user')->where(['id'=>$value['user_id']])->value('nickname'):'';
+            }else{
+                $ret[$value['role_id']]['standard_person']  = '';
+            }
+            
 
-            $ret[$value['role_id']]['standard_person'] .= ' '.$value['timeLengths']>99*60? db('admin_user')->where(['id'=>$value['user_id']])->value('nickname'):'';
-
-            $ret[$value['role_id']]['contact'] += (db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())-(db('call_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())<0?0:1;
+            if (isset($ret[$value['role_id']]['contact'])) {
+                $ret[$value['role_id']]['contact'] += (db('call_alloc_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())-(db('call_log')->where(['user_id'=>$value['user_id']])->whereTime('create_time', 'today')->count())<0?0:1;
+            }else{
+                $ret[$value['role_id']]['contact'] = 0;
+            }
+            
 
             $m3['a.create_time'] = array('gt',time()-86400*7);
             $m3['a.user_id'] = $value['user_id'];
             $day_nocontact = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
 
-
-            $ret[$value['role_id']]['day_nocontact'] .= ' '.db('admin_user')->where(['id'=>$value['user_id']])->value('nickname').$day_nocontact.'条';
-
+            if (isset($ret[$value['role_id']]['day_nocontact'])) {
+                $ret[$value['role_id']]['day_nocontact'] .= ' '.db('admin_user')->where(['id'=>$value['user_id']])->value('nickname').$day_nocontact.'条';
+            }else{
+                $ret[$value['role_id']]['day_nocontact']= '';
+            }
             
+
 
         }
 
