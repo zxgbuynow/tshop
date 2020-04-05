@@ -2074,9 +2074,10 @@ class Report extends Admin
 
                     $m3['a.create_time'] = array('gt',time()-86400*7);
                     $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
-                }
-            }
 
+                }
+
+            }
             $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('timeLengths DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
                     unset($m1);
                     unset($m2);
@@ -2094,7 +2095,8 @@ class Report extends Admin
                     $item->gtback = db('call_alloc_log')->where($m2)->count();
 
                     //role_id 
-                    $item->standard_num = $item['timeLengths']>99*60?'':'';
+                    $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
+                    $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
 
                     $item->role = db('admin_role')->where(['id'=>$data['role_id'][1]])->value('name');
 
