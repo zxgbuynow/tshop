@@ -18,9 +18,28 @@ class Calllog extends Admin
     public function index()
     {
         cookie('__forward__', $_SERVER['REQUEST_URI']);
-
         // 获取查询条件
         $map = $this->getMap();
+
+        if (isset($map['timeLengthst'])) {
+            if (isset($map['timeLengthed'])) {
+                $map['timeLength'][0]='between';
+                $map['timeLength'][1][0]=$map['timeLengthst'][1];
+                $map['timeLength'][1][1]=$map['timeLengthed'][1];
+                unset($map['timeLengthed']);
+                unset($map['timeLengthst']);
+            }else{
+                $map['timeLength'][0]='egt';
+                $map['timeLength'][1][0]=$map['timeLengthst'][1];
+                unset($map['timeLengthst']);
+            }
+        }else{
+            if (isset($map['timeLengthed'])) {
+                $map['timeLength'][0]='elt';
+                $map['timeLength'][1][0]=$map['timeLengthed'][1];
+                unset($map['timeLengthed']);
+            }
+        }
 
         $map['user_id'] = UID;
         if (UID==1) {
@@ -46,10 +65,25 @@ class Calllog extends Admin
             'icon'  => 'fa fa-fw fa-pinterest-p',
             'href'  => url('downcord',['id'=>'__id__'])
         ];
+        $btnexport = [
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('export',http_build_query($this->request->param()))
+        ];
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['calledNum' => '被叫号码','callerNum'=>'主叫号码'])// 设置搜索框
+            // ->setSearch(['calledNum' => '被叫号码','callerNum'=>'主叫号码'])// 设置搜索框
+            ->setSearchArea([
+                ['daterange', 'startTime', '通话时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['text:6', 'extension', '分机号', 'like'],
+                ['text:6', 'callerNum', '主叫号码', 'like'],
+                ['text:6', 'calledNum', '被叫号码', 'like'],
+
+                ['text:6', 'timeLengthst', '通话时长开始'],
+                ['text:6', 'timeLengthed', '通话时长结束'],
+
+            ])
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['user', '员工'],
@@ -70,12 +104,44 @@ class Calllog extends Admin
             ->hideCheckbox()
             ->setRowList($data_list)// 设置表格数据
             ->addRightButton('custom',$btn_down)
+            ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             ->raw('user') // 使用原值
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [export 导出]
+     * @return [type] [description]
+     */
+    public function export()
+    {
+        $map = $this->getMaps();
+        
+        // 数据列表
+        $data_list = CalllogModel::where($map)->order('id desc')->paginate();
+
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['id','auto', 'ID'],
+            ['id', 'auto','ID'],
+            ['user', 'auto','员工'],
+            ['callType', 'auto','呼叫类型',['','已接来电','已拨电话','未接来电','未接去电']],
+            // ['callerNum','auto', '主叫号码'],
+            // ['calledNum','auto', '被叫号码'],
+            ['startTime', 'auto','开始通话时间'],
+            ['timeLength','auto', '通话时长'],
+            ['code','auto', '通话唯一标识'],
+            ['recordURL', 'auto','录音地址'],
+            ['extension','auto', '分机号'],
+            ['create_time', 'auto','创建时间','datetime'],
+        ];
+        
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['通话记录', $cellName, $data_list]);
+    }
     
     /**
      * [downCord 下载]

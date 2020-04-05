@@ -68,7 +68,17 @@ if (!function_exists('get_auth_call_sign')) {
      */
     function get_auth_call_sign($data = [])
     {
-       return data_auth_sign($data);
+        // 数据类型检测
+        if(!is_array($data)){
+            $data = (array)$data;
+        }
+
+        // 排序
+        ksort($data);
+        // url编码并生成query字符串
+        $code = http_build_query($data);
+        return md5($code);  
+        return data_auth_sign($data);
     }
 }
 if (!function_exists('get_file_path')) {

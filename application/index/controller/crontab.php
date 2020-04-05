@@ -495,7 +495,7 @@ class Crontab
             }
             $s['callType'] = $type;
             $s['timeLength'] = $ret['list']['billsec'];
-            $s['addtime'] = $ret['list']['startTime'];
+            $s['addtime'] = $ret['list']['addtime'];
             $s['recordURL'] = $ret['list']['userfield'];
             $s['status'] = 1;
             db('call_log')->where(['code'=>$value['code']])->save($s);
