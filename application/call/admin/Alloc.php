@@ -216,7 +216,7 @@ class Alloc extends Admin
             if (!$sdata['batch_id']) {
                 $this->error('导入批次必填');
             }
-            if ($data['custom_ids']>$data['cusids']) {
+            if ($data['custom_ids']>$data['calloc_num']) {
                 $this->error('不能大于可分配总数');
             }
             if ($props = AllocModel::create($sdata)) {
@@ -235,7 +235,7 @@ class Alloc extends Admin
                     $m['batch_id'] = $data['batch_id'];
                     $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
 
-                    $average = ceil($custCts/$custCts);
+                    $average = ceil($custCts/$userCts);
 
                     $custCtarr = array_chunk($customs, $average);
 
@@ -244,7 +244,7 @@ class Alloc extends Admin
                         $cc = count($value);
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
-                            $rs['user_id'] = $data['user_ids'][$key];
+                            $rs['user_id'] = $data['user_id'][$key];
                             $rs['alloc_id'] = $insert_id;
                             $rs['create_time'] = time();
                             array_push($r,$rs);
@@ -269,7 +269,7 @@ class Alloc extends Admin
                         $cc = count($value);
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
-                            $rs['user_id'] = $data['user_ids'][$key];
+                            $rs['user_id'] = $data['user_id'][$key];
                             $rs['alloc_id'] = $insert_id;
                             $rs['create_time'] = time();
                             array_push($r,$rs);
@@ -349,7 +349,36 @@ class Alloc extends Admin
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
-        $batchs = CustomEXLogModel::column('id,title'); 
+        $batchs = CustomEXLogModel::column('batch_id,title'); 
+
+        $get_batch =  url('get_batch');
+        $js = <<<EOF
+            <script type="text/javascript">
+               
+                $(function(){
+
+                    $('.select-linkage').change(function (r) {
+                        if($(this).data('param')=='batch_id'){
+                            if(!$(this).val()){return false}
+
+                            $.post("{$get_batch}", { "batch_id": $(this).val() },
+                                function(data){
+                                    console.log(data);
+                                    if (data.code == 1){
+                                        $('#form_group_cusids').find('div.form-control-static').html(data.value);
+                                        $('#calloc_num').val(data.value)
+
+                                    }else{
+                                        $('#form_group_cusids').find('form-control-static').html('');
+                                        $('#calloc_num').val(0)
+                                        Dolphin.notify('该批次下没有可分配的客户', 'danger');
+                                    }
+                                }, "json");
+                        }
+                    })
+                });
+            </script>
+EOF;
         // 显示添加页面
         return ZBuilder::make('form')
             ->addLinkage('role_id', '选择组', '', $role, '', url('get_user'), 'user_id')
@@ -359,9 +388,10 @@ class Alloc extends Admin
                 // ['text', 'call_count', '呼叫次数'],
                 ['text', 'name', '任务名称'],
                 ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+                ['hidden', 'calloc_num', '数量'],
                 // ['number', 'alloc_count', '设置分配数量'],
                 // ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
-                ['static', 'cusids', '当前任务总数','',$tips],
+                ['static', 'cusids', '当前任务总数','<code>如果任务数为0即无可分配客户</code>',$tips],
                 ['number', 'custom_ids', '输入客户数量'],
                 // ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
 
@@ -376,6 +406,7 @@ class Alloc extends Admin
             
             ->setTrigger('way', 1, 'custom_id')
             ->setTrigger('way', 0, 'custom_ids')
+            ->setExtraJs($js)
             ->fetch();
     }
     /**
