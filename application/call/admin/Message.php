@@ -209,6 +209,9 @@ class Message extends Admin
         $info = MessageLgModel::get($id);
         $info['content'] = MessageModel::where(['id'=>$info['message_id']])->value('content');
         $info['title'] = MessageModel::where(['id'=>$info['message_id']])->value('title');
+
+        //更新已读
+        db('call_message_log')->where(['message_id'=>$info['message_id'],'user_id'=>UID])->update(['is_read'=>1]);
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([

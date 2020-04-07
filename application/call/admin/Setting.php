@@ -104,6 +104,27 @@ class Setting extends Admin
                 ->setFormData($info) // 设置表单数据
                 ->fetch();
         }
+
+        if ($group=='tab4') {
+            $map['wechat_name'] = array('neq',''); 
+            $users = db('admin_user')->where($map)->column('wechat_name,nickname');
+            // 使用ZBuilder快速创建表单
+            return ZBuilder::make('form')
+                ->setPageTitle('报表微信推送配置') // 设置页面标题
+                ->setTabNav($list_tab,  $group)
+                ->addFormItems([ // 批量添加表单项
+                    ['select', 'timeLength_statistics', '员工时长统计','',$users,'','multiple'],
+                    ['select', 'classareport_statistics', 'A类客户1周平均成本统计','',$users,'','multiple'],
+                    ['select', 'classareport_m_statistics', 'A类客户1月平均成本统计','',$users,'','multiple'],
+                    ['select', 'classnreport_statistics', '单条客户平均成本','',$users,'','multiple'],
+                    ['select', 'classfreport_statistics', '当月签约客户平均成本','',$users,'','multiple'],
+                    ['select', 'classf15report_statistics', '15天签约数量统计','',$users,'','multiple'],
+                    ['select', 'previousfeereport_statistics', '往年同期成本分析','',$users,'','multiple'],
+                    ['select', 'roleCall_statistics', '部门新数据通话汇总','',$users,'','multiple'],
+                ])
+                ->setFormData($info) // 设置表单数据
+                ->fetch();
+        }
     
         
     }

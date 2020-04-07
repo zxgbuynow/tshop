@@ -126,7 +126,7 @@ class Employ extends Admin
 
         $params['extenFrom'] = get_extension(UID)['extension'];
         if (!$params['extenFrom']) {
-            $this->error('转移分机号缺失', null, '_close_pop');
+            $this->error('当前登录账号分机号缺失', null, '_close_pop');
         }
 
         $status = ring_up_new('transferCall',$params);
@@ -162,7 +162,7 @@ class Employ extends Admin
 
         $params['extenFrom'] = get_extension(UID)['extension'];
         if (!$params['extenFrom']) {
-            $this->error('转移分机号缺失', null, '_close_pop');
+            $this->error('当前登录账号分机号缺失', null, '_close_pop');
         }
 
         $status = ring_up_new('listenCall',$params);

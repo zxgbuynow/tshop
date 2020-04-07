@@ -315,7 +315,7 @@ class Statistics extends Admin
         if (!$map) {
             $map['id'] = '';//过滤所有数据
         }
-        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
+        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees,count(fee) as counts')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
             $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
             $item->project = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
         });
@@ -346,6 +346,7 @@ class Statistics extends Admin
                 ['project', '项目'],
                 ['source', '客户来源'],
                 ['fees', '成本'],
+                ['counts', '留言总数'],
             ])
             ->addTopButton('custom', $btnexport)
             ->setRowList($data_list)// 设置表格数据
@@ -362,7 +363,7 @@ class Statistics extends Admin
 
         //查询数据
 
-        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
+        $data_list = CustomModel::where($map)->field('*,avg(fee) as fees,count(fee) as counts')->order('fees DESC')->group('category')->paginate()->each(function($item, $key) use ($map){
             $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
             $item->project = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
         });
@@ -374,6 +375,7 @@ class Statistics extends Admin
             ['project','auto', '项目'],
             ['source', 'auto','客户来源'],
             ['fees','auto', '成本'],
+            ['counts', 'auto', '留言总数'],
         ];
         
         

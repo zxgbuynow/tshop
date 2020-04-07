@@ -36,8 +36,18 @@ class Task extends Admin
         //     $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
         // });
 
-        
+        //权限查看
         $map['call_alloc_log.user_id'] = UID;
+        if (UID == 1) {
+            unset($map['call_alloc_log.user_id']);
+        }
+        //判断是否为主管
+        if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+            $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+            $map['call_alloc_log.user_id'] = array('in',$userids);
+        }
+
+        
         $map['call_alloc_log.status'] = 1;
         if (isset($map['tag'])) {
             if ($map['tag'][1]=='will_contact_custom_count') {

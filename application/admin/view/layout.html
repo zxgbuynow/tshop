@@ -265,11 +265,11 @@
                                 <i class="si si-settings pull-right"></i>个人设置
                             </a>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a tabindex="-1" href="{:url('call/message/log')}">
                                 <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>消息中心
                             </a>
-                        </li>
+                        </li> -->
                         <li class="divider"></li>
                         <li>
                             <a tabindex="-1" href="{:url('user/publics/signout')}">
@@ -280,6 +280,27 @@
                     </ul>
                 </div>
             </li>
+            <li>
+                <a class="btn btn-default" href="{:url('call/message/log')}" data-toggle="tooltip" data-placement="bottom" data-original-title="消息中心">
+                    <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>
+                </a>
+            </li>
+            <!-- 
+            <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="message-num">消息中心</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li>
+                            <a tabindex="-1" href="{:url('call/message/log')}">
+                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>消息中心
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li> -->
             {neq name="Think.session.user_auth.uid" value="1"}
             <!-- <li>
                 <div class="btn-group">

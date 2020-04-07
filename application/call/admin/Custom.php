@@ -142,7 +142,8 @@ class Custom extends Admin
                         return replaceTel($value);
                     }
                 }, '__data__'],
-                ['categorys', '分类'],
+                // ['categorys', '分类'],
+                ['categorys', '分类','popover',5],
                 ['source', '来源'],
                 ['email', '邮箱'],
                 ['address', '地址'],
@@ -652,6 +653,8 @@ class Custom extends Admin
             $list_source[$value] = $value;
         }
 
+        $project = db('call_project_list')->where(['status'=>1])->column('id,col1');
+
         $btn_alloc = [
             'title' => '分配',
             'icon'  => 'fa fa-fw fa-stack-overflow',
@@ -676,6 +679,7 @@ class Custom extends Admin
                 ->setSearchArea([
                     ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['select', 'project_id', '项目', '', '', $project],
                     ['select', 'source', '平台来源', '', '', $list_source],
 
                 ])

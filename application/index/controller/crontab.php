@@ -573,6 +573,13 @@ class Crontab
     public function roleCallTask()
     {
         
+        $info = [
+            'roleCallSetting'=>isset(plugin_config('wechat')['roleCallSetting'])?plugin_config('wechat')['roleCallSetting']:''
+        ];
+
+        if (!$info['roleCallSetting']) {
+            echo '请配置达标时长';exit;
+        }
         $m = date('m');
         $d = date('d');
 
@@ -583,7 +590,7 @@ class Crontab
            
 
            if (isset($ret[$value['role_id']]['standard_num'])) {
-            $ret[$value['role_id']]['standard_num'] += $value['timeLengths']>99*60?1:0;
+            $ret[$value['role_id']]['standard_num'] += $value['timeLengths']>$info['roleCallSetting']*60?1:0;
            }else{
             $ret[$value['role_id']]['standard_num'] = 0;
            }
@@ -599,7 +606,7 @@ class Crontab
             }
             
             if (isset($ret[$value['role_id']]['standard_person'])) {
-                $ret[$value['role_id']]['standard_person'] .= ' '.$value['timeLengths']>99*60? db('admin_user')->where(['id'=>$value['user_id']])->value('nickname'):'';
+                $ret[$value['role_id']]['standard_person'] .= ' '.$value['timeLengths']>$info['roleCallSetting']*60? db('admin_user')->where(['id'=>$value['user_id']])->value('nickname'):'';
             }else{
                 $ret[$value['role_id']]['standard_person']  = '';
             }
@@ -672,6 +679,34 @@ class Crontab
         $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $msg]);
 
     }
+
+    /**
+     * [recoverTask description]
+     * @return [type] [description]
+     */
+    public function ondateTask()
+    {
+        //取需要通知的数据
+        $map['status'] = 0;
+        // $map['ondate'] = array('lt',time());
+        $data = db('call_ondate')->where($map)->whereTime('ondate','back of 10')->select();
+        
+        //数据
+        foreach ($data as $key => $value) {
+            // $s['tags'] = 'ondate';
+            // $s['user_id'] = $value['user_id'];
+            // $s['title'] = '预约提醒';
+            $s['custom'] = $value['custom_id'];
+            $s['ondate'] = date('Y-m-d H:i',$value['ondate']);
+            $s['content'] = $value['note'];
+            //提醒管理员 tags user_id title content 
+            notice_log('ondate',$value['user_id'],$s,1);
+        }
+
+        echo 'succ';
+        
+    }
+
     public function testask()
     {
         // notice_log('recover',1,['custom'=>'1','project'=>1],true);
