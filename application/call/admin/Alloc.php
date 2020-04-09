@@ -42,7 +42,8 @@ class Alloc extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->hideCheckbox([
+            ->hideCheckbox()
+            ->setSearchArea([
                 ['text:12', 'id', '任务ID', 'eq'],
                 ['text:12', 'name', '任务名称', 'like'],
 
@@ -198,6 +199,8 @@ class Alloc extends Admin
      */
     public function add()
     {
+        //超级管理员 只分配组长 
+        if(UID == 1){
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
@@ -342,10 +345,14 @@ class Alloc extends Admin
         }
 
         $custom =  CustomModel::where(['status'=>1])->column('id,name');
+
         $map['id'] = array('>',1);
+        $map['is_maner'] = 1;//过滤非管理员
         $user =  UserModel::where($map)->column('id,username'); 
 
-        $role = RoleModel::where(['status'=>1])->column('id,name'); 
+        $map1['status'] = 1;
+        $map1['id'] = array('>',1);
+        $role = RoleModel::where($map1)->column('id,name'); 
 
         $tips = db('call_custom')->where(['status'=>1])->count();
         
@@ -403,11 +410,64 @@ EOF;
 
                 // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
             ])
-            
+            ->setPageTips('超级管理员分配数据给主管', 'danger')
             ->setTrigger('way', 1, 'custom_id')
             ->setTrigger('way', 0, 'custom_ids')
             ->setExtraJs($js)
             ->fetch();
+
+        }else{
+
+            if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+                $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+                $map['call_alloc_log.user_id'] = array('in',$userids);
+            }
+            $custom =  CustomModel::where(['status'=>1])->column('id,name');
+
+            $map['id'] = array('>',1);
+            $map['is_maner'] = 1;//过滤非管理员
+            $user =  UserModel::where($map)->column('id,username'); 
+
+            $map1['status'] = 1;
+            $map1['id'] = array('>',1);
+            $role = RoleModel::where($map1)->column('id,name'); 
+
+            $tips = db('call_custom')->where(['status'=>1])->count();
+            
+            $batchs = CustomEXLogModel::column('batch_id,title'); 
+
+            $get_batch =  url('get_batch');
+
+            // 显示添加页面
+            return ZBuilder::make('form')
+                ->addFormItems([
+                    // ['text', 'call_count', '呼叫次数'],
+                    ['text', 'name', '任务名称'],
+                    ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
+                    ['hidden', 'calloc_num', '数量'],
+                    // ['number', 'alloc_count', '设置分配数量'],
+                    // ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                    ['static', 'cusids', '当前任务总数','<code>如果任务数为0即无可分配客户</code>',$tips],
+                    ['number', 'custom_ids', '输入客户数量'],
+                    ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
+
+                    // ['select', 'user_id', '选择员工', '', $user],
+                    // ['select', 'role_id', '选择组', '<code>可多选</code>', $custom,'','multiple'],
+                    ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+
+                    ['radio', 'status', '立即启用', '', ['否', '是'], 1],
+
+                    // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
+                ])
+                ->setPageTips('超级管理员分配数据给主管', 'danger')
+                ->setTrigger('way', 1, 'custom_id')
+                ->setTrigger('way', 0, 'custom_ids')
+                ->setExtraJs($js)
+                ->fetch();
+        }
+
+
+
     }
     /**
      * [get_batch description]

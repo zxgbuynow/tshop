@@ -61,6 +61,54 @@ class Ondate extends Admin
     }
 
     /**
+     * [pool description]
+     * @return [type] [description]
+     */
+    public function pool($group = 'yes')
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+
+        $list_tab = [
+            'yes' => ['title' => '待回访', 'url' => url('index', ['group' => 'yes'])],
+            'no' => ['title' => '已回访', 'url' => url('index', ['group' => 'no'])],
+        ];
+
+        // 获取查询条件
+        $map = $this->getMap();
+        $map['status'] = 1;
+        if ($group=='yes') {
+            $map['status'] = 0;
+        }
+        // 数据列表
+        $data_list = OndateModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->users = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
+        });
+
+        // 分页数据
+        $page = $data_list->render();
+
+        return ZBuilder::make('table')
+            ->setTabNav($list_tab,  $group)
+            ->setSearch(['custom'=>'客户'])// 设置搜索框
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['users', '员工'],
+                ['custom', '客户'],
+                ['ondate', '预约时间','datetime'],
+                ['sign_time', '录入时间','datetime'],
+                ['create_time', '创建时间','datetime'],
+                ['status', '状态', 'switch'],
+                ['user', '操作人'],
+                ['right_button', '操作', 'btn']
+            ])
+            ->addTopButton('add', ['href' => url('add')])
+            ->addRightButton('edit')
+            ->setRowList($data_list)// 设置表格数据
+            ->raw('custom,user') // 使用原值
+            ->fetch(); // 渲染模板
+    }
+    /**
      * 新增
      * @return mixed
      */

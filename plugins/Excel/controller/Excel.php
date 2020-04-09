@@ -130,7 +130,7 @@ class Excel extends Common
      * @alter 蔡伟明 <314013107@qq.com>
      * @return array
      */
-    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null, $second_field = null)
+    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null, $second_field = null, $requre_fields = null)
     {
         if(!file_exists($file)){
             return ["error" => 1, 'message' => '文件未找到!']; //file not found!
@@ -276,6 +276,11 @@ class Excel extends Common
                             if ($index=='batch_id') {
                                  $data[$firstRow[$index]] = $batch_id;
                             }
+                        }else{
+                            if (in_array($index, $requre_fields)) {
+                                return ["error" => 11, 'message' => '字段'.$index.'必填，请检查数据'];
+                            }
+                            
                         }
                     }
                     //按second_feild过滤 妖孽代码

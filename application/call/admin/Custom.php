@@ -562,7 +562,7 @@ class Custom extends Admin
                 'batch_id' => '分批Id',
             ];
             // 调用插件('插件',[路径,导入表名,字段限制,类型,条件,重复数据检测字段])
-            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile'], $second_field = 'project_id');
+            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile',['name,mobile,note_time,note_area,fee,source,policy']], $second_field = 'project_id');
 
             
             // 失败或无数据导入 计算净得率

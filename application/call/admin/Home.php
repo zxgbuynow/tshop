@@ -52,7 +52,7 @@ class Home extends Admin
 
         	// $ondate_count = 0;//预约提醒
             $m3['status'] = 0;
-            $m3['user_id'] = UID; 
+            // $m3['user_id'] = UID; 
             $ondate_count = db('call_ondate')->where($m3)->count();
         }else{
             $m4['a.status'] = 1;

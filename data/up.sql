@@ -65,3 +65,10 @@ CREATE TABLE `call_msg_log` (
 
 ALTER TABLE `tshop1`.`call_log` 
 ADD COLUMN `role_id` int(10) NULL COMMENT '角色ID' AFTER `extension`;
+
+ALTER TABLE `tshop1`.`call_message_log` 
+ADD COLUMN `to_user` int(10) NULL COMMENT '接收人' AFTER `user_id`,
+ADD COLUMN `content` varchar(255) NULL COMMENT '内容' AFTER `to_user`;
+
+ALTER TABLE `tshop1`.`call_message_log` 
+CHANGE COLUMN `to_user` `send_user` int(10) NULL DEFAULT NULL COMMENT '发送人' AFTER `user_id`;

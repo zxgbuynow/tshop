@@ -27,7 +27,11 @@ class Message extends Admin
 
         $map['oper_id'] = UID;
         // 数据列表
-        $data_list = MessageModel::where($map)->order('id desc')->paginate();
+        $data_list = MessageModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $m['user_id'] = $item['user_id'];
+            $m['is_read'] = 0;
+            $item->is_read = db('call_message_log')->where($m)->count();
+        });
 
         // 分页数据
         $page = $data_list->render();
@@ -39,23 +43,125 @@ class Message extends Admin
             'href' => url('detail',['id'=>'__id__'])
         ];
 
+        $btn_ls = [
+            'title' => '消息列表',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'href' => url('ls',['id'=>'__id__'])
+        ];
+
+        $btn_msg = [
+            'title' => '回复',
+            'icon'  => 'fa fa-fw fa-navicon',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('relpy',['id'=>'__id__'])
+        ];
+
+        //btn 隐藏 新消息
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['title', '标题'],
                 ['content', '内容'],
-                ['status', '发布', 'switch'],
+                ['is_read', '新消息','yesno'],
+                // ['status', '发布', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
-            // ->addTopButton('custom', $btn_access,true)
+            ->addRightButton('custom', $btn_ls)
+            ->replaceRightButton(['oper_id' => ['eq',UID]], '', 'custom')
+            ->addRightButton('custom', $btn_msg,true)
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
 
+    /**
+     * [ls description]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function ls($id='')
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        if ($id === null) $this->error('缺少参数');
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        $map['message_id'] = $id;
+
+        $map['user_id'] = UID;
+
+        // 数据列表
+        $data_list = MessageLgModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+                    $item->is_read = $item['is_read']?'已读':'未读';
+                });
+
+        // 分页数据
+        $page = $data_list->render();
+
+        $btn_access = [
+            'title' => '详情',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('detail',['id'=>'__id__'])
+        ];
+      
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                // ['title', '标题'],
+                ['content', '内容'],
+                ['is_read', '是否已读'],
+                ['right_button', '操作', 'btn']
+            ])
+            ->addRightButton('custom', $btn_access,true)
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
+    }
+    /**
+     * [relpy 回复]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function relpy($id ='')
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+
+            $content['content'] = $data['title'];
+            if (!$content['content']) {
+                $this->error('内容不对',null,'_close_pop');
+            }
+            
+            //生成日志
+            $s['content'] = $data['title'];
+            $s['message_id'] = $data['id'];
+            $s['send_user'] = UID;
+            $s['user_id'] = db('call_message')->where(['id'=>$data['id']])->value('oper_id');
+            db('call_message_log')->insert($s);
+
+            $this->success('发送成功',null,'_close_pop');
+            
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['text', 'title', '内容'],
+            ])
+            ->setBtnTitle('submit', '发送')
+            ->setFormData()
+            ->fetch();
+    }
     /**
      * [log 消息日志]
      * @return [type] [description]

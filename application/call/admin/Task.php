@@ -38,14 +38,14 @@ class Task extends Admin
 
         //权限查看
         $map['call_alloc_log.user_id'] = UID;
-        if (UID == 1) {
-            unset($map['call_alloc_log.user_id']);
-        }
-        //判断是否为主管
-        if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
-            $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
-            $map['call_alloc_log.user_id'] = array('in',$userids);
-        }
+        // if (UID == 1) {
+        //     unset($map['call_alloc_log.user_id']);
+        // }
+        // //判断是否为主管
+        // if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+        //     $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+        //     $map['call_alloc_log.user_id'] = array('in',$userids);
+        // }
 
         
         $map['call_alloc_log.status'] = 1;
@@ -165,6 +165,107 @@ class Task extends Admin
             ->raw('custom') // 使用原值
             ->fetch(); // 渲染模板
         
+    }
+
+    /**
+     * [pool description]
+     * @return [type] [description]
+     */
+    public function pool()
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+        $request = Request::instance();
+        $params = $request->param();
+
+
+        //权限查看
+        $map['call_alloc_log.user_id'] = UID;
+
+        if (UID == 1) {
+            unset($map['call_alloc_log.user_id']);
+        }
+        //判断是否为主管
+        if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+            $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+            $map['call_alloc_log.user_id'] = array('in',$userids);
+        }
+
+        
+        $map['call_alloc_log.status'] = 1;
+        if (isset($map['tag'])) {
+            if ($map['tag'][1]=='will_contact_custom_count') {
+                $map['call_log.alloc_log_id'] = array('eq',null);
+            }
+            if ($map['tag'][1]=='pass_second_contact_custom_count') {
+                $map['call_log.timeLength'] = array('eq',0);
+                $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+            }
+            if ($map['tag'][1]=='no_contact_custom_count') {
+                $map['call_log.timeLength'] = array('eq',0);
+            }
+            unset($map['tag']);
+        }else{
+            if (isset($params['tag'])) {
+                if ($params['tag']=='will_contact_custom_count') {
+                    $map['call_log.alloc_log_id'] = array('eq',null);
+                }
+                if ($params['tag']=='pass_second_contact_custom_count') {
+                    $map['call_log.timeLength'] = array('eq',0);
+                    $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                }
+                if ($params['tag']=='no_contact_custom_count') {
+                    $map['call_log.timeLength'] = array('eq',0);
+                }
+            }
+
+        }
+        $data_list = AlloclgModel::view('call_alloc_log', '*,count(*) as counts')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.user_id')->paginate()->each(function($item, $key) use ($map){
+            $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
+            $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
+            $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
+        });
+        
+
+        $mpsel = '';
+        if (isset($params['tag'])) {
+            $mpsel = $params['tag'];
+        }
+
+        // 分页数据
+        $page = $data_list->render();
+    
+
+        $msel = [
+            'will_contact_custom_count'=>'新任务未联系客户',
+            // 'pass_second_contact_custom_count'=>'超2天未联系客户',
+            'no_contact_custom_count'=>'新任务未接通客户'
+        ];
+
+        
+        // print_r($msel);exit;
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->setSearchArea([
+                ['select', 'tag', '类型', '', $mpsel, $msel],
+
+            ])
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['user', '员工'],
+                ['custom', '客户'],
+                ['mobile', '电话'],
+                ['counts', '搜索结果(未联系|未接通)'],
+                ['alloc_count', '分配次数'],
+                ['create_time', '创建时间','datetime'],
+                // ['right_button', '操作', 'btn']
+            ])
+            ->hideCheckbox()
+            ->setRowList($data_list)// 设置表格数据
+            ->raw('custom') // 使用原值
+            ->fetch(); // 渲染模板
     }
 
     /**

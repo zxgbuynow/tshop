@@ -115,7 +115,7 @@ class Crontab
                 foreach ($bottom5 as $key => $value) {
                     $msg .= get_nickname($value['user_id']).',呼出通话时长'.$value['times'].',统计时间段'.$range.'\n';
                 }
-                _sendMaster($msg);
+                _sendMaster($msg,'timeLength_statistics');
                 echo 'succ';exit;
                 // $touser = db('admin_user')->where(['id'=>1])->find();
                 // //push
@@ -172,7 +172,7 @@ class Crontab
                 $map['project_id'] = $key;
                 $pjavg = number_format(db('call_custom')->where($map)->avg('fee'),1) ;
                 $content = $pjnm.'上周的A类客户成本为'.$pjavg.'，（安全值为'.$info['classAReport'].'元），其中:'.implode('，', $pj[$key]);
-                _sendMaster($content);
+                _sendMaster($content,'classareport_statistics');
             }
             echo 'succ';
             exit;
@@ -184,7 +184,7 @@ class Crontab
             $content .= $pjnm.'上周的A类客户成本为'.$pjavg.'，（安全值为'.$info['classAReport'].'元），其中:'.implode('，', $pj[$pj_id]);
         }
 
-        _sendMaster($content);
+        _sendMaster($content,'classareport_statistics');
         echo 'succ';exit;
 
     }
@@ -223,7 +223,7 @@ class Crontab
                 $map['project_id'] = $key;
                 $pjavg = number_format(db('call_custom')->avg('fee'),1) ;
                 $content = $pjnm.'上周的单条客户平均成本为'.$pjavg.'，（安全值为'.$info['classNReport'].'元），其中:'.implode('，', $pj[$key]);
-                _sendMaster($content);
+                _sendMaster($content,'classnreport_statistics');
             }
             echo 'succ';
             exit;
@@ -235,7 +235,7 @@ class Crontab
             $content .= $pjnm.'上周的单条客户平均成本为'.$pjavg.'，（安全值为'.$info['classNReport'].'元），其中:'.implode('，', $pj[$pj_id]);
         }
 
-        _sendMaster($content);
+        _sendMaster($content,'classnreport_statistics');
         echo 'succ';exit;
     }
 
@@ -281,7 +281,7 @@ class Crontab
                 //好奇小屋上月数据总数量为100条，签约5单，平均签约成本为1000元，签约成本安全值为200元，其中抖音300条，平均单条成本90元，头条400条，平均单条成本80元
                 $content = $pjnm.'上月数据总数量为'.$pjsum.'，签约'.$pjsucc.'单，平均签约成本为'.$pjavg.'元，签约成本安全值为'.$info['classFReport'].'元，其中'.implode('，', $pj[$key]);
 
-                _sendMaster($content);
+                _sendMaster($content,'classfreport_statistics');
             }
             echo 'succ';
             exit;
@@ -296,7 +296,7 @@ class Crontab
             $content = $pjnm.'上月数据总数量为'.$pjsum.'，签约'.$pjsucc.'单，平均签约成本为'.$pjavg.'元，签约成本安全值为'.$info['classFReport'].'元，其中'.implode('，', $pj[$pj_id]);
         }
 
-        _sendMaster($content);
+        _sendMaster($content,'classfreport_statistics');
         echo 'succ';exit;
     }
 
@@ -346,7 +346,7 @@ class Crontab
                 //好奇小屋前15留言数据总数量为100条，其中签单数量为2条，UC 为50条，签单0，百度为50条签单2.
                 $content = $pjnm.'15天留言数据总数量为'.$pjsum.'条，其中签单数量为'.$pjsucc.'条，'.implode('，', $pj[$key]);
 
-                _sendMaster($content);
+                _sendMaster($content,'classf15report_statistics');
             }
             // echo $content;exit;
             echo 'succ';
@@ -363,7 +363,7 @@ class Crontab
             $content .= $pjnm.'15天留言数据总数量为'.$pjsum.'其中签单数量为'.$pjsucc.'条，'.implode('，', $pj[$pj_id]);
         }
 
-        _sendMaster($content);
+        _sendMaster($content,'classf15report_statistics');
         echo 'succ';exit;
 
 
@@ -411,7 +411,7 @@ class Crontab
 
                 $content = $pjnm.'，往年同期单条数据平均成本为'.number_format($value[0]['fees'],1).'元，包含节日：'.$festival;
 
-                _sendMaster($content);
+                _sendMaster($content,'previousfeereport_statistics');
             }
             // echo $content;exit;
             echo 'succ';
@@ -433,7 +433,7 @@ class Crontab
 
             $content = $pjnm.'，往年同期单条数据平均成本为'.number_format($pj[$pj_id][0]['fees'],1).'元，包含节日：'.$festival;
         }
-        _sendMaster($content);
+        _sendMaster($content,'previousfeereport_statistics');
         echo 'succ';exit;
     }
     /**
@@ -470,6 +470,7 @@ class Crontab
         $map['code'] = array('neq','');
         $info = db('call_log')->where($map)->select();
 
+        error_log('updateCallLog:'.time().':'.var_export($info,1),3,'/data/httpd/tshop/public/task.log');
         //拉接口
         foreach ($info as $key => $value) {
             $params['transactionId'] = $value['code'];
@@ -498,6 +499,7 @@ class Crontab
             $s['addtime'] = $ret['list']['addtime'];
             $s['recordURL'] = $ret['list']['userfield'];
             $s['status'] = 1;
+            error_log('updateCallLog update:'.time().':'.var_export($s,1),3,'/data/httpd/tshop/public/task.log');
             db('call_log')->where(['code'=>$value['code']])->save($s);
         }
         echo 'succ';exit;
@@ -583,7 +585,14 @@ class Crontab
         $m = date('m');
         $d = date('d');
 
-        $data_list = db('call_log')->whereTime('create_time', 'today')->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->group('user_id')->select();
+        //过滤用户
+        $manger = db('admin_user')->where(['is_maner'=>1])->colunm('id');
+
+        $map = [];
+        if ($manger) {
+            $map['user_id'] = array('not in',array_column($manger, 'id'));
+        }
+        $data_list = db('call_log')->where()->whereTime('create_time', 'today')->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->group('user_id')->select();
 
         $ret = [];//组名 分配数 未满人 当日及时联系 7天未联系的具体人
         foreach ($data_list as $key => $value) {
@@ -641,8 +650,8 @@ class Crontab
                 //例如 12月23号，张三组今日总分配新数据为60条，未满100分钟人员：李四、王二，当日数据为及时联系：1， 7天未联系数据：李刚9条
                 $content = $m.'月'.$d.'号，'.$value['name'].'今日总分配新数据为'.$value['alloc'].'条，'.'未满100分钟人员：'.$value['standard_person'].'，当日数据为及时联系'.$value['contact'].'，7天未联系数据：'.$value['day_nocontact'];
 
-                echo $content;exit;
-                // _sendMaster($content);
+                // echo $content;exit;
+                _sendMaster($content,'roleCall_statistics');
             }
             
         }
@@ -654,10 +663,11 @@ class Crontab
     }
     /**
      * [_sendMaster 通用发送方法]
-     * @param  [type] $msg [description]
+     * @param  [type] $msg [消息]
+     * @param  [type] $tag [标识报表]
      * @return [type]       [description]
      */
-    function _sendMaster($msg)
+    function _sendMaster($msg, $tag)
     {
         $touser = db('admin_user')->where(['id'=>1])->find();
         //push
@@ -665,8 +675,9 @@ class Crontab
         $totag = [];
         $user = [];
 
-        //取配置
-        $wechat = isset(plugin_config('wechat')['wechat'])?plugin_config('wechat')['wechat']:'';
+        //根据标识配置
+        $wechat = isset(plugin_config('wechat')[$tag])?plugin_config('wechat')[$tag]:'';
+
         if (!$wechat) {
             array_push($user, $touser['wechat_name']);
         }else{
@@ -675,6 +686,7 @@ class Crontab
             }
         }
         
+
 
         $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $msg]);
 

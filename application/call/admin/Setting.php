@@ -39,6 +39,16 @@ class Setting extends Admin
                 plugin_config('wechat.pass_second_contact_custom_notice',$data['pass_second_contact_custom_notice']);
                 plugin_config('wechat.no_contact_custom_notice',$data['no_contact_custom_notice']);
             }
+
+            if ($group=='tab4') {
+                plugin_config('wechat.timeLength_statistics',$data['timeLength_statistics']);
+                plugin_config('wechat.classareport_statistics',$data['classareport_statistics']);
+                plugin_config('wechat.classnreport_statistics',$data['classnreport_statistics']);
+                plugin_config('wechat.classfreport_statistics',$data['classfreport_statistics']);
+                plugin_config('wechat.classf15report_statistics',$data['classf15report_statistics']);
+                plugin_config('wechat.previousfeereport_statistics',$data['previousfeereport_statistics']);
+                plugin_config('wechat.roleCall_statistics',$data['roleCall_statistics']);
+            }
             
             $this->success('操作成功', cookie('__forward__'));
         }
@@ -108,6 +118,13 @@ class Setting extends Admin
         if ($group=='tab4') {
             $map['wechat_name'] = array('neq',''); 
             $users = db('admin_user')->where($map)->column('wechat_name,nickname');
+            $info['timeLength_statistics'] = plugin_config('wechat')['timeLength_statistics'];
+            $info['classareport_statistics'] = plugin_config('wechat')['classareport_statistics'];
+            $info['classnreport_statistics'] = plugin_config('wechat')['classnreport_statistics'];
+            $info['classfreport_statistics'] = plugin_config('wechat')['classfreport_statistics'];
+            $info['classf15report_statistics'] = plugin_config('wechat')['classf15report_statistics'];
+            $info['previousfeereport_statistics'] = plugin_config('wechat')['previousfeereport_statistics'];
+            $info['roleCall_statistics'] = plugin_config('wechat')['roleCall_statistics'];
             // 使用ZBuilder快速创建表单
             return ZBuilder::make('form')
                 ->setPageTitle('报表微信推送配置') // 设置页面标题
@@ -115,7 +132,7 @@ class Setting extends Admin
                 ->addFormItems([ // 批量添加表单项
                     ['select', 'timeLength_statistics', '员工时长统计','',$users,'','multiple'],
                     ['select', 'classareport_statistics', 'A类客户1周平均成本统计','',$users,'','multiple'],
-                    ['select', 'classareport_m_statistics', 'A类客户1月平均成本统计','',$users,'','multiple'],
+                    // ['select', 'classareport_m_statistics', 'A类客户1月平均成本统计','',$users,'','multiple'],
                     ['select', 'classnreport_statistics', '单条客户平均成本','',$users,'','multiple'],
                     ['select', 'classfreport_statistics', '当月签约客户平均成本','',$users,'','multiple'],
                     ['select', 'classf15report_statistics', '15天签约数量统计','',$users,'','multiple'],

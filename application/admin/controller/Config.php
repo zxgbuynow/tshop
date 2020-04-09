@@ -124,6 +124,7 @@ class Config extends Admin
             ->addText('format', '格式')
             ->addText('tips', '配置说明', '该配置的具体说明')
             ->addText('sort', '排序', '', 100)
+            ->addText('copyright', '版权配置', '如 <code>web_site_copyright</code>，调用方法：<code>config(\'web_site_copyright\')</code>')
             ->setTrigger('type', 'linkage', 'ajax_url,next_items,param')
             ->setTrigger('type', 'linkages', 'table,pid,level,key,option')
             ->setTrigger('type', 'bmap', 'ak')
