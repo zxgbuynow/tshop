@@ -468,22 +468,24 @@ class Crontab
         //查找要更新的数据
         $map['status'] = 0;
         $map['code'] = array('neq','');
+        // $map['id'] = 39;
         $info = db('call_log')->where($map)->select();
-
         error_log('updateCallLog:'.time().':'.var_export($info,1),3,'/data/httpd/tshop/public/task.log');
         //拉接口
         foreach ($info as $key => $value) {
             $params['transactionId'] = $value['code'];
             $status = ring_up_new('getOneRecord',$params);
+
             $ret = json_decode($status,true);
             if ($ret['status']==0) {
                 continue;
             }
-            if ($ret['status']==true&&!isset($ret['data'])) {
+            if ($ret['status']==1&&!isset($ret['msg']['data'])) {
                 continue;
             }
+
             //处理更新
-            switch ($ret['list']['calltype']) {
+            switch ($ret['msg']['data'][0]['calltype']) {
                 case 'outcall':
                     $type = '2';
                     break;
@@ -495,12 +497,13 @@ class Crontab
                     break;
             }
             $s['callType'] = $type;
-            $s['timeLength'] = $ret['list']['billsec'];
-            $s['addtime'] = $ret['list']['addtime'];
-            $s['recordURL'] = $ret['list']['userfield'];
+            $s['timeLength'] = $ret['msg']['data'][0]['billsec'];
+            $s['addtime'] = $ret['msg']['data'][0]['addtime'];
+            $s['recordURL'] = $ret['msg']['data'][0]['userfield'];
             $s['status'] = 1;
+
             error_log('updateCallLog update:'.time().':'.var_export($s,1),3,'/data/httpd/tshop/public/task.log');
-            db('call_log')->where(['code'=>$value['code']])->save($s);
+            db('call_log')->where(['code'=>$value['code']])->update($s);
         }
         echo 'succ';exit;
         
@@ -702,15 +705,16 @@ class Crontab
         $map['status'] = 0;
         // $map['ondate'] = array('lt',time());
         $data = db('call_ondate')->where($map)->whereTime('ondate','back of 10')->select();
-        
+        // $data = db('call_ondate')->where($map)->order('id desc')->limit(1)->select();
         //数据
         foreach ($data as $key => $value) {
             // $s['tags'] = 'ondate';
             // $s['user_id'] = $value['user_id'];
             // $s['title'] = '预约提醒';
-            $s['custom'] = $value['custom_id'];
+            $s['custom'] = db('call_custom')->where(['id'=>$value['custom_id']])->value('name'); ;
             $s['ondate'] = date('Y-m-d H:i',$value['ondate']);
             $s['content'] = $value['note'];
+            // $s['user_id'] = $value['user_id'];
             //提醒管理员 tags user_id title content 
             notice_log('ondate',$value['user_id'],$s,1);
         }

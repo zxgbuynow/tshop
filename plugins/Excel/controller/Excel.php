@@ -273,16 +273,15 @@ class Excel extends Common
                     foreach ($col as $index => $val) { //循环每一个单元格
                         if (isset($firstRow[$index])) {
                             $data[$firstRow[$index]] = trim($val);
-                            if ($index=='batch_id') {
-                                 $data[$firstRow[$index]] = $batch_id;
+                            if ($firstRow[$index] == 'batch_id') {
+                                $data[$firstRow[$index]] = $batch_id;
                             }
-                        }else{
-                            if (in_array($index, $requre_fields)) {
-                                return ["error" => 11, 'message' => '字段'.$index.'必填，请检查数据'];
+                            if ($val==''&&in_array($firstRow[$index], $requre_fields)) {
+                                return ["error" => 11, 'message' => '字段'.$firstRow[$index].'必填，请检查数据'];
                             }
-                            
                         }
                     }
+
                     //按second_feild过滤 妖孽代码
                     if ($second_field&&$isget==0) {
                         $where[$second_field] = $data[$second_field];

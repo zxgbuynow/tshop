@@ -103,6 +103,8 @@ class Notice extends Admin
         if ($id === null) $this->error('缺少参数');
         $info = NoticeLgModel::get($id);
         $info['create_time'] = date('Y-m-d H:i:s',$info['create_time']);
+
+        db('call_notice_log')->where(['id'=>$id,'user_id'=>UID])->update(['is_read'=>1]);
         // 显示添加页面
         return ZBuilder::make('form')
             ->setPageTitle('详情')

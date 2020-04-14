@@ -281,8 +281,8 @@
                 </div>
             </li>
             <li>
-                <a class="btn btn-default" href="{:url('call/message/log')}" data-toggle="tooltip" data-placement="bottom" data-original-title="消息中心">
-                    <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>
+                <a class="btn btn-default" href="{:url('call/message/index')}" data-toggle="tooltip" data-placement="bottom" data-original-title="消息中心">
+                    <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right" style="background-color:red;top:3px">{$_newmessage|default=0}</span>
                 </a>
             </li>
             <!-- 
@@ -334,7 +334,7 @@
             <li>
                 <!-- Layout API, functionality initialized in App() -> uiLayoutApi() -->
                 <button class="btn btn-default" data-toggle="layout" data-action="side_overlay_toggle" title="侧边栏" type="button">
-                    <i class="fa fa-tasks"></i>
+                    <i class="fa fa-tasks"></i><span class="badge badge-primary" style="background-color:red;top:0px;float:left;margin:2px">{$_notice_count|default=0}</span>
                 </button>
             </li>
         </ul>
@@ -424,7 +424,7 @@
     {empty name="_pop"}
     <footer id="page-footer" class="content-mini content-mini-full font-s12 bg-gray-lighter clearfix">
         <div class="pull-right">
-            Crafted with <i class="fa fa-heart text-city"></i> by <a class="font-w600" href="{:config('dolphin.company_website')}" target="_blank">{:config('dolphin.company_name')}{:config('web_site_copyright')}</a>
+            Crafted with <i class="fa fa-heart text-city"></i> by <a class="font-w600" href="javascript:;" target="_blank">{:config('web_site_copyright')}</a>
         </div>
         <div class="pull-left">
             <a class="font-w600" href="{:config('dolphin.product_website')}" target="_blank">{:config('dolphin.product_name')} {:config('dolphin.product_version')}</a> &copy; <span class="js-year-copy"></span>

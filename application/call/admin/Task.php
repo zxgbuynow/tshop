@@ -38,9 +38,9 @@ class Task extends Admin
 
         //权限查看
         $map['call_alloc_log.user_id'] = UID;
-        // if (UID == 1) {
-        //     unset($map['call_alloc_log.user_id']);
-        // }
+        if (UID == 1) {
+            unset($map['call_alloc_log.user_id']);
+        }
         // //判断是否为主管
         // if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
         //     $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
@@ -109,7 +109,7 @@ class Task extends Admin
         $btn_getback = [
             'title' => '回收',
             'icon'  => 'fa fa-fw  fa-trash-o',
-            'class' => 'btn btn-xs btn-default ajax-get confirm',
+            'class' => 'btn btn-xs btn-default ajax-post confirm',
             'href' => url('getback')
         ];
 
@@ -134,7 +134,7 @@ class Task extends Admin
 
         $btn_msg = [
             'title' => '短信',
-            'icon'  => 'fa fa-fw fa-navicon',
+            'icon'  => 'fa fa-fw fa-envelope-o',
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('msg',['id'=>'__id__'])
         ];
@@ -154,7 +154,7 @@ class Task extends Admin
                 ['create_time', '创建时间','datetime'],
                 ['right_button', '操作', 'btn']
             ])
-            ->hideCheckbox()
+            // ->hideCheckbox()
             ->addTopButton('custom', $btn_getback)
             ->addRightButton('custom',$btn_access, ['title' => '客户信息'])
             ->addRightButton('custom',$btn_discard)

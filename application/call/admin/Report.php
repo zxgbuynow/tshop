@@ -2035,7 +2035,7 @@ class Report extends Admin
             $map['id']  = '';
             $data_list = CalllogModel::where($map)->paginate();
         }else{
-            $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']));//强行转换
+            $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']);//强行转换
             // 数据列表
             if (isset($map['create_time'])) {
                 $data = $map;
@@ -2066,7 +2066,7 @@ class Report extends Admin
                     $role_ids = CalllogModel::where($map)->column('role_id');
 
                     foreach ($role_ids as $key => $value) {
-                        $user_ids = db('admin_user')->where(['role'=>$map['role_id'][1]])->column('user_id');
+                        $user_ids = db('admin_user')->where(['role'=>$value])->column('id');
                         //部门计总
                         $standard_num = 0;
                         foreach ($user_ids as $key => $value) {
@@ -2105,7 +2105,7 @@ class Report extends Admin
                         $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
                         $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
 
-                        $item->role = db('admin_role')->where(['id'=>$data['role_id'][1]])->value('name');
+                        $item->role = db('admin_role')->where(['id'=>$item['role_id']])->value('name');
 
                         $item->timeLengths = date('i:s',$item['timeLengths']);
 
@@ -2197,7 +2197,7 @@ class Report extends Admin
             $map['id']  = '';
             $data_list = CalllogModel::where($map)->paginate();
         }else{
-            $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']));//强行转换
+            $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']);//强行转换
             // 数据列表
             if (isset($map['create_time'])) {
                 $data = $map;

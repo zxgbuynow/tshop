@@ -54,6 +54,7 @@ class Calllog extends Admin
         // 数据列表
         $data_list = CalllogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->calledNum = UID==1?$item['calledNum']:replaceTel($item['calledNum']);
+            $item->timeLength = date('i:s',$item['timeLength']);
         });
 
         // 分页数据
@@ -153,17 +154,23 @@ class Calllog extends Admin
         if ($id === null) $this->error('缺少参数');
 
         //transactionId
-        $params['transactionId'] = db('call_log')->where(['id'=>$id])->value('transactionId');
+        $params['transactionId'] = db('call_log')->where(['id'=>$id])->value('code');
         if (!$params['transactionId']) {
             $this->error('transactionId缺失');
         }
+        $params['file'] = db('call_log')->where(['id'=>$id])->value('recordURL');
+        if (!$params['file']) {
+            $this->error('file缺失');
+        }
         $status = ring_up_new('downloadFile',$params);
+        print_r($status);exit;
         //弹框
         $ret = json_decode($status,true);
+
         if ($ret['status']==0) {
             $this->error($ret['msg'], null, '_close_pop');
         }
-        if ($ret['status']==true&&!isset($ret['data'])) {
+        if ($ret['status']==1&&!isset($ret['msg'])) {
             $this->error($ret['msg'], null, '_close_pop');
         }
         

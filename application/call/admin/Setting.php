@@ -67,6 +67,7 @@ class Setting extends Admin
             'tab1' => ['title' => '短信配置', 'url' => url('index', ['group' => 'tab1'])],
             'tab2' => ['title' => '微信配置', 'url' => url('index', ['group' => 'tab2'])],
             'tab3' => ['title' => '呼叫配置', 'url' => url('index', ['group' => 'tab3'])],
+            'tab4' => ['title' => '报表微信推送配置', 'url' => url('index', ['group' => 'tab4'])],
         ];
 
         if ($group=='tab1') {
@@ -118,13 +119,13 @@ class Setting extends Admin
         if ($group=='tab4') {
             $map['wechat_name'] = array('neq',''); 
             $users = db('admin_user')->where($map)->column('wechat_name,nickname');
-            $info['timeLength_statistics'] = plugin_config('wechat')['timeLength_statistics'];
-            $info['classareport_statistics'] = plugin_config('wechat')['classareport_statistics'];
-            $info['classnreport_statistics'] = plugin_config('wechat')['classnreport_statistics'];
-            $info['classfreport_statistics'] = plugin_config('wechat')['classfreport_statistics'];
-            $info['classf15report_statistics'] = plugin_config('wechat')['classf15report_statistics'];
-            $info['previousfeereport_statistics'] = plugin_config('wechat')['previousfeereport_statistics'];
-            $info['roleCall_statistics'] = plugin_config('wechat')['roleCall_statistics'];
+            $info['timeLength_statistics'] = isset(plugin_config('wechat')['timeLength_statistics'])? plugin_config('wechat')['timeLength_statistics']:'';
+            $info['classareport_statistics'] = isset(plugin_config('wechat')['classareport_statistics'])? plugin_config('wechat')['classareport_statistics']:'';
+            $info['classnreport_statistics'] = isset(plugin_config('wechat')['classnreport_statistics'])?plugin_config('wechat')['classnreport_statistics']:'' ;
+            $info['classfreport_statistics'] = isset(plugin_config('wechat')['classfreport_statistics'])? plugin_config('wechat')['classfreport_statistics']:'';
+            $info['classf15report_statistics'] = isset(plugin_config('wechat')['classf15report_statistics'])? plugin_config('wechat')['classf15report_statistics']:'';
+            $info['previousfeereport_statistics'] = isset(plugin_config('wechat')['previousfeereport_statistics'])? plugin_config('wechat')['previousfeereport_statistics']:'';
+            $info['roleCall_statistics'] = isset(plugin_config('wechat')['roleCall_statistics'])?plugin_config('wechat')['roleCall_statistics']:'';
             // 使用ZBuilder快速创建表单
             return ZBuilder::make('form')
                 ->setPageTitle('报表微信推送配置') // 设置页面标题

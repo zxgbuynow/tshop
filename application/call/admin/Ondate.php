@@ -5,6 +5,7 @@ use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Ondate as OndateModel;
 use app\call\model\Custom as CustomModel;
+use \think\Request;
 /**
  * 首页后台控制器
  */
@@ -80,6 +81,7 @@ class Ondate extends Admin
         if ($group=='yes') {
             $map['status'] = 0;
         }
+
         // 数据列表
         $data_list = OndateModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->users = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
@@ -171,6 +173,7 @@ class Ondate extends Admin
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
+                ['hidden', 'id'],
                 ['select', 'custom_id', '客户','',$userList],
                 ['datetime', 'sign_time', '录入时间'],
                 ['datetime', 'ondate', '预约时间'],

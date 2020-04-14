@@ -27,7 +27,6 @@ class Custom extends Admin
     {
         cookie('__forward__', $_SERVER['REQUEST_URI']);
 
-
         // 获取查询条件
         $map = $this->getMap();
 
@@ -53,7 +52,8 @@ class Custom extends Admin
 
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
-            $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
+            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 4, 'gbk').'</span>';
             $item->access_mobile = $access_moblie;
 
         });
@@ -89,7 +89,7 @@ class Custom extends Admin
 
         $btn_msg = [
             'title' => '短信',
-            'icon'  => 'fa fa-fw fa-navicon',
+            'icon'  => 'fa fa-fw fa-envelope-o',
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('msg',['id'=>'__id__'])
         ];
@@ -142,8 +142,7 @@ class Custom extends Admin
                         return replaceTel($value);
                     }
                 }, '__data__'],
-                // ['categorys', '分类'],
-                ['categorys', '分类','popover',5],
+                ['categoryst', '分类'],
                 ['source', '来源'],
                 ['email', '邮箱'],
                 ['address', '地址'],
@@ -508,7 +507,7 @@ class Custom extends Admin
         // $data['project_id'] = 1;
         // 设置表头信息（对应字段名,宽度，显示表头名称）
         $cellName = [
-            ['id', 'auto','ID'],
+            // ['id', 'auto','ID'],
             ['project_id', 'auto','项目ID'],
             ['name', 'auto','客户名称'],
             ['tel', 'auto','客户电话'],
@@ -517,12 +516,14 @@ class Custom extends Admin
             ['email', 'auto','邮箱'],
             ['address', 'auto','地址'],
             ['note_time', 'auto','留言时间'],
+            ['policy','auto', '政策'],
             ['note_area','auto', '记录地区'],
             ['fee', 'auto','成本'],
             ['extend_url', 'auto','推广链接'],
-            ['create_time', 'auto','创建时间'],
+            // ['create_time', 'auto','创建时间'],
             ['record_time', 'auto','记录时间'],
-            ['call_time', 'auto','最后一次通话时间']
+            ['call_time', 'auto','最后一次通话时间'],
+            ['batch_id', 'auto','批次']
         ];
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
         plugin_action('Excel/Excel/export', ['客户模板表', $cellName, $data]);
@@ -542,27 +543,27 @@ class Custom extends Admin
             $excel_file = $this->request->post('excel');
             // 获取附件 ID 完整路径
             $full_path = getcwd() . get_file_path($excel_file);
-            
+
             // 只导入的字段列表
             $fields = [
                 'project_id' => '项目ID',
                 'name' => '客户名称',
                 'tel' => '客户电话',
                 'mobile' => '客户手机',
-                'note_time' => '留言时间',
-                'note_area' => '记录地区',
                 'source' => '来源',
-                'extend_url' => '推广链接',
-                'policy' => '政策',
-                'fee' => '成本',
-                'address' => '地址',
                 'email' => '邮箱',
+                'address' => '地址',
+                'note_time' => '留言时间',
+                'policy' => '政策',
+                'note_area' => '记录地区',
+                'fee' => '成本',
+                'extend_url' => '推广链接',
                 'record_time' => '记录时间',
                 'call_time' => '最后一次通话时间',
-                'batch_id' => '分批Id',
+                'batch_id' => '批次'
             ];
             // 调用插件('插件',[路径,导入表名,字段限制,类型,条件,重复数据检测字段])
-            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile',['name,mobile,note_time,note_area,fee,source,policy']], $second_field = 'project_id');
+            $import = plugin_action('Excel/Excel/import', [$full_path, 'call_custom', $fields, $type = 0, $where = null, $main_field = 'mobile', $second_field = 'project_id',['name','mobile','note_time','note_area','fee','source','policy']]);
 
             
             // 失败或无数据导入 计算净得率

@@ -1648,8 +1648,9 @@ if (!function_exists('notice_log')) {
             if(preg_match_all('/\[(\S+?)\]/', $action_info['content'], $match)){
                 $log = [
                     'employ'=>$user_id,
-                    'custom'=>$deails['custom'],
-                    'project'=>$deails['project']
+                    'custom'=>isset($deails['custom'])? $deails['custom']:'',
+                    'project'=>isset($deails['project'])? $deails['project']:'',
+                    'ondate'=>isset($deails['ondate'])? $deails['ondate']:'',
                 ];
                 $replace = [];
                 foreach ($match[1] as $value){

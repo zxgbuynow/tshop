@@ -45,13 +45,13 @@ class Message extends Admin
 
         $btn_ls = [
             'title' => '消息列表',
-            'icon'  => 'fa fa-fw fa-navicon ',
+            'icon'  => 'fa fa-fw fa-envelope-o ',
             'href' => url('ls',['id'=>'__id__'])
         ];
 
         $btn_msg = [
             'title' => '回复',
-            'icon'  => 'fa fa-fw fa-navicon',
+            'icon'  => 'fa fa-fw fa-comment',
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('relpy',['id'=>'__id__'])
         ];
@@ -71,8 +71,8 @@ class Message extends Admin
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
-            ->addRightButton('custom', $btn_ls)
-            ->replaceRightButton(['oper_id' => ['eq',UID]], '', 'custom')
+            ->addRightButton('custom1', $btn_ls)
+            ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'custom1')
             ->addRightButton('custom', $btn_msg,true)
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
@@ -106,13 +106,14 @@ class Message extends Admin
 
         $btn_access = [
             'title' => '详情',
-            'icon'  => 'fa fa-fw fa-navicon ',
+            'icon'  => 'fa fa-fw fa-eye',
             'class' => 'btn btn-default ajax-get',
             'href' => url('detail',['id'=>'__id__'])
         ];
       
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
+            ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 // ['title', '标题'],
@@ -317,9 +318,11 @@ class Message extends Admin
         $info['title'] = MessageModel::where(['id'=>$info['message_id']])->value('title');
 
         //更新已读
+        
         db('call_message_log')->where(['message_id'=>$info['message_id'],'user_id'=>UID])->update(['is_read'=>1]);
         // 显示添加页面
         return ZBuilder::make('form')
+
             ->addFormItems([
                 ['hidden', 'id'],
                 ['static', 'title', '标题'],
