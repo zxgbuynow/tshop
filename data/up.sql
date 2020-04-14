@@ -72,3 +72,6 @@ ADD COLUMN `content` varchar(255) NULL COMMENT '内容' AFTER `to_user`;
 
 ALTER TABLE `tshop1`.`call_message_log` 
 CHANGE COLUMN `to_user` `send_user` int(10) NULL DEFAULT NULL COMMENT '发送人' AFTER `user_id`;
+
+ALTER TABLE `tshop1`.`call_alloc_log` 
+ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `alloc_count`;
