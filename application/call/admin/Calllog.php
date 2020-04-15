@@ -41,6 +41,14 @@ class Calllog extends Admin
             }
         }
 
+        //搜索客户
+        if (isset($map['custom'])) {
+            $m['name'] = $map['custom'];
+            $customs = db('call_custom')->where($m)->column('id');
+            $map['custom_id'] = array('in',$customs);            
+            unset($map['custom']);
+        }
+
         $map['user_id'] = UID;
         if (UID==1) {
             unset($map['user_id']);
@@ -55,6 +63,8 @@ class Calllog extends Admin
         $data_list = CalllogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->calledNum = UID==1?$item['calledNum']:replaceTel($item['calledNum']);
             $item->timeLength = date('i:s',$item['timeLength']);
+            $item->username = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
+            $item->customname = db('call_custom')->where(['id'=>$item['custom_id']])->value('name');
         });
 
         // 分页数据
@@ -78,6 +88,7 @@ class Calllog extends Admin
             ->setSearchArea([
                 ['daterange', 'startTime', '通话时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                 ['text:6', 'extension', '分机号', 'like'],
+                ['text:6', 'custom', '客户', 'like'],
                 ['text:6', 'callerNum', '主叫号码', 'like'],
                 ['text:6', 'calledNum', '被叫号码', 'like'],
 
@@ -87,7 +98,8 @@ class Calllog extends Admin
             ])
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
-                ['user', '员工'],
+                ['username', '员工'],
+                ['customname', '客户'],
                 // ['followId', '跟进ID'],
                 ['callType', '呼叫类型',['','已接来电','已拨电话','未接来电','未接去电']],
                 ['callerNum', '主叫号码'],
@@ -103,11 +115,11 @@ class Calllog extends Admin
                 ['right_button', '操作', 'btn']
             ])
             ->hideCheckbox()
-            ->setRowList($data_list)// 设置表格数据
             ->addRightButton('custom',$btn_down)
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
-            ->raw('user') // 使用原值
+            // ->raw('user') // 使用原值
+            ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
         
     }

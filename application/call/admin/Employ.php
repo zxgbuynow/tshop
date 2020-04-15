@@ -65,14 +65,14 @@ class Employ extends Admin
         //转移
          $btn_transfer = [
             'title' => '转移',
-            'icon'  => 'fa fa-fw fa-navicon',
+            'icon'  => 'fa fa-fw fa-mail-reply-all',
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('transfer',['id'=>'__id__'])
         ];
         //监控
          $btn_contrl = [
             'title' => '监控',
-            'icon'  => 'fa fa-fw fa-navicon',
+            'icon'  => 'fa fa-fw fa-headphones',
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('contrl',['id'=>'__id__'])
         ];

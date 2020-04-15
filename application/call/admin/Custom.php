@@ -49,9 +49,8 @@ class Custom extends Admin
         //读取权限
         $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
-
         // 数据列表
-        $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
+        $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
             $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
             $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 4, 'gbk').'</span>';
             $item->access_mobile = $access_moblie;
@@ -140,6 +139,8 @@ class Custom extends Admin
                 ['mobile', '客户手机','callback',function($value, $data){
                     if (!$data['access_mobile']) {
                         return replaceTel($value);
+                    }else{
+                        return $value;
                     }
                 }, '__data__'],
                 ['categoryst', '分类'],
@@ -149,9 +150,14 @@ class Custom extends Admin
                 ['note_time', '记录时间'],
                 ['note_area', '记录地区'],
                 ['fee', '成本','callback',function($value, $data){
-                    if (UID !=1) {
+                    if (!$data['access_mobile']) {
                         return '无权限';
+                    }else{
+                        return $value;
                     }
+                    // if (UID !=1) {
+                    //     return '无权限';
+                    // }
                 }, '__data__'],
                 ['extend_url', '推广链接'],
                 ['policy', '政策'],
@@ -295,9 +301,9 @@ class Custom extends Admin
         //查询数据
         // if (!$map) $this->error('缺少参数');
 
-        $data =  CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$access_moblie){
+        $data =  CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use($access_moblie){
             $item->categorys = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
-            $item->mobile = $access_moblie?$item['mobile']:'无权限';
+            $item->mobile = $access_moblie?$item['mobile']:replaceTel($item['mobile']);
             $item->fee = UID==1?$item['fee']:'无权限';
 
         });
