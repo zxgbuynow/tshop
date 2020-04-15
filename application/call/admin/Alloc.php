@@ -88,7 +88,10 @@ class Alloc extends Admin
 
         $map['alloc_id'] = $id;
         // 数据列表
-        $data_list = AlloclgModel::where($map)->order('id desc')->paginate();
+        $data_list = AlloclgModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->call_count = db('call_log')->where(['custom_id'=>$item['custom_id']])->count();
+            $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
+        });
 
         // 分页数据
         $page = $data_list->render();
@@ -105,8 +108,8 @@ class Alloc extends Admin
                 ['id', 'ID'],
                 ['user', '员工'],
                 ['custom', '客户'],
-                // ['call_count', '呼叫次数'],
-                // ['alloc_count', '分配次数'],
+                ['call_count', '呼叫次数'],
+                ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
                 // ['right_button', '操作', 'btn']
             ])
@@ -250,6 +253,7 @@ class Alloc extends Admin
                             $rs['user_id'] = $data['user_id'][$key];
                             $rs['alloc_id'] = $insert_id;
                             $rs['create_time'] = time();
+                            $rs['batch_id'] = $data['batch_id'];
                             array_push($r,$rs);
                         }
                     }
@@ -275,6 +279,7 @@ class Alloc extends Admin
                             $rs['user_id'] = $data['user_id'][$key];
                             $rs['alloc_id'] = $insert_id;
                             $rs['create_time'] = time();
+                            $rs['batch_id'] = $data['batch_id'];
                             array_push($r,$rs);
                         }
                     }
@@ -418,51 +423,136 @@ EOF;
 
         }else{
 
-            if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
-                $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
-                $map['call_alloc_log.user_id'] = array('in',$userids);
+            //是否是主管
+            if (!db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+                $this->error('无权限');
             }
+
+            $role = db('admin_user')->where(['id'=>UID])->value('role');
+
+            //过滤 可分配数据
             $custom =  CustomModel::where(['status'=>1])->column('id,name');
 
-            $map['id'] = array('>',1);
-            $map['is_maner'] = 1;//过滤非管理员
+            $map['role'] = $role;//取部门员工
+            $map['is_maner'] = 0;
             $user =  UserModel::where($map)->column('id,username'); 
 
-            $map1['status'] = 1;
-            $map1['id'] = array('>',1);
-            $role = RoleModel::where($map1)->column('id,name'); 
 
-            $tips = db('call_custom')->where(['status'=>1])->count();
-            
-            $batchs = CustomEXLogModel::column('batch_id,title'); 
+            $tips = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->count();
 
-            $get_batch =  url('get_batch');
+            $batch_id = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->value('batch_id');//只取一个批次；
+            if ($this->request->isPost()) {
+                // 表单数据
+                $data = $this->request->post();
+                $sdata['create_time'] =  time();
+                //UID
+                $sdata['op_id'] = UID;
+                $sdata['way'] = $data['way']==0?1:2;
+                // $sdata['call_count'] = $data['call_count'];
+                $sdata['name'] = $data['name'];
+                $sdata['batch_id'] = $data['batch_id'];
+                //必填字段
+                if (!$sdata['name']) {
+                    $this->error('任务名称必填');
+                }
+                if (!$sdata['batch_id']) {
+                    $this->error('导入批次必填');
+                }
+                if ($data['custom_ids']>$tips) {
+                    $this->error('不能大于可分配总数');
+                }
 
+                if ($props = AllocModel::create($sdata)) {
+                    $insert_id = $props->id;
+                    
+                    if ($sdata['way']==1) {
+                        //平均分处理
+                        // if (!$data['user_ids']) {
+                        //     $data['user_ids'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
+
+                        // }
+                        $userCts = count($data['user_ids']);
+                        $custCts = count($data['custom_ids']);
+
+                        //取其中数量
+
+                        $customs = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->column('custom_id');
+                        $average = ceil($custCts/$userCts);
+
+                        $custCtarr = array_chunk($customs, $average);
+                        $r = [];
+                        foreach ($custCtarr as $key => $value) {
+                            $cc = count($value);
+                            if (!isset($data['user_ids'][$key])) {
+                                continue;
+                            }
+                            for ($i=0; $i < $cc; $i++) { 
+                                $rs['custom_id'] = $value[$i];
+                                $rs['user_id'] = $data['user_ids'][$key];
+                                $rs['alloc_id'] = $insert_id;
+                                $rs['create_time'] = time();
+                                $rs['batch_id'] = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
+                                array_push($r,$rs);
+                            }
+                        }
+                        
+                        
+                    }
+
+                    if ($sdata['way']==2) {
+                        $custCts = count($data['custom_id']);
+                        $r = [];
+                        for ($i=0; $i < $custCts; $i++) { 
+                            $r[$i]['custom_id'] = $data['custom_id'][$i];
+                            $r[$i]['user_id'] = $data['user_id'];
+                            $r[$i]['alloc_id'] = $insert_id;
+                            $rs['batch_id'] = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID,'custom_id'=>$data['custom_id'][$i]])->value('batch_id');
+                            // $r[$i]['call_count'] = $data['call_count'];
+                            $r[$i]['create_time'] = time();
+                        } 
+                    }
+                    $Alloclg = new AlloclgModel;
+                    $Alloclg->saveAll($r);
+
+                    if ($sdata['way']==1) {
+                        $mp['id'] = array('in',implode(',', $customs) );
+                        CustomModel::where($mp)->update(['status'=>2]);
+                        $mm['status']=1;
+                        $mm['custom_id']=array('in',implode(',', $customs) );
+                        $mm['user_id']=UID;
+                        AlloclgModel::where($mm)->update(['status'=>0]);
+                    }
+                    if ($sdata['way']==2) {
+                        $mp['id'] = array('in',$data['custom_id']);
+                        CustomModel::where($mp)->update(['status'=>2]);
+                        $mm['status']=1;
+                        $mm['custom_id']=array('in',$data['custom_id']);
+                        $mm['user_id']=UID;
+                        AlloclgModel::where($mm)->update(['status'=>0]);
+                    }
+                   
+                    $this->success('新增成功', url('index'));
+                } else {
+                    $this->error('新增失败');
+                }
+            }
             // 显示添加页面
             return ZBuilder::make('form')
                 ->addFormItems([
-                    // ['text', 'call_count', '呼叫次数'],
+                    ['hidden', 'batch_id', $batch_id],
                     ['text', 'name', '任务名称'],
                     ['radio', 'way', '分配方式' ,'', ['平均分配', '选配'], 0],
-                    ['hidden', 'calloc_num', '数量'],
-                    // ['number', 'alloc_count', '设置分配数量'],
-                    // ['select', 'custom_ids', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
                     ['static', 'cusids', '当前任务总数','<code>如果任务数为0即无可分配客户</code>',$tips],
                     ['number', 'custom_ids', '输入客户数量'],
                     ['select', 'user_ids', '选择员工', '<code>可多选</code>', $user,'','multiple'],
-
-                    // ['select', 'user_id', '选择员工', '', $user],
-                    // ['select', 'role_id', '选择组', '<code>可多选</code>', $custom,'','multiple'],
                     ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
-
                     ['radio', 'status', '立即启用', '', ['否', '是'], 1],
-
-                    // ['selectTable', 'test', '测试客户', '', $columns, [], url('Custom/index')],
+                    ['select', 'user_id', '选择员工', '', $user],
                 ])
-                ->setPageTips('超级管理员分配数据给主管', 'danger')
-                ->setTrigger('way', 1, 'custom_id')
-                ->setTrigger('way', 0, 'custom_ids')
-                ->setExtraJs($js)
+                ->setPageTips('主管需按批次分配自己的数据', 'danger')
+                ->setTrigger('way', 1, 'custom_id,user_id')
+                ->setTrigger('way', 0, 'custom_ids,user_ids')
+                // ->setExtraJs($js)
                 ->fetch();
         }
 

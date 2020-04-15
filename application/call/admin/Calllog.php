@@ -115,7 +115,10 @@ class Calllog extends Admin
                 ['right_button', '操作', 'btn']
             ])
             ->hideCheckbox()
-            ->addRightButton('custom',$btn_down)
+            // ->addRightButton('custom',$btn_down)
+            ->setRowList($data_list)// 设置表格数据
+            // ->addRightButton('custom',$btn_down)
+            ->addRightButton('custom',$btn_down,['title'=>'下载录音','area' => ['200px', '200px']])
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             // ->raw('user') // 使用原值
@@ -174,20 +177,35 @@ class Calllog extends Admin
         if (!$params['file']) {
             $this->error('file缺失');
         }
-        $status = ring_up_new('downloadFile',$params);
-        print_r($status);exit;
-        //弹框
-        $ret = json_decode($status,true);
 
-        if ($ret['status']==0) {
-            $this->error($ret['msg'], null, '_close_pop');
-        }
-        if ($ret['status']==1&&!isset($ret['msg'])) {
-            $this->error($ret['msg'], null, '_close_pop');
-        }
+        //直接打开连接
+        //http://xxx.xxx.xx.xx/http_uncall_api.php?model=downloadFile&transactionId=xxxxxxxxxxxx 
         
+        // $status = ring_up_new('downloadFile',$params);
+        // //弹框
+        // $ret = json_decode($status,true);
+
+        // if ($ret['status']==0) {
+        //     $this->error($ret['msg'], null, '_close_pop');
+        // }
+        // if ($ret['status']==1&&!isset($ret['msg'])) {
+        //     $this->error($ret['msg'], null, '_close_pop');
+        // }
+        $downUrl = "http://101.132.248.56/http_uncall_api.php?model=downloadFile&transactionId=".$params['transactionId'];
+        $data['downUrl'] = $downUrl;
+//         $js = <<<EOF
+//             <script type="text/javascript">
+               
+//                 $(function(){
+//                     console.log(111)
+//                     // window.open({$downUrl})
+//                 });
+//             </script>
+// EOF;
         // 显示添加页面
         return ZBuilder::make('form')
+            // ->setExtraJs($js)
+            ->assign('downUrl',$downUrl)
             ->fetch('hangup');
     }
     /**
