@@ -72,7 +72,7 @@ class Calllog extends Admin
     
         $btn_down = [
             // 'class' => 'btn btn-info',
-            'title' => '下载录音',
+            'title' => '播放录音',
             'icon'  => 'fa fa-fw fa-pinterest-p',
             'href'  => url('downcord',['id'=>'__id__'])
         ];
@@ -118,7 +118,7 @@ class Calllog extends Admin
             // ->addRightButton('custom',$btn_down)
             ->setRowList($data_list)// 设置表格数据
             // ->addRightButton('custom',$btn_down)
-            ->addRightButton('custom',$btn_down,['title'=>'下载录音','area' => ['200px', '200px']])
+            ->addRightButton('custom',$btn_down,['title'=>'播放录音','area' => ['320px', '120px']])
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             // ->raw('user') // 使用原值
