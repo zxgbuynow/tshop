@@ -730,6 +730,7 @@ class Custom extends Admin
                 ->setSearchArea([
                     ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['select', 'project_id', '项目', '', '', $project],
                     ['select', 'source', '平台来源', '', '', $list_source],
 
                 ])
