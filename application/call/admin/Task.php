@@ -109,7 +109,7 @@ class Task extends Admin
         $btn_getback = [
             'title' => '回收',
             'icon'  => 'fa fa-fw  fa-trash-o',
-            'class' => 'btn btn-xs btn-default ajax-post confirm',
+            'class' => 'btn  btn-default ajax-post confirm',
             'href' => url('getback')
         ];
 
