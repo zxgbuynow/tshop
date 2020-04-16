@@ -2155,7 +2155,8 @@ class Report extends Admin
             ])
             ->setRowList($data_list)// 设置表格数据
             ->addTopButton('custom', $btnexport)
-            ->addTopButton('custom', $btn_access)
+            ->addTopButton('custom', $btn_access,true)
+            // ->addTopButton('custom', $btn_access)
             ->fetch(); // 渲染模板
     }
 
