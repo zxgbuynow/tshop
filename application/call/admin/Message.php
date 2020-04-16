@@ -26,8 +26,9 @@ class Message extends Admin
         $map = $this->getMap();
 
         $map['oper_id'] = UID;
+        $m['user_id'] = UID;
         // 数据列表
-        $data_list = MessageModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+        $data_list = MessageModel::where($map)->whereOr($m)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $m['user_id'] = $item['user_id'];
             $m['is_read'] = 0;
             $item->is_read = db('call_message_log')->where($m)->count();
@@ -71,6 +72,7 @@ class Message extends Admin
             ->addTopButton('add', ['href' => url('add')])
             ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
+            ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'delete,edit')
             ->addRightButton('custom1', $btn_ls)
             ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'custom1')
             ->addRightButton('custom', $btn_msg,true)

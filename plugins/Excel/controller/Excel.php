@@ -256,6 +256,9 @@ class Excel extends Common
         $dataSkip['list']  = [];
         $isget = 0;
         $batch_id = md5(time());
+
+        //存当前手机号
+        $table_moble = [];
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -276,6 +279,9 @@ class Excel extends Common
                             if ($firstRow[$index] == 'batch_id') {
                                 $data[$firstRow[$index]] = $batch_id;
                             }
+                            if ($firstRow[$index] == 'mobile') {
+                                $table_moble[] = trim($val);
+                            }
                             if ($val==''&&in_array($firstRow[$index], $requre_fields)) {
                                 return ["error" => 11, 'message' => '字段'.$firstRow[$index].'必填，请检查数据'];
                             }
@@ -294,6 +300,11 @@ class Excel extends Common
                             $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
                             continue;//跳过已存在的考生
                         } else {
+                            //判断是否在导入表中存在
+                            if (in_array($data[$main_field], $table_moble)) {
+                                $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
+                                continue;//跳过已存在的考生
+                            }
                             $dataAdd['list'][] = $data[$main_field]; //记录新增的数据
                         }
                     } else {//覆盖导入

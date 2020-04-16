@@ -331,6 +331,7 @@ class Task extends Admin
         //清空分配日志
         db('call_alloc_log')->where($map)->update(['status'=>2]);//2为特殊处理掉的分配
 
+        $this->success('操作成功', null, '_parent_reload');
 
     }
     public function hangup($id=null)
