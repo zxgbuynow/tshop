@@ -123,6 +123,7 @@ class Ondate extends Admin
             $data['sign_time'] =strtotime($data['sign_time']);
             $data['ondate'] =  strtotime($data['ondate']);
             $data['create_time'] = time();
+            $data['user_id'] = UID;
             $result = $this->validate($data, 'Ondate');
             if(true !== $result) $this->error($result);
 
