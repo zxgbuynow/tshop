@@ -111,7 +111,7 @@ class Admin extends Common
             ];
 
             //提醒
-            $_notice = db('call_notice_log')->where(['is_read'=>0])->order('create_time DESC')->select(); 
+            $_notice = db('call_notice_log')->where(['is_read'=>0,'user_id'=>UID])->order('create_time DESC')->select(); 
 
 
             $_notice_count = db('call_notice_log')->where(['is_read'=>0,'user_id'=>UID])->order('create_time DESC')->count(); 
