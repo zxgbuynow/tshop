@@ -158,7 +158,7 @@ class Message extends Admin
             
             //生成日志
             $s['content'] = $data['title'];
-            $s['message_id'] = $id;
+            $s['message_id'] = db('call_message_log')->where(['id'=>$id])->value('message_id');
             $s['send_user'] = UID;
             $s['user_id'] = db('call_message_log')->where(['id'=>$id])->value('send_user');
             db('call_message_log')->insert($s);
