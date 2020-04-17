@@ -260,6 +260,7 @@ class Excel extends Common
         //存当前手机号
         $table_moble = [];
         $table_moble1 = [];
+        $count = 0;
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -274,6 +275,7 @@ class Excel extends Common
                     if (empty($firstRow)) {
                         return ["error" => 8, 'message' => '没有表头数据，无法导入!'];
                     }
+                    $count ++;
                     foreach ($col as $index => $val) { //循环每一个单元格
                         if (isset($firstRow[$index])) {
                             $data[$firstRow[$index]] = trim($val);
@@ -330,7 +332,7 @@ class Excel extends Common
 
             }
         }
-        // return ["error" => 19, 'message' => '必填，请检查数据data_list!'.json_encode($data_list)];
+        // return ["error" => 19, 'message' => '必填，请检查数据data_list!'.round(count($data_list)/$count*100,2).'%'];
         if ($data_list) {
             if (Db::name($table)->insertAll($data_list)) {
             // if (1==1) {
@@ -343,7 +345,7 @@ class Excel extends Common
                 cache('dataCover', $dataCover);
                 cache('dataSkip', $dataSkip);
                 cache('nextUrl', null);
-                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name, 'batch_id'=>$batch_id,'rate'=>round(count($data_list)/$i*100,2).'%'];
+                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name, 'batch_id'=>$batch_id,'rate'=>round(count($data_list)/$count*100,2).'%'];
             } else {
                 return ["error" => 9, 'message' => '导入失败!请重新导入。'];
             }
