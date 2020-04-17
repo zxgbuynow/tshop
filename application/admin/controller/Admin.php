@@ -113,7 +113,8 @@ class Admin extends Common
             //提醒
             $_notice = db('call_notice_log')->where(['is_read'=>0])->order('create_time DESC')->select(); 
 
-            $_notice_count = db('call_notice_log')->where(['is_read'=>0])->order('create_time DESC')->count(); 
+
+            $_notice_count = db('call_notice_log')->where(['is_read'=>0,'user_id'=>UID])->order('create_time DESC')->count(); 
             $this->assign('_notice_count', $_notice_count);
             $recent_list = [];
             foreach ($_notice as $key => $value) {
