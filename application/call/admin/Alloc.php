@@ -248,6 +248,9 @@ class Alloc extends Admin
                     $r = [];
                     foreach ($custCtarr as $key => $value) {
                         $cc = count($value);
+                        if (!isset($data['user_id'][$key])) {
+                                continue;
+                            }
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
                             $rs['user_id'] = $data['user_id'][$key];
@@ -274,6 +277,9 @@ class Alloc extends Admin
                     $r = [];
                     foreach ($custCtarr as $key => $value) {
                         $cc = count($value);
+                        if (!isset($data['user_id'][$key])) {
+                                continue;
+                            }
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
                             $rs['user_id'] = $data['user_id'][$key];
