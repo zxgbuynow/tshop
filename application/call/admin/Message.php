@@ -102,6 +102,7 @@ class Message extends Admin
         // 数据列表
         $data_list = MessageLgModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
                     $item->is_read = $item['is_read']?'已读':'未读';
+                    $item->send_user = db('admin_user')->where(['id'=>$item['send_user']])->value('nickname');
                 });
 
         // 分页数据
@@ -129,6 +130,7 @@ class Message extends Admin
                 // ['title', '标题'],
                 ['content', '内容'],
                 ['is_read', '是否已读'],
+                ['send_user', '发送人'],
                 ['right_button', '操作', 'btn']
             ])
             ->addRightButton('custom1', $btn_access,true)
