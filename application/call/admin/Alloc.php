@@ -229,7 +229,7 @@ class Alloc extends Admin
                 $insert_id = $props->id;
                 //分配处理
                 if ($sdata['way']==1) {
-                    if (!$data['user_id']) {
+                    if (!isset($data['user_id'])) {
                         $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
 
                     }
@@ -260,7 +260,7 @@ class Alloc extends Admin
 
                 }//平均
                 if ($sdata['way']==2) {
-                    if (!$data['user_id']) {
+                    if (!isset($data['user_id'])) {
                         $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
 
                     }
