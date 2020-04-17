@@ -31,9 +31,9 @@ class Message extends Admin
         $data_list = MessageModel::where($map)->whereOr($m)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $m['user_id'] = $item['user_id'];
             $m['is_read'] = 0;
+            $m['message_id'] = $item['id'];
             $item->is_read = db('call_message_log')->where($m)->count();
         });
-
         // 分页数据
         $page = $data_list->render();
 
