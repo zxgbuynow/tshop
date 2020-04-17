@@ -585,7 +585,7 @@ class Custom extends Admin
                 $this->error($import['message'], url('import'));
             }
 
-            $s['rate'] = '100%';
+            $s['rate'] = $import['rate'];
             $s['title'] = get_file_name($excel_file);
             $s['create_time'] = time();
             $s['batch_id'] = $import['batch_id'];
