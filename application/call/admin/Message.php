@@ -75,7 +75,8 @@ class Message extends Admin
             ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'delete,edit')
             ->addRightButton('custom1', $btn_ls)
             ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'custom1')
-            ->addRightButton('custom', $btn_msg,true)
+            // ->addRightButton('custom', $btn_msg,true)
+            // ->replaceRightButton(['oper_id' => ['eq',UID]], '', 'custom')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
@@ -109,10 +110,17 @@ class Message extends Admin
         $btn_access = [
             'title' => '详情',
             'icon'  => 'fa fa-fw fa-eye',
-            'class' => 'btn btn-default ajax-get',
+            'class' => 'btn  btn-xs btn-default ajax-get',
             'href' => url('detail',['id'=>'__id__'])
         ];
-      
+        
+        $btn_msg = [
+            'title' => '回复',
+            'icon'  => 'fa fa-fw fa-comment',
+            'class' => 'btn btn-xs btn-default ajax-get',
+            'href' => url('relpy',['id'=>'__id__'])
+        ];
+
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->hideCheckbox()
@@ -123,7 +131,10 @@ class Message extends Admin
                 ['is_read', '是否已读'],
                 ['right_button', '操作', 'btn']
             ])
-            ->addRightButton('custom', $btn_access,true)
+            ->addRightButton('custom1', $btn_access,true)
+
+            ->addRightButton('custom', $btn_msg,true)
+            ->replaceRightButton(['oper_id' => ['eq',UID]], '', 'custom')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
@@ -138,7 +149,6 @@ class Message extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
-
             $content['content'] = $data['title'];
             if (!$content['content']) {
                 $this->error('内容不对',null,'_close_pop');
@@ -146,9 +156,9 @@ class Message extends Admin
             
             //生成日志
             $s['content'] = $data['title'];
-            $s['message_id'] = $data['id'];
+            $s['message_id'] = $id;
             $s['send_user'] = UID;
-            $s['user_id'] = db('call_message')->where(['id'=>$data['id']])->value('oper_id');
+            $s['user_id'] = db('call_message_log')->where(['id'=>$id])->value('send_user');
             db('call_message_log')->insert($s);
 
             $this->success('发送成功',null,'_close_pop');
@@ -220,9 +230,11 @@ class Message extends Admin
             $data = $this->request->post();
             $data['oper_id'] = UID;
             if ($props = MessageModel::create($data)) {
+            // if (1==1) {
                 //日志
                 $insert_id = $props->id;
                 $save['message_id'] = $insert_id;
+                // $save['message_id'] = 999;
 
 
                 if ($data['touser_type']==0) {
@@ -230,6 +242,8 @@ class Message extends Admin
                         $this->error('选择用户');
                     }
                     $save['user_id'] = $data['user_id'];
+                    $save['send_user'] = UID;
+                    $save['content'] = $data['content'];
                     MessageLgModel::create($save);
                 }
                 if ($data['touser_type']==1) {
@@ -240,6 +254,8 @@ class Message extends Admin
                     $users = db('admin_user')->where($map1)->column('id');
                     foreach ($users as $key => $value) {
                         $save['user_id'] = $value;
+                        $save['send_user'] = UID;
+                        $save['content'] = $data['content'];
                     }
                     MessageLgModel::saveAll($save);
                 }
@@ -248,6 +264,8 @@ class Message extends Admin
                     $users = db('admin_user')->where($map2)->column('id');
                     foreach ($users as $key => $value) {
                         $save['user_id'] = $value;
+                        $save['send_user'] = UID;
+                        $save['content'] = $data['content'];
                     }
                     MessageLgModel::saveAll($save);
                 }
