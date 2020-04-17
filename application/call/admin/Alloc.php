@@ -225,18 +225,24 @@ class Alloc extends Admin
             if ($data['custom_ids']>$data['calloc_num']) {
                 $this->error('不能大于可分配总数');
             }
+
+            if ($data['calloc_num']==0) {
+                $this->error('数量必须大于0');
+            }
             if ($props = AllocModel::create($sdata)) {
+            // if (1==1) {
                 $insert_id = $props->id;
+                // $insert_id = 99;
                 //分配处理
                 if ($sdata['way']==1) {
+                    
                     if (!isset($data['user_id'])) {
                         // $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
-                        $data['user_id'] = db('admin_user')->where(['id'=>$data['role_id']])->column('id');
+                        $data['user_id'] = db('admin_user')->where(['role'=>$data['role_id']])->column('id');
 
                     }
                     $userCts = count($data['user_id']);
                     $custCts = $data['custom_ids'];
-
                     //取其中数量
                     $m['status'] = 1;
                     $m['batch_id'] = $data['batch_id'];
@@ -262,11 +268,13 @@ class Alloc extends Admin
                         }
                     }
 
+
                 }//平均
                 if ($sdata['way']==2) {
                     if (!isset($data['user_id'])) {
                         // $data['user_id'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
-                        $data['user_id'] = db('admin_user')->where(['id'=>$data['role_id']])->column('id');
+                        // $data['user_id'] = db('admin_user')->where(['id'=>$data['role_id']])->column('id');
+                        $data['user_id'] = db('admin_user')->where(['role'=>$data['role_id']])->column('id');
 
                     }
 
