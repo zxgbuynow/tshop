@@ -259,6 +259,7 @@ class Excel extends Common
 
         //存当前手机号
         $table_moble = [];
+        $table_moble1 = [];
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -280,12 +281,16 @@ class Excel extends Common
                                 $data[$firstRow[$index]] = $batch_id;
                             }
                             if ($firstRow[$index] == 'mobile') {
+                                if (in_array($data[$main_field], $table_moble)) {
+                                    $table_moble1[] = trim($val);
+                                }
                                 $table_moble[] = trim($val);
                             }
                             if ($val==''&&in_array($firstRow[$index], $requre_fields)) {
                                 return ["error" => 11, 'message' => '字段'.$firstRow[$index].'必填，请检查数据'];
                             }
                         }
+
                     }
 
                     //按second_feild过滤 妖孽代码
@@ -300,12 +305,15 @@ class Excel extends Common
                             $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
                             continue;//跳过已存在的考生
                         } else {
+
                             //判断是否在导入表中存在
-                            if (in_array($data[$main_field], $table_moble)) {
+                            if (in_array($data[$main_field], $table_moble1)) {
                                 $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
                                 continue;//跳过已存在的考生
+                            }else{
+                                $dataAdd['list'][] = $data[$main_field]; //记录新增的数据
                             }
-                            $dataAdd['list'][] = $data[$main_field]; //记录新增的数据
+                            
                         }
                     } else {//覆盖导入
                         if (in_array($data[$main_field], $exists_list)) {
@@ -319,11 +327,13 @@ class Excel extends Common
 
                     $data_list[] = $data;
                 }
+
             }
         }
-
+        // return ["error" => 19, 'message' => '必填，请检查数据data_list!'.json_encode($data_list)];
         if ($data_list) {
             if (Db::name($table)->insertAll($data_list)) {
+            // if (1==1) {
                 //计算新增、覆盖、跳过的数量
                 $dataAdd['total']   = count($dataAdd['list']);
                 $dataCover['total'] = count($dataCover['list']);
