@@ -70,9 +70,9 @@ class Message extends Admin
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
-            ->addRightButton('edit')
+            // ->addRightButton('edit')
             ->addRightButton('delete', ['data-tips' => '删除后无法恢复。'])// 批量添加右侧按钮
-            ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'delete,edit')
+            ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'delete')
             ->addRightButton('custom', $btn_ls)
             // ->replaceRightButton(['oper_id' => ['neq',UID]], '', 'custom1')
             // ->addRightButton('custom', $btn_msg,true)
@@ -431,8 +431,8 @@ class Message extends Admin
     public function setStatus($type = '', $record = [])
     {
         $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
-        $menu_title = CouponModel::where('id', 'in', $ids)->column('title');
-        return parent::setStatus($type, ['coupon_'.$type, 'class', 0, UID, implode('、', $menu_title)]);
+        $menu_title = MessageModel::where('id', 'in', $ids)->column('title');
+        return parent::setStatus($type, ['message_'.$type, 'class', 0, UID, implode('、', $menu_title)]);
     }
 
 }
