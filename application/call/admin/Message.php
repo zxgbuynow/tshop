@@ -397,7 +397,6 @@ class Message extends Admin
      */
     public function delete($ids = null)
     {
-        
         return $this->setStatus('delete');
     }
 
@@ -433,6 +432,10 @@ class Message extends Admin
     public function setStatus($type = '', $record = [])
     {
         $ids        = $this->request->isPost() ? input('post.ids/a') : input('param.ids');
+        if ($type=='delete'&&$ids) {
+            $mmm['message_id'] = array('in',$ids);
+            db('call_message_log')->where($mmm)->delete();
+        }
         $menu_title = MessageModel::where('id', 'in', $ids)->column('title');
         return parent::setStatus($type, ['message_'.$type, 'class', 0, UID, implode('、', $menu_title)]);
     }
