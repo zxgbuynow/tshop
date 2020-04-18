@@ -549,11 +549,14 @@ class Task extends Admin
             }
         }
 
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
         $calllog = db('call_report_custom_cat')->where(['custom_id'=>$custom_id,'employ_id'=>UID])->select();
         foreach ($calllog as $key => &$value) {
             $value['custom'] = $custom['name'];
             $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
             $value['category'] = $category[$value['category']];
+           
         }
         $abam['status'] = 1;
         $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
@@ -563,6 +566,7 @@ class Task extends Admin
             $value['create_time'] = $value['tags'];
             $value['category'] = $value['content'];
         }
+        $custom['mobile'] = $access_moblie?$custom['mobile']:replaceTel($custom['mobile']);
         $custom['calllog']['body'] = $calllog;
         $custom['calllog']['header'] = ['客户','分类','时间'];
         $custom['aba']['body'] = $aba;
