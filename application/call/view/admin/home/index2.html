@@ -135,7 +135,7 @@
         <div class="layui-card-body">
 
             <div class="layui-row">
-                <a class="layui-col-md3 u12" {if( $info['user_id'] == 1)} href="{:url('call/task/pool',['tag' => 'will_contact_custom_count'])}" {else/} href="{:url('call/task/index',['tag' => 'will_contact_custom_count'])}" {/if}>
+                <a class="layui-col-md3 u12" {if( $info['_is_show'] == 1)} href="{:url('call/task/pool',['tag' => 'will_contact_custom_count'])}" {else/} href="{:url('call/task/index',['tag' => 'will_contact_custom_count'])}" {/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u26.svg">
                     </div>
@@ -145,7 +145,7 @@
                         <p class="layui-card-body-right-p3" style="">{$info.will_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" {if( $info['user_id'] == 1)} href="{:url('call/task/pool',['tag' => 'pass_second_contact_custom_count'])}" {else/} href="{:url('call/custom/index',['tag' => 'pass_second_contact_custom_count'])}"{/if}>
+                <a class="layui-col-md3 u12" {if( $info['_is_show'] == 1)} href="{:url('call/custom/index',['tag' => 'pass_second_contact_custom_count'])}" {else/} href="{:url('call/custom/index',['tag' => 'pass_second_contact_custom_count'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u30.svg">
                     </div>
@@ -155,7 +155,7 @@
                         <p class="layui-card-body-right-p3" style="">{$info.pass_second_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" {if( $info['user_id'] == 1)} href="{:url('call/task/pool',['tag' => 'no_contact_custom_count'])}" {else/} href="{:url('call/task/index',['tag' => 'no_contact_custom_count'])}"{/if}>
+                <a class="layui-col-md3 u12" {if( $info['_is_show'] == 1)} href="{:url('call/task/pool',['tag' => 'no_contact_custom_count'])}" {else/} href="{:url('call/task/index',['tag' => 'no_contact_custom_count'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u20.svg">
                     </div>
@@ -165,7 +165,7 @@
                         <p class="layui-card-body-right-p3" style="">{$info.no_contact_custom_notice}</p>
                     </div>
                 </a>
-                <a class="layui-col-md3 u12" {if( $info['user_id'] == 1)} href="{:url('call/ondate/index',['group' => 'yes'])}" {else/} href="{:url('call/ondate/index',['group' => 'no'])}"{/if}>
+                <a class="layui-col-md3 u12" {if( $info['_is_show'] == 1)} href="{:url('call/ondate/index',['group' => 'yes'])}" {else/} href="{:url('call/ondate/index',['group' => 'no'])}"{/if}>
                     <div class="layui-card-body-left" >
                       <img src="__HOME_IMG__/u29.svg">
                     </div>

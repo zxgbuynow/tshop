@@ -55,7 +55,7 @@ class Task extends Admin
             }
             if ($map['tag'][1]=='pass_second_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
-                $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
             }
             if ($map['tag'][1]=='no_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
@@ -64,11 +64,11 @@ class Task extends Admin
         }else{
             if (isset($params['tag'])) {
                 if ($params['tag']=='will_contact_custom_count') {
-                    $map['call_log.alloc_log_id'] = array('eq',null);
+                    // $map['call_log.alloc_log_id'] = array('eq',null);
                 }
                 if ($params['tag']=='pass_second_contact_custom_count') {
                     $map['call_log.timeLength'] = array('eq',0);
-                    $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                    $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
                 }
                 if ($params['tag']=='no_contact_custom_count') {
                     $map['call_log.timeLength'] = array('eq',0);
@@ -201,7 +201,7 @@ class Task extends Admin
             }
             if ($map['tag'][1]=='pass_second_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
-                $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
             }
             if ($map['tag'][1]=='no_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
@@ -210,11 +210,12 @@ class Task extends Admin
         }else{
             if (isset($params['tag'])) {
                 if ($params['tag']=='will_contact_custom_count') {
-                    $map['call_log.alloc_log_id'] = array('eq',null);
+                    // $map['call_log.alloc_log_id'] = array('eq',null);
+
                 }
                 if ($params['tag']=='pass_second_contact_custom_count') {
                     $map['call_log.timeLength'] = array('eq',0);
-                    $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                    $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
                 }
                 if ($params['tag']=='no_contact_custom_count') {
                     $map['call_log.timeLength'] = array('eq',0);
@@ -222,7 +223,8 @@ class Task extends Admin
             }
 
         }
-        $data_list = AlloclgModel::view('call_alloc_log', '*,count(*) as counts')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.user_id')->paginate()->each(function($item, $key) use ($map){
+        $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($map){
+
             $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
             $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
@@ -244,7 +246,7 @@ class Task extends Admin
             'no_contact_custom_count'=>'新任务未接通客户'
         ];
 
-        
+        $count = $data_list->toarray()['total'];
         // print_r($msel);exit;
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -252,12 +254,13 @@ class Task extends Admin
                 ['select', 'tag', '类型', '', $mpsel, $msel],
 
             ])
+            ->setPageTitle('任务汇总('.$count.'条)')
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['user', '员工'],
                 ['custom', '客户'],
                 ['mobile', '电话'],
-                ['counts', '搜索结果(未联系|未接通)'],
+                // ['counts', '搜索结果(未联系|未接通)'],
                 ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
                 // ['right_button', '操作', 'btn']
@@ -368,7 +371,6 @@ class Task extends Admin
     {
         if ($id === null) $this->error('缺少参数');
 
-
         $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
         //手机号
         $params['telNum'] = get_mobile($custom_id)['mobile'];
@@ -385,10 +387,10 @@ class Task extends Admin
         }
         $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
         // $params['transactionId'] = UID.time();
-        // print_r($params);exit;
         $status = ring_up_new('ClickCall',$params);
         //弹框
         $ret = json_decode($status,true);
+
         if ($ret['status']==0) {
             // return json(['code' => 0, 'msg' => $ret['msg']]);
             $this->error($ret['msg'], null, '_close_pop');
@@ -400,7 +402,7 @@ class Task extends Admin
         //创建空的通话记录
         $s['alloc_log_id'] = $id;
         $s['user_id'] = UID;
-        $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role_id');
+        $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role');
         $s['callType'] = 2;//按实际更新
         $s['calledNum'] = $params['telNum'];
         $s['create_time'] = time();

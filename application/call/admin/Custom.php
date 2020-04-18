@@ -29,26 +29,65 @@ class Custom extends Admin
 
         // 获取查询条件
         $map = $this->getMap();
-
         $request = Request::instance();
         $params = $request->param();
+        $title = '客户列表';
         if (isset($params['tag'])) {
-            
+            $title = '客户列表(2天未联系结果)';
             if ($params['tag']=='pass_second_contact_custom_count') {
-
-                $m1['a.create_time'] = array('gt',time()-86400*2);
+                
+                if (UID!=1) {
+                    $userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find();
+                    if ($userin) {
+                        $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+                    }
+                    $m1['a.user_id'] = UID;
+                    if ($userin) {
+                        $m1['a.user_id'] = array('in',$userids);
+                    }
+                }
+                
+                $m1['a.status'] = 1;
+                $m1['c.create_time'] = array('lt',time()-86400*2);
+                
                 $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->select();
                 if ($pass_second_contact_custom_count) {
                     $map['id'] = array('in',array_column($pass_second_contact_custom_count, 'custom_id'));
+                }else{
+                    $map['id'] = '';
                 }
-                // $map['call_log.timeLength'] = array('eq',0);
-                // $map['call_alloc_log.create_time'] = array('gt',time()-86400*2);
+                
             }
             
+        }else{
+            if (UID!=1) {
+                $userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find();
+                if ($userin) {
+                    $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+                    $mm['status'] = 1;
+                    $mm['user_id'] = array('in',$userids);
+                    $customs = db('call_alloc_log')->where($mm)->column('custom_id');
+                    $map['id'] = array('in',array_column($customs, 'custom_id'));
+                    
+                }else{
+                    $mm['status'] = 1;
+                    $mm['user_id'] = UID;
+                    $customs = db('call_alloc_log')->where($mm)->column('custom_id');
+                    $map['id'] = array('in',array_column($customs, 'custom_id'));
+                    
+                }
+                if (!$map['id']) {
+                    $map['id'] = '';
+
+                }
+            }
+
         }
         //读取权限
         $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+
+
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
             $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
@@ -132,6 +171,7 @@ class Custom extends Admin
             // ->setSearch(['tel' => '电话','mobile' => '手机','name'=>'客户'])// 设置搜索框
             ->hideCheckbox()
             ->setSearchArea($searchArr)
+            ->setPageTitle($title)
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['name', '客户名称'],
