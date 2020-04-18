@@ -32,6 +32,7 @@ class Ondate extends Admin
         if ($group=='yes') {
             $map['status'] = 0;
         }
+        $map['user_id'] = UID;
         // 数据列表
         $data_list = OndateModel::where($map)->order('id desc')->paginate();
 
@@ -80,6 +81,18 @@ class Ondate extends Admin
         $map['status'] = 1;
         if ($group=='yes') {
             $map['status'] = 0;
+        }
+
+
+        $map['user_id'] = UID;
+        //权限查看
+        if (UID == 1) {
+            unset($map['user_id']);
+        }
+        //判断是否为主管
+        if ($userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
+            $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
+            $map['user_id'] = array('in',$userids);
         }
 
         // 数据列表

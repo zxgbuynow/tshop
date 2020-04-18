@@ -52,8 +52,9 @@ class Crontab
 
         // $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
         $m['a.status'] = 1;
-        $m['c.timeLength'] = array('eq',0);
+        // $m['c.timeLength'] = array('eq',0);
         $userInfo = Db::name('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->whereTime('a.create_time','<',$diff)->where($m)->select();
+        // echo Db::name('call_alloc_log')->getlastsql();exit;
         //新数据过滤
         if (!$userInfo) {
             error_log('NOT MODIF CUSTOM RECOVERTASK_'.time(),3,'/data/httpd/tshop/public/task.log');
@@ -704,7 +705,8 @@ class Crontab
         //取需要通知的数据
         $map['status'] = 0;
         // $map['ondate'] = array('lt',time());
-        $data = db('call_ondate')->where($map)->whereTime('ondate','back of 10')->select();
+        $sj = [time(),(time()+300)];
+        $data = db('call_ondate')->where($map)->whereTime('ondate','between',$sj)->select();
         // $data = db('call_ondate')->where($map)->order('id desc')->limit(1)->select();
         //数据
         foreach ($data as $key => $value) {
@@ -716,6 +718,7 @@ class Crontab
             $s['content'] = $value['note'];
             // $s['user_id'] = $value['user_id'];
             //提醒管理员 tags user_id title content 
+            // print_r($s);exit;
             notice_log('ondate',$value['user_id'],$s,1);
         }
 
