@@ -191,7 +191,8 @@ class Calllog extends Admin
         // if ($ret['status']==1&&!isset($ret['msg'])) {
         //     $this->error($ret['msg'], null, '_close_pop');
         // }
-        $downUrl = "http://101.132.248.56/http_uncall_api.php?model=downloadFile&transactionId=".$params['transactionId'];
+        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        $downUrl = $ser."?model=downloadFile&transactionId=".$params['transactionId'];
         $data['downUrl'] = $downUrl;
 //         $js = <<<EOF
 //             <script type="text/javascript">
