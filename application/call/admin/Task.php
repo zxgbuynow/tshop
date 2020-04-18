@@ -567,6 +567,7 @@ class Task extends Admin
             $value['category'] = $value['content'];
         }
         $custom['mobile'] = $access_moblie?$custom['mobile']:replaceTel($custom['mobile']);
+        $custom['fee'] = $access_moblie?$custom['fee']:'无权限';
         $custom['calllog']['body'] = $calllog;
         $custom['calllog']['header'] = ['客户','分类','时间'];
         $custom['aba']['body'] = $aba;
