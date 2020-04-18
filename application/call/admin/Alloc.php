@@ -447,8 +447,14 @@ EOF;
             $role = db('admin_user')->where(['id'=>UID])->value('role');
 
             //过滤 可分配数据
-            $custom =  CustomModel::where(['status'=>1])->column('id,name');
-
+            $customs = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->column('custom_id');
+            $mmm['status'] = 1;
+            $mmm['id'] = array('in',$customs);
+            if (!$customs) {
+                $mmm['id'] = '';
+            }
+            
+            $custom =  CustomModel::where($mmm)->column('id,name');
             $map['role'] = $role;//取部门员工
             $map['is_maner'] = 0;
             $user =  UserModel::where($map)->column('id,username'); 
