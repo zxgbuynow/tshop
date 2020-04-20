@@ -248,6 +248,7 @@ class Alloc extends Admin
                     $m['batch_id'] = $data['batch_id'];
                     $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
 
+                    $hts = [];
                     $average = ceil($custCts/$userCts);
 
                     $custCtarr = array_chunk($customs, $average);
@@ -260,6 +261,7 @@ class Alloc extends Admin
                             }
                         for ($i=0; $i < $cc; $i++) { 
                             $rs['custom_id'] = $value[$i];
+                            $hts[] = $value[$i];
                             $rs['user_id'] = $data['user_id'][$key];
                             $rs['alloc_id'] = $insert_id;
                             $rs['create_time'] = time();
@@ -305,8 +307,11 @@ class Alloc extends Admin
                 $Alloclg->saveAll($r);
 
                 if ($sdata['way']==1) {
-                    $mp['id'] = array('in',implode(',', $customs) );
-                    CustomModel::where($mp)->update(['status'=>2]);
+                    if ($hts) {
+                        $mp['id'] = array('in',implode(',', $hts) );
+                        CustomModel::where($mp)->update(['status'=>2]);
+                    }
+                    
                 }
                 if ($sdata['way']==2) {
                      $mp['id'] = array('in',$data['custom_id']);
@@ -380,6 +385,15 @@ class Alloc extends Admin
         $batchs = CustomEXLogModel::column('batch_id,title'); 
 
         $get_batch =  url('get_batch');
+        $get_custom = url('get_custom');
+         // <select class="js-select2 form-control" name="custom_id" id="custom_id">
+                                        //     <option value="">请选择：</option>
+                                        //     {notempty name="list"}
+                                        //         {volist name="list" id="option"}
+                                        //         <option value="{$option['id']}">{$option['value']}</option>
+                                        //         {/volist}
+                                        //     {/notempty}
+                                        // </select>
         $js = <<<EOF
             <script type="text/javascript">
                
@@ -387,6 +401,7 @@ class Alloc extends Admin
 
                     $('.select-linkage').change(function (r) {
                         if($(this).data('param')=='batch_id'){
+                            console.log($(this).val())
                             if(!$(this).val()){return false}
 
                             $.post("{$get_batch}", { "batch_id": $(this).val() },
@@ -411,7 +426,8 @@ EOF;
         return ZBuilder::make('form')
             ->addLinkage('role_id', '选择组', '', $role, '', url('get_user'), 'user_id')
             ->addSelect('user_id', '选择员工','',$user,'','multiple')
-            ->addLinkage('batch_id', '选择导入任务', '', $batchs, '', url('get_batch'), 'cusids')
+            ->addLinkage('batch_id', '选择导入任务', '', $batchs, '', url('get_batch'), 'custom_id[]')
+            ->addSelect('custom_id', '选择客户数据','<code>可多选</code>','','','multiple')
             ->addFormItems([
                 // ['text', 'call_count', '呼叫次数'],
                 ['text', 'name', '任务名称'],
@@ -425,7 +441,7 @@ EOF;
 
                 // ['select', 'user_id', '选择员工', '', $user],
                 // ['select', 'role_id', '选择组', '<code>可多选</code>', $custom,'','multiple'],
-                ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
+                // ['select', 'custom_id', '选择客户数据', '<code>可多选</code>', $custom,'','multiple'],
 
                 ['radio', 'status', '立即启用', '', ['否', '是'], 1],
 
@@ -448,13 +464,14 @@ EOF;
 
             //过滤 可分配数据
             $customs = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->column('custom_id');
-            $mmm['status'] = 1;
+            // $mmm['status'] = 2;
             $mmm['id'] = array('in',$customs);
             if (!$customs) {
                 $mmm['id'] = '';
             }
             
             $custom =  CustomModel::where($mmm)->column('id,name');
+
             $map['role'] = $role;//取部门员工
             $map['is_maner'] = 0;
             $user =  UserModel::where($map)->column('id,username'); 
@@ -501,6 +518,7 @@ EOF;
                         $customs = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->column('custom_id');
                         $average = ceil($custCts/$userCts);
 
+                        $hcus = [];
                         $custCtarr = array_chunk($customs, $average);
                         $r = [];
                         foreach ($custCtarr as $key => $value) {
@@ -510,6 +528,7 @@ EOF;
                             }
                             for ($i=0; $i < $cc; $i++) { 
                                 $rs['custom_id'] = $value[$i];
+                                $hcus[] = $value[$i];
                                 $rs['user_id'] = $data['user_ids'][$key];
                                 $rs['alloc_id'] = $insert_id;
                                 $rs['create_time'] = time();
@@ -537,12 +556,15 @@ EOF;
                     $Alloclg->saveAll($r);
 
                     if ($sdata['way']==1) {
-                        $mp['id'] = array('in',implode(',', $customs) );
-                        CustomModel::where($mp)->update(['status'=>2]);
-                        $mm['status']=1;
-                        $mm['custom_id']=array('in',implode(',', $customs) );
-                        $mm['user_id']=UID;
-                        AlloclgModel::where($mm)->update(['status'=>0]);
+                        if ($hcus) {
+                            $mp['id'] = array('in',implode(',', $hcus) );
+                            CustomModel::where($mp)->update(['status'=>2]);
+                            $mm['status'] = 1;
+                            $mm['custom_id'] = array('in',implode(',', $hcus) );
+                            $mm['user_id'] = UID;
+                            AlloclgModel::where($mm)->update(['status'=>0]);
+                        }
+                        
                     }
                     if ($sdata['way']==2) {
                         $mp['id'] = array('in',$data['custom_id']);
@@ -581,6 +603,27 @@ EOF;
 
 
     }
+
+    /**
+     * [get_custom description]
+     * @param  string $batch_id [description]
+     * @return [type]           [description]
+     */
+    // public function get_custom($batch_id='')
+    // {
+    //     $arr['code'] = '1'; //判断状态
+    //     $arr['msg'] = '请求成功'; //回传信息
+
+    //     $list = db('call_custom')->where(['batch_id'=>$batch_id,'status'=>1])->select();
+
+    //     $arr['list'] = [];
+    //     foreach ($list as $key => $value) {
+    //       $arr['list'][$key]['key'] = $value['id']; 
+    //       $arr['list'][$key]['value'] = $value['name']; 
+    //     }
+        
+    //     return json($arr);
+    // }
     /**
      * [get_batch description]
      * @param  string $batch_id [description]
@@ -595,13 +638,13 @@ EOF;
         $map['batch_id'] = $batch_id;
         $count = db('call_custom')->where($map)->count();
         $arr['value'] = $count;
-        // $arr['list'] = [];
-        // $arr['list'][0]['key'] = $value['id']; 
-        // $arr['list'][0]['value'] = $value['nickname']; 
-        // foreach ($city as $key => $value) {
-        //   $arr['list'][$key]['key'] = $value['id']; 
-        //   $arr['list'][$key]['value'] = $value['nickname']; 
-        // }
+
+        $list = db('call_custom')->where(['batch_id'=>$batch_id,'status'=>1])->select();
+        $arr['list'] = [];
+        foreach ($list as $key => $value) {
+          $arr['list'][$key]['key'] = $value['id']; 
+          $arr['list'][$key]['value'] = $value['name']; 
+        }
         
         return json($arr);
     }
