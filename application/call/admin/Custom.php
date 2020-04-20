@@ -831,8 +831,9 @@ class Custom extends Admin
             $s['create_time'] = time();
             $s['way'] = 2;
             if ($props = AllocModel::create($s)) {
-
+            // if (1==1) {
                 $insert_id = $props->id;
+                // $insert_id = 999;
                 //log
                 $sl = [];
                 $ids = explode(',', $data['ids']);
@@ -840,11 +841,19 @@ class Custom extends Admin
                     //回收数据id
                     db('call_recover_data')->where(['id'=>$value])->update(['status'=>0]);
                     $custom_id = db('call_recover_data')->where(['id'=>$value])->value('custom_id');
+                    $sl[$key]['batch_id'] = db('call_custom')->where(['id'=>$custom_id])->value('batch_id');
+
+                    $sl[$key]['alloc_count'] = 1;
                     $sl[$key]['alloc_id'] = $insert_id;
                     $sl[$key]['custom_id'] = $custom_id;
                     $sl[$key]['create_time'] = time();
                     $sl[$key]['alloc_count'] = 1;
+                    $sl[$key]['user_id'] = $data['employ_id'];
+
+                    $batch_id = $sl[$key]['batch_id'];
                 }
+                db('call_alloc')->where(['id'=>$insert_id])->update(['batch_id'=>$batch_id]);
+                // print_r($sl);exit;
                 $RoleModel = new AlloclgModel();
                 $RoleModel->saveAll($sl);
 

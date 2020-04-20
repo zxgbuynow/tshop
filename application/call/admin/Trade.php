@@ -371,7 +371,19 @@ class Trade extends Admin
         $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
         $user = db('admin_user')->where('id','gt','1')->column('id,nickname');
         $type  = TradecatModel::column('id,title');
-        $custom = db('call_custom')->column('id,mobile');
+
+        // $custom = db('call_custom')->column('id,mobile');
+        $custom = db('call_custom')->where(['status'=>1])->select();
+
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+
+        $customs = [];
+        foreach ($custom as $key => $value) {
+            $customs[$value['id']]= $access_moblie?$value['name'].' '.replaceTel($value['mobile']):$value['name'].' '.$value['mobile'];
+            // $customs[$key]['id'] = $value['id'];
+        }
+        // print_r($customs);exit;
         // $list_item = db('call_item')->where(['status'=>1])->column('id,title');
         // 显示添加页面
         return ZBuilder::make('form')
@@ -379,7 +391,7 @@ class Trade extends Admin
                 ['text', 'title', '合同名称'],
                 ['text', 'serialNO', '合同序列号'],
                 ['text', 'contactMobile', '手机号'],
-                ['select', 'custom_id', '客户','',$custom],
+                ['select', 'custom_id', '客户','',$customs],
                 ['select', 'project_id', '项目','',$list_project],
                 ['select', 'type', '合同类型','',$type],
                 ['select', 'menger', '负责人','',$user],
