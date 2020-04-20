@@ -1,17 +1,17 @@
 <div>
-	<!-- <p style="text-align: center;padding: 50px 0px;">下载操作成功！</p> -->
+	<p style="text-align: center;padding: 50px 0px;">下载操作成功！</p>
 	<!-- <audio  id="myaudio" src="http://ws.stream.qqmusic.qq.com/C100003R74Cn0JR4O6.m4a?fromtag=0" controls="controls">
    </audio> -->
    <!-- <code><audio id="speech" src="http://101.132.248.56/http_uncall_api.php?model=downloadFile&transactionId=11111120200321008" controls="controls" autoplay="autoplay">您的浏览器</audio> -->
-   	<audio src="" controls="controls" preload id="audio"></audio>
+   	<!-- <audio src="" controls="controls" preload id="audio"></audio> -->
 </div>
 <script src="__ADMIN_JS__/core/jquery.min.js"></script>
 <script src="__ADMIN_JS__/core/bootstrap.min.js"></script>
 <script type="text/javascript">
    $(function(){
    		var url = "{$downUrl}";
-   		// window.open(url)
-   		$('#audio').attr("src","{$downUrl}");
+   		window.open(url)
+   		// $('#audio').attr("src","{$downUrl}");
    		
     });
 </script>

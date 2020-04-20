@@ -385,8 +385,8 @@ class Task extends Admin
         if (!$params['extNum']) {
             $this->error('没有绑定分机号');
         }
-        $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
-        // $params['transactionId'] = UID.time();
+        // $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
+        $params['transactionId'] = UID.time();
         $status = ring_up_new('ClickCall',$params);
         //弹框
         $ret = json_decode($status,true);
@@ -559,8 +559,11 @@ class Task extends Admin
            
         }
         $abam['status'] = 1;
-        $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
-        $aba = db('call_speechcraft')->where($abam)->order('sort ASC')->select(); 
+        //多id查询
+        $alloc_id = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        $aba = Db::query("select * from call_speechcraft where status = 1 and  CONCAT(',',alloc_id,',') like '%,".$alloc_id.",%' ");
+        // $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        // $aba = db('call_speechcraft')->where($abam)->order('sort ASC')->select(); 
         foreach ($aba as $key => &$value) {
             $value['custom'] = $value['title'];
             $value['create_time'] = $value['tags'];

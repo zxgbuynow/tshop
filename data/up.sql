@@ -75,3 +75,6 @@ CHANGE COLUMN `to_user` `send_user` int(10) NULL DEFAULT NULL COMMENT '发送人
 
 ALTER TABLE `tshop1`.`call_alloc_log` 
 ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `alloc_count`;
+
+ALTER TABLE `tshop1`.`call_speechcraft` 
+MODIFY COLUMN `alloc_id` varchar(100) NULL DEFAULT NULL COMMENT '任务id' AFTER `tags`;

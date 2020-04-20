@@ -4,6 +4,7 @@ namespace app\call\admin;
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\call\model\Speechcraft as SpeechcraftModel;
+use \think\Db;
 
 /**
  * 首页后台控制器
@@ -55,12 +56,16 @@ class Speechcraft extends Admin
      */
     public function add()
     {
-  
+    
+         // $db_instance = Db::connect('call_speechcraft');
+        // $result = Db::query("select * from call_speechcraft where CONCAT(',',alloc_id,',') like '%,74,%' ");
+        // print_r($result);exit;
         // 保存数据
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
             $data['create_time'] =  time();
+            $data['alloc_id'] = implode(',', $data['alloc_id']);
             if ($props = SpeechcraftModel::create($data)) {
                 $this->success('新增成功', url('index'));
             } else {
@@ -73,7 +78,7 @@ class Speechcraft extends Admin
         return ZBuilder::make('form')
             ->addFormItems([
                 ['select', 'project_id', '项目','',$list_project],
-                ['select', 'alloc_id', '任务','',$list_task],
+                ['select', 'alloc_id', '任务','',$list_task,'','multiple'],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],
@@ -94,6 +99,7 @@ class Speechcraft extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            $data['alloc_id'] = implode(',', $data['alloc_id']);
             if (SpeechcraftModel::update($data)) {
                 $this->success('编辑成功', url('index'));
             } else {
@@ -107,7 +113,7 @@ class Speechcraft extends Admin
             ->addFormItems([
                 ['hidden', 'id'],
                 ['select', 'project_id', '项目','',$list_project],
-                ['select', 'alloc_id', '任务','',$list_task],
+                ['select', 'alloc_id', '任务','',$list_task,'','multiple'],
                 ['text', 'title', '名称'],
                 ['number', 'sort', '排序','<code>越小越排前</code>'],
                 ['textarea', 'content', '内容'],
