@@ -34,7 +34,7 @@ class Home extends Admin
         //待办事项
         if (UID==1) {
             $m4['a.status'] = 1;
-            // $m4['c.alloc_log_id'] = array('eq',null);
+            $m4['c.alloc_log_id'] = array('eq',null);
             $will_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m4)->whereTime('a.create_time', 'today')->group('a.id')->count();//当天分配没有拨打记录
             // echo db('call_alloc_log')->getlastsql();exit;
         	// $will_contact_custom_count = 0;//新任务未联系客户
@@ -49,7 +49,7 @@ class Home extends Admin
         	// $no_contact_custom_count = 0;//新任务未接通未达标客户
             $m2['a.status'] = 1;
             $m2['c.timeLength'] = array('eq',0);
-            $no_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m2)->group('a.id')->count();
+            $no_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m2)->group('a.id')->count();//没有接通的
 
         	// $ondate_count = 0;//预约提醒
             $m3['status'] = 0;
@@ -70,7 +70,7 @@ class Home extends Admin
             if ($userin) {
                 $m4['a.user_id'] = array('in',$userids);
             }
-            // $m4['c.alloc_log_id'] = array('eq','');
+            $m4['c.alloc_log_id'] = array('eq',null);
             $will_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m4)->whereTime('a.create_time', 'today')->group('a.id')->count();//当天分配没有拨打记录
         	// $will_contact_custom_count = 0;//新任务未联系客户 新客户是没有通话时长的
             $m1['c.status'] = 1;
