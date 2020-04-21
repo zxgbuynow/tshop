@@ -589,7 +589,6 @@ class Custom extends Admin
             $excel_file = $this->request->post('excel');
             // 获取附件 ID 完整路径
             $full_path = getcwd() . get_file_path($excel_file);
-
             // 只导入的字段列表
             $fields = [
                 'project_id' => '项目ID',
@@ -696,6 +695,7 @@ class Custom extends Admin
         ];
 
         $sources = db('call_custom')->column('source');
+        $list_source = [];
         foreach ($sources as $key => $value) {
             $list_source[$value] = $value;
         }
