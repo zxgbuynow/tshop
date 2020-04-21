@@ -316,6 +316,7 @@ class Project extends Admin
         if ($this->request->isPost()) {
             // 表单数据
             $data = $this->request->post();
+            $data['id'] = $id;
             if ($props = ProjectlsModel::update($data)) {
                 $this->success('编辑成功',url('pjlist',['id'=>$eid]));
             } else {
