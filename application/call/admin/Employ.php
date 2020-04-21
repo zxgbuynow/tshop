@@ -190,9 +190,9 @@ class Employ extends Admin
         if ($this->request->isPost()) {
             $data = $this->request->post();
             // 验证
-            $result = $this->validate($data, 'User');
+            // $result = $this->validate($data, 'User');
             // 验证失败 输出错误信息
-            if(true !== $result) $this->error($result);
+            // if(true !== $result) $this->error($result);
 
             if ($user = UserModel::create($data)) {
                 Hook::listen('user_add', $user);
@@ -245,9 +245,9 @@ class Employ extends Admin
             }
 
             // 验证
-            $result = $this->validate($data, 'User.update');
+            // $result = $this->validate($data, 'User.update');
             // 验证失败 输出错误信息
-            if(true !== $result) $this->error($result);
+            // if(true !== $result) $this->error($result);
 
             // 如果没有填写密码，则不更新密码
             if ($data['password'] == '') {
