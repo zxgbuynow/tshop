@@ -30,7 +30,10 @@ class Employ extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
-        $map['id'] = array('NEQ','1');
+        if (UID!=1) {
+            $map['id'] = array('NEQ','1');
+        }
+        
         //分机状态
         $exst = [];
         $status = ring_up_new('getAllExtensStatus');

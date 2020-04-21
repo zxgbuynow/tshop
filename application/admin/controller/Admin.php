@@ -272,7 +272,10 @@ class Admin extends Common
         ];
         // 验证是否操作管理员
         if (in_array($Model->getTable(), $protect_table) && $id == 1) {
-            $this->error('禁止操作超级管理员');
+            if (UID!=1) {
+                $this->error('禁止操作超级管理员'); 
+            }
+            
         }
 
         // 验证器
