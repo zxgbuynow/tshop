@@ -194,7 +194,7 @@ class Calllog extends Admin
         $ret  = file_put_contents($path, $status);
 
         if (!$ret) {
-            echo '下载成功'; exit// 然后可以取查看文件答
+            echo '下载成功'; exit;// 然后可以取查看文件答
         }
         
         // //弹框
