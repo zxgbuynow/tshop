@@ -78,7 +78,7 @@ class Calllog extends Admin
         // ];
         $btn_down = [
             // 'class' => 'btn btn-info',
-            'title' => '下载录音',
+            'title' => '下载并播放录音',
             'icon'  => 'fa fa-fw fa-pinterest-p',
             'href'  => url('downcord',['id'=>'__id__'])
         ];
@@ -125,7 +125,7 @@ class Calllog extends Admin
             ->setRowList($data_list)// 设置表格数据
             // ->addRightButton('custom',$btn_down)
             // ->addRightButton('custom',$btn_down,['title'=>'播放录音','area' => ['320px', '120px']])
-            ->addRightButton('custom',$btn_down,['title'=>'下载录音','area' => ['200', '200px']])
+            ->addRightButton('custom',$btn_down,['title'=>'下载并播放录音','area' => ['200', '200px']])
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             // ->raw('user') // 使用原值
@@ -186,9 +186,17 @@ class Calllog extends Admin
         }
 
         //直接打开连接
-        //http://xxx.xxx.xx.xx/http_uncall_api.php?model=downloadFile&transactionId=xxxxxxxxxxxx 
+        //http://101.132.248.56/http_uncall_api.php?model=downloadFile&transactionId=xxxxxxxxxxxx 
         
-        // $status = ring_up_new('downloadFile',$params);
+        $status = ring_up_new('downloadFile',$params);
+
+        $path = PUBLIC_PATH.'admin/'.$params['file'].".mp3";
+        $ret  = file_put_contents($path, $status);
+
+        if (!$ret) {
+            echo '下载成功'; exit// 然后可以取查看文件答
+        }
+        
         // //弹框
         // $ret = json_decode($status,true);
 
@@ -198,9 +206,14 @@ class Calllog extends Admin
         // if ($ret['status']==1&&!isset($ret['msg'])) {
         //     $this->error($ret['msg'], null, '_close_pop');
         // }
-        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
-        $downUrl = $ser."?model=downloadFile&transactionId=".$params['transactionId'];
-        $data['downUrl'] = $downUrl;
+        // $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        // $downUrl = $ser."?model=downloadFile&transactionId=".$params['transactionId'];
+
+        // $downUrl = 'https://www.oooha.com/images/f9/03/b2/ee7d301c352e5874a104b78d45a479b5e2596c6c.jpg';
+        // $file = downloadFile($downUrl);
+
+        // var_dump($file);exit;
+        $data['downUrl'] = $path;
 //         $js = <<<EOF
 //             <script type="text/javascript">
                
