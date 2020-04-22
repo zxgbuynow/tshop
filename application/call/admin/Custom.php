@@ -67,13 +67,13 @@ class Custom extends Admin
                     $mm['status'] = 1;
                     $mm['user_id'] = array('in',$userids);
                     $customs = db('call_alloc_log')->where($mm)->column('custom_id');
-                    $map['id'] = array('in',array_column($customs, 'custom_id'));
+                    $map['id'] = array('in',$customs);
                     
                 }else{
                     $mm['status'] = 1;
                     $mm['user_id'] = UID;
                     $customs = db('call_alloc_log')->where($mm)->column('custom_id');
-                    $map['id'] = array('in',array_column($customs, 'custom_id'));
+                    $map['id'] = array('in',$customs);
                     
                 }
                 if (!$map['id']) {
