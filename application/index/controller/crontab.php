@@ -53,6 +53,7 @@ class Crontab
         // $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
         $m['a.status'] = 1;
         // $m['c.timeLength'] = array('eq',0);
+        $m['c.alloc_log_id'] = array('eq',null);
         $userInfo = Db::name('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->whereTime('a.create_time','<',$diff)->where($m)->select();
         // echo Db::name('call_alloc_log')->getlastsql();exit;
         //新数据过滤
