@@ -51,7 +51,7 @@ class Task extends Admin
         $map['call_alloc_log.status'] = 1;
         if (isset($map['tag'])) {
             if ($map['tag'][1]=='will_contact_custom_count') {
-                $map['call_log.alloc_log_id'] = array('eq',null);
+                $map['call_log.alloc_log_id'] = array('exp','is null');
             }
             if ($map['tag'][1]=='pass_second_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
@@ -64,7 +64,7 @@ class Task extends Admin
         }else{
             if (isset($params['tag'])) {
                 if ($params['tag']=='will_contact_custom_count') {
-                    $map['call_log.alloc_log_id'] = array('eq',null);
+                    $map['call_log.alloc_log_id'] = array('exp','is null');
                 }
                 if ($params['tag']=='pass_second_contact_custom_count') {
                     $map['call_log.timeLength'] = array('eq',0);
@@ -197,7 +197,7 @@ class Task extends Admin
         $map['call_alloc_log.status'] = 1;
         if (isset($map['tag'])) {
             if ($map['tag'][1]=='will_contact_custom_count') {
-                $map['call_log.alloc_log_id'] = array('eq',null);
+                $map['call_log.alloc_log_id'] = array('exp','is null');
             }
             if ($map['tag'][1]=='pass_second_contact_custom_count') {
                 $map['call_log.timeLength'] = array('eq',0);
@@ -210,7 +210,7 @@ class Task extends Admin
         }else{
             if (isset($params['tag'])) {
                 if ($params['tag']=='will_contact_custom_count') {
-                    $map['call_log.alloc_log_id'] = array('eq',null);
+                    $map['call_log.alloc_log_id'] = array('exp','is null');
 
                 }
                 if ($params['tag']=='pass_second_contact_custom_count') {
