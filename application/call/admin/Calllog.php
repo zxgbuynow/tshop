@@ -218,7 +218,7 @@ class Calllog extends Admin
         // $file = downloadFile($downUrl);
 
         // var_dump($file);exit;
-        $downUrl = 'http://'.$_SERVER['SERVER_NAME'].'/uploads/voices/'.md5($params['file']).'.mp3';
+        $downUrl = 'http://'.$_SERVER['HTTP_HOST'].'/uploads/voices/'.md5($params['file']).'.mp3';
 //         $js = <<<EOF
 //             <script type="text/javascript">
                
