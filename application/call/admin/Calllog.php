@@ -124,8 +124,8 @@ class Calllog extends Admin
             // ->addRightButton('custom',$btn_down)
             ->setRowList($data_list)// 设置表格数据
             // ->addRightButton('custom',$btn_down)
-            // ->addRightButton('custom',$btn_down,['title'=>'播放录音','area' => ['320px', '120px']])
-            ->addRightButton('custom',$btn_down,['title'=>'下载并播放录音','area' => ['200', '200px']])
+            ->addRightButton('custom',$btn_down,['title'=>'播放录音','area' => ['320px', '120px']])
+            // ->addRightButton('custom',$btn_down,['title'=>'下载并播放录音','area' => ['200', '200px']])
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             // ->raw('user') // 使用原值
