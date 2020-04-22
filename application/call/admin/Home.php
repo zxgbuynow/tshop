@@ -35,9 +35,9 @@ class Home extends Admin
         if (UID==1) {
             $m4['a.status'] = 1;
             $m4['c.alloc_log_id'] = array('eq',null);
-            $m4['c.status'] = 1;
+            // $m4['c.status'] = 1;
             $will_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m4)->whereTime('a.create_time', 'today')->group('a.id')->count();//当天分配没有拨打记录
-            // echo db('call_alloc_log')->getlastsql();exit;
+            echo db('call_alloc_log')->getlastsql();exit;
         	// $will_contact_custom_count = 0;//新任务未联系客户
         	// $pass_second_contact_custom_count = 0;//超2天未联系客户
             $m1['c.status'] = 1;
@@ -68,7 +68,7 @@ class Home extends Admin
             $m4['a.status'] = 1;
             // $m4['c.timeLength'] = array('eq',0);
             $m4['a.user_id'] = UID;
-            $m4['c.status'] = 1;
+            // $m4['c.status'] = 1;
             if ($userin) {
                 $m4['a.user_id'] = array('in',$userids);
             }
