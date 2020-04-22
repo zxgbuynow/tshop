@@ -44,7 +44,7 @@ class Crontab
         //分配日志
         $recoverHour = config('recover_data_hour')?config('recover_data_hour'):0;
         if (!$recoverHour) {
-            error_log('NOT SET RECOVER HOUR RECOVERTASK_'.time(),3,'/data/http/ringup/public/task.log');
+            error_log('NOT SET RECOVER HOUR RECOVERTASK_'.time(). "\r\n",3,'/data/http/ringup/public/task.log');
             echo 'succ';exit;
         }
         //回收数据 分配任务状态修改 客户状态修改
@@ -58,7 +58,7 @@ class Crontab
         // echo Db::name('call_alloc_log')->getlastsql();exit;
         //新数据过滤
         if (!$userInfo) {
-            error_log('NOT MODIF CUSTOM RECOVERTASK_'.time(),3,'/data/http/ringup/public/task.log');
+            error_log('NOT MODIF CUSTOM RECOVERTASK_'.time(). "\r\n",3,'/data/http/ringup/public/task.log');
             echo 'succ';exit;
         }
         db('call_alloc_log')->whereTime('create_time','<',$diff)->update(['status'=>0]);
@@ -70,7 +70,7 @@ class Crontab
             $sv[$key]['custom_id'] = $value;
             $sv[$key]['create_time'] = time();
         }
-        error_log('NOT MODIF CUSTOM RECOVERTASK_'.time().json_encode($sv),3,'/data/http/ringup/public/task.log');
+        error_log('NOT MODIF CUSTOM RECOVERTASK_'.time().json_encode($sv). "\r\n",3,'/data/http/ringup/public/task.log');
         $Recoverdt = new RecoverdtModel;
         $Recoverdt->saveAll($sv);
         
@@ -472,7 +472,7 @@ class Crontab
         $map['code'] = array('neq','');
         // $map['id'] = 39;
         $info = db('call_log')->where($map)->select();
-        error_log('updateCallLog:'.time().':'.var_export($info,1),3,'/data/http/ringup/public/task.log');
+        error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
         //拉接口
         foreach ($info as $key => $value) {
             $params['transactionId'] = $value['code'];
@@ -504,7 +504,7 @@ class Crontab
             $s['recordURL'] = $ret['msg']['data'][0]['userfield'];
             $s['status'] = 1;
 
-            error_log('updateCallLog update:'.time().':'.var_export($s,1),3,'/data/http/ringup/public/task.log');
+            error_log('updateCallLog update:'.time().':'.var_export($s,1). "\r\n",3,'/data/http/ringup/public/task.log');
             db('call_log')->where(['code'=>$value['code']])->update($s);
         }
         echo 'succ';exit;
@@ -745,7 +745,7 @@ class Crontab
         $map['status'] = 0;
         $map['end_time'] = array('lt',time());
         db('calendar')->where($map)->update(['status'=>1]);
-        error_log('ts adivcetask:'.time(),3,'/data/httpd/daguan/public/task.log');  
+        error_log('ts adivcetask:'.time(). "\r\n",3,'/data/httpd/daguan/public/task.log');  
     }
     //------function ----------------
     /**
