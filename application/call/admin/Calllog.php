@@ -194,11 +194,13 @@ class Calllog extends Admin
             echo $status;exit;
         }
         $path = ROOT_PATH.'public/uploads/voices/'.md5($params['file']).'.mp3';
-        $ret  = file_put_contents($path, $status);
-
-        if (!$ret) {
-            echo '下载失败'; exit;// 然后可以取查看文件答
+        if (!is_file($path)) {
+            $ret  = file_put_contents($path, $status);
+            if (!$ret) {
+                echo '下载失败'; exit;// 然后可以取查看文件答
+            }
         }
+        
         
         // //弹框
         // $ret = json_decode($status,true);
