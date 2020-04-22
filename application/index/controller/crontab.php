@@ -530,7 +530,7 @@ class Crontab
         //提醒 第一、二天 3次 第三、四、五提醒1次
         $m['status'] = 1;
         $ent = time();
-        $date=floor((strtotime($enddate)-strtotime($startdate))/86400);
+        // $date=floor((strtotime($enddate)-strtotime($startdate))/86400);
         $task = db('call_alloc_log')->where($m)->select();
         $currH = date('t',time());
         foreach ($task as $key => $value) {
