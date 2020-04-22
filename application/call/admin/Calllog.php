@@ -190,7 +190,7 @@ class Calllog extends Admin
         
         $status = ring_up_new('downloadFile',$params);
 
-        if (strpos($status,'IP')!==false) {
+        if (strpos($status,'客户端IP')!==false) {
             echo $status;exit;
         }
         $path = ROOT_PATH.'public/uploads/voices/'.md5($params['file']).'.mp3';
