@@ -190,11 +190,14 @@ class Calllog extends Admin
         
         $status = ring_up_new('downloadFile',$params);
 
-        $path = PUBLIC_PATH.'admin/'.$params['file'].".mp3";
+        if (strpos($status,'IP')!==false) {
+            echo $status;exit;
+        }
+        $path = ROOT_PATH.'public/uploads/voices/'.md5($params['file']).'.mp3';
         $ret  = file_put_contents($path, $status);
 
         if (!$ret) {
-            echo '下载成功'; exit;// 然后可以取查看文件答
+            echo '下载失败'; exit;// 然后可以取查看文件答
         }
         
         // //弹框
@@ -213,7 +216,7 @@ class Calllog extends Admin
         // $file = downloadFile($downUrl);
 
         // var_dump($file);exit;
-        $data['downUrl'] = $path;
+        $downUrl = '/uploads/voices/'.md5($params['file']).'.mp3';
 //         $js = <<<EOF
 //             <script type="text/javascript">
                
