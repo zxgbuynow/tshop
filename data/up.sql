@@ -78,3 +78,13 @@ ADD COLUMN `batch_id` varchar(100) NULL COMMENT '批次' AFTER `alloc_count`;
 
 ALTER TABLE `tshop1`.`call_speechcraft` 
 MODIFY COLUMN `alloc_id` varchar(100) NULL DEFAULT NULL COMMENT '任务id' AFTER `tags`;
+
+CREATE TABLE `call_custom_note` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '提醒日志id',
+  `custom_id` int(10) unsigned DEFAULT '0' COMMENT '客户ID',
+  `user_id` int(10) unsigned DEFAULT '0' COMMENT '用户id',
+  `create_time` int(10) unsigned DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '0' COMMENT '1正常',
+   `content` longtext CHARACTER SET utf8 COLLATE utf8_unicode_ci COMMENT '祥情',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='客户拨打小记表';

@@ -6,6 +6,7 @@ use app\common\builder\ZBuilder;
 use app\call\model\Payment as PaymentModel;
 use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Custom as CustomModel;
+use app\call\model\CustomNote as CustomNoteModel;
 use \think\Request;
 use \think\Db;
 /**
@@ -516,7 +517,6 @@ class Task extends Admin
     {
         if ($id === null) $this->error('缺少参数');
 
-
         $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
         $custom = db('call_custom')->where(['id'=>$custom_id])->find();
         $category = db('call_custom_cat')->column('id,title');
@@ -531,6 +531,17 @@ class Task extends Admin
             $data['update_time'] =  time();
             $data['id'] = $custom_id;
             $data['category'] = $data['category'];
+            $notedt['content'] = $data['note'];
+            unset($data['note']);
+            //并记录
+            if (isset($notedt['content'])) {
+                //custom_id user_id create_time content
+                $notedt['custom_id'] = $custom_id;
+                $notedt['user_id'] = UID;
+                $notedt['create_time'] = time();
+
+                // CustomNoteModel::create($notedt);
+            }
             if ($props = CustomModel::update($data)) {
                 //生成日志
                 $s['create_time'] = time();
@@ -579,7 +590,18 @@ class Task extends Admin
         $custom['calllog']['header'] = ['客户','分类','时间'];
         $custom['aba']['body'] = $aba;
         $custom['aba']['header'] = ['标题','内容','标识'];
+       
+        $customNote = CustomNoteModel::where(['custom_id'=>$custom_id,'status'=>1])->select();
+        foreach ($customNote as $key => &$value) {
+            $value['custom'] = $custom['name'];
+            $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
+            $value['category'] = $value['content'];
+        }
+
+        $custom['cusnote']['body'] = $customNote;
+        $custom['cusnote']['header'] = ['销售联系人','联系时间','联系小记'];
         // print_r($calllog);exit;
+         // print_r($custom);exit;
         //用户信息
         return ZBuilder::make('form')
             ->addFormItems([
@@ -593,7 +615,10 @@ class Task extends Admin
                 ['static','note_area', '记录地区'],
                 ['select', 'category', '设置客户分类', '', $category],
                 ['mtable', 'calllog', '客户分类轨迹'],
-                ['mtable', 'aba', '销售话术']
+                ['mtable', 'aba', '销售话术'],
+                ['mtable', 'cusnote', '客户联系轨迹'],
+                ['textarea', 'note', '联系小记'],
+
                 
             ])
             ->setFormData($custom)
