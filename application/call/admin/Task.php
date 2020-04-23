@@ -538,18 +538,23 @@ class Task extends Admin
                 //custom_id user_id create_time content
                 $notedt['custom_id'] = $custom_id;
                 $notedt['user_id'] = UID;
+                $notedt['status'] = 1;
                 $notedt['create_time'] = time();
 
-                // CustomNoteModel::create($notedt);
+                CustomNoteModel::create($notedt);
             }
             if ($props = CustomModel::update($data)) {
                 //生成日志
-                $s['create_time'] = time();
-                $s['category'] = $data['category'];
-                $s['custom_id'] = $custom_id;
-                $s['export_time'] = $custom['create_time'];
-                $s['employ_id'] = UID;
-                db('call_report_custom_cat')->insert($s);
+                if ($data['category']>0) {
+                    $s['create_time'] = time();
+                    $s['category'] = $data['category'];
+                    $s['custom_id'] = $custom_id;
+                    $s['export_time'] = $custom['create_time'];
+                    $s['employ_id'] = UID;
+                    db('call_report_custom_cat')->insert($s);
+                }
+                
+
                 if ($data['category']==6) {//当签约时
                     //生成推送任务 $tag $content $aciton
                     $ep = db('admin_user')->where(['id'=>UID])->find();
@@ -593,11 +598,10 @@ class Task extends Admin
        
         $customNote = CustomNoteModel::where(['custom_id'=>$custom_id,'status'=>1])->select();
         foreach ($customNote as $key => &$value) {
-            $value['custom'] = $custom['name'];
-            $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
-            $value['category'] = $value['content'];
+            $value['custom'] = db('admin_user')->where(['id'=>$value['user_id']])->value('nickname');
+            $value['category'] = date('Y-m-d H:i',$value['create_time']);
+            $value['create_time'] = $value['content'];
         }
-
         $custom['cusnote']['body'] = $customNote;
         $custom['cusnote']['header'] = ['销售联系人','联系时间','联系小记'];
         // print_r($calllog);exit;
