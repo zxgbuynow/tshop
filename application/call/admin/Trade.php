@@ -373,7 +373,7 @@ class Trade extends Admin
         $type  = TradecatModel::column('id,title');
 
         // $custom = db('call_custom')->column('id,mobile');
-        $custom = db('call_custom')->where(['status'=>1])->select();
+        $custom = db('call_custom')->select();
 
         $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
