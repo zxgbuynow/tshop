@@ -119,7 +119,7 @@ class Task extends Admin
         $btn_call = [
             'title' => '呼叫',
             'icon'  => 'fa fa-fw fa-phone',
-            'class' => 'btn btn-xs btn-default ajax-get',
+            'class' => 'btn btn-xs btn-default ajax-get ring-up',
             'href' => url('ringup',['id'=>'__id__'])
         ];
         $btn_hangup = [
@@ -141,6 +141,20 @@ class Task extends Admin
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('msg',['id'=>'__id__'])
         ];
+        $js = <<<EOF
+            <script type="text/javascript">
+               
+                $(function(){
+                    console.log(1113)
+                    $('.ring-up').click(function(e){
+                        $('.get-user-info').removeClass('show-user-info');
+                        $(this).prev().addClass('show-user-info')
+
+                    })
+                    
+                });
+            </script>
+EOF;
         // print_r($msel);exit;
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
@@ -160,12 +174,13 @@ class Task extends Admin
             // ->hideCheckbox()
             ->addTopButton('custom', $btn_getback)
             ->addRightButton('custom',$btn_access, ['title' => '客户信息'])
-            ->addRightButton('custom',$btn_discard)
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
+            ->addRightButton('custom',$btn_discard)
             ->addRightButton('custom',$btn_hangup,['title'=>'分机挂断','area' => ['200px', '200px']])
             ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '500px']])
             ->setRowList($data_list)// 设置表格数据
             ->raw('custom') // 使用原值
+            ->setExtraJs($js)
             ->fetch(); // 渲染模板
         
     }
