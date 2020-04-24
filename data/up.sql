@@ -88,3 +88,6 @@ CREATE TABLE `call_custom_note` (
    `content` longtext CHARACTER SET utf8 COLLATE utf8_unicode_ci COMMENT '祥情',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 COMMENT='客户拨打小记表';
+
+ALTER TABLE `tshop1`.`call_ondate` 
+ADD COLUMN `is_notice` tinyint(1) NULL DEFAULT 0 COMMENT '没有提醒' AFTER `note`;

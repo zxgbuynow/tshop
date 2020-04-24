@@ -470,15 +470,14 @@ class Crontab
         //查找要更新的数据
         $map['status'] = 0;
         $map['code'] = array('neq','');
-        // $map['id'] = 39;
+        // $map['id'] = 12;
         $info = db('call_log')->where($map)->select();
         error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
         //拉接口
         foreach ($info as $key => $value) {
             $params['transactionId'] = $value['code'];
             $status = ring_up_new('getOneRecord',$params);
-
-            $ret = json_decode($status,true);
+            $ret = json_decode($status,true);  
             if ($ret['status']==0) {
                 continue;
             }
@@ -486,6 +485,9 @@ class Crontab
                 continue;
             }
 
+            if (!$ret['msg']['data']) {
+                continue;
+            }
             //处理更新
             switch ($ret['msg']['data'][0]['calltype']) {
                 case 'outcall':
@@ -571,6 +573,7 @@ class Crontab
                 }
             }
         }
+        echo 'succ';exit;
     }
 
     /**
@@ -705,6 +708,7 @@ class Crontab
     {
         //取需要通知的数据
         $map['status'] = 0;
+        $map['is_notice'] = 0;
         // $map['ondate'] = array('lt',time());
         $sj = [time(),(time()+300)];
         $data = db('call_ondate')->where($map)->whereTime('ondate','between',$sj)->select();
@@ -721,6 +725,8 @@ class Crontab
             //提醒管理员 tags user_id title content 
             // print_r($s);exit;
             notice_log('ondate',$value['user_id'],$s,1);
+
+            db('call_ondate')->where(['id'=>$value['id']])->update(['is_notice'=>1]);
         }
 
         echo 'succ';
