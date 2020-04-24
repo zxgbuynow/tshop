@@ -54,14 +54,15 @@ return [
     ],
     'datetimepicker_js' => [ // 日期时间选择
         $libs_path. "bootstrap-datetimepicker/moment.min.js",
-        $libs_path. "bootstrap-datetimepicker/bootstrap-datetimepicker.min.js",
+        $libs_path. "bootstrap-datetimepicker/bootstrap-datetimepicker.js",
         $libs_path. "bootstrap-datetimepicker/locale/zh-cn.js",
+        $libs_path. "bootstrap-daterangepicker/myCalendar.js",
     ],
     'moment_js' => [
         $libs_path. "bootstrap-datetimepicker/moment.min.js",
     ],
     'datetimepicker_css' => [ // 日期时间选择
-        $libs_path. "bootstrap-datetimepicker/bootstrap-datetimepicker.min.css"
+        $libs_path. "bootstrap-datetimepicker/bootstrap-datetimepicker.css"
     ],
     'webuploader_js' => [ // 文件或图片上传
         $libs_path. "webuploader/webuploader.min.js",
@@ -143,5 +144,8 @@ return [
     ],
     'daterangepicker_css' => [ // 日期时间范围
         $libs_path. "bootstrap-daterangepicker/daterangepicker.css",
+    ],
+    'mycalendar_js' => [ // 日期时间范围
+        $libs_path. "bootstrap-daterangepicker/myCalendar.js",
     ]
 ];

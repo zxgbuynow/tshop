@@ -65,7 +65,7 @@
     display: block; }
   .daterangepicker .calendar {
     display: none;
-    max-width: 270px;
+    max-width: 290px;
     margin: 4px; }
     .daterangepicker .calendar.single .calendar-table {
       border: none; }

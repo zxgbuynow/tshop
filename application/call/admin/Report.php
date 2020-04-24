@@ -160,7 +160,10 @@ class Report extends Admin
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->addFilter('role_id', $roles)
-            ->addTimeFilter('create_time') // 添加时间段筛选
+            // ->addTimeFilter('create_time') // 添加时间段筛选
+            ->setSearchArea([
+                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+            ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
                 ['__INDEX__', '序列'],
@@ -313,7 +316,10 @@ class Report extends Admin
         }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->addTimeFilter('update_time') // 添加时间段筛选
+            // ->addTimeFilter('update_time') // 添加时间段筛选
+            ->setSearchArea([
+                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+            ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
                 ['project', '项目'],
@@ -429,7 +435,10 @@ class Report extends Admin
         }
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->addTimeFilter('update_time') // 添加时间段筛选
+            // ->addTimeFilter('update_time') // 添加时间段筛选
+            ->setSearchArea([
+                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+            ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
                 ['project', '项目'],

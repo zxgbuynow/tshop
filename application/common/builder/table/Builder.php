@@ -1216,6 +1216,7 @@ class Builder extends ZBuilder
                         break;
                     case 'daterange':
                         $this->_vars['_js_files'][]  = 'moment_js';
+                        $this->_vars['_js_files'][]  = 'mycalendar_js';
                         $this->_vars['_js_files'][]  = 'daterangepicker_js';
                         $this->_vars['_css_files'][] = 'daterangepicker_css';
                         $this->_vars['_js_init'][]   = 'daterangepicker';
