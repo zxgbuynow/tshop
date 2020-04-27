@@ -53,8 +53,9 @@ class Crontab
         // $userInfo = db('call_alloc_log')->where(['status'=>1])->whereTime('create_time','<',$diff)->field('custom_id,user_id')->select();
         $m['a.status'] = 1;
         // $m['c.timeLength'] = array('eq',0);
-        $m['c.alloc_log_id'] = array('eq',null);
+        $m['c.alloc_log_id'] = array('exp','is null');
         $userInfo = Db::name('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->whereTime('a.create_time','<',$diff)->where($m)->select();
+        // print_r($userInfo);exit;
         // echo Db::name('call_alloc_log')->getlastsql();exit;
         //新数据过滤
         if (!$userInfo) {
@@ -69,6 +70,19 @@ class Crontab
         foreach ($customs as $key => $value) {
             $sv[$key]['custom_id'] = $value;
             $sv[$key]['create_time'] = time();
+            $cc = db('call_custom')->where(['id'=>$value])->find();
+            //project_id source custom note_time mobile  alloc_time call_count alloc_count  user_id  user
+            $sv[$key]['project_id'] = $cc['project_id'];
+            $sv[$key]['source'] = $cc['source'];
+            $sv[$key]['custom'] = $cc['name'];
+            $sv[$key]['note_time'] = $cc['note_time'];
+            $sv[$key]['mobile'] = $cc['mobile'];
+            $sv[$key]['call_count'] = db('call_log')->where(['custom_id'=>$value])->count();
+            $sv[$key]['alloc_count'] = db('call_alloc_log')->where(['custom_id'=>$value])->count();
+            $sv[$key]['alloc_time'] = db('call_alloc_log')->where(['custom_id'=>$value,'status'=>1])->value('create_time');
+
+            $sv[$key]['user_id'] = 1;
+            $sv[$key]['user'] = '超级管理员';
         }
         error_log('NOT MODIF CUSTOM RECOVERTASK_'.time().json_encode($sv). "\r\n",3,'/data/http/ringup/public/task.log');
         $Recoverdt = new RecoverdtModel;
@@ -76,6 +90,8 @@ class Crontab
         
         //提醒管理员 tags user_id title content 
         notice_log('recover',1);
+
+        echo 'succ';exit;
     }
 
     /**
@@ -472,20 +488,23 @@ class Crontab
         $map['code'] = array('neq','');
         // $map['id'] = 12;
         $info = db('call_log')->where($map)->select();
-        error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
+        // print_r($info);exit;
+        // error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
         //拉接口
         foreach ($info as $key => $value) {
             $params['transactionId'] = $value['code'];
             $status = ring_up_new('getOneRecord',$params);
             $ret = json_decode($status,true);  
+
             if ($ret['status']==0) {
                 continue;
             }
             if ($ret['status']==1&&!isset($ret['msg']['data'])) {
                 continue;
             }
-
             if (!$ret['msg']['data']) {
+                //没有数据更新状态
+                db('call_log')->where(['id'=>$value['id']])->update(['status'=>1]);
                 continue;
             }
             //处理更新
