@@ -174,7 +174,7 @@ class Custom extends Admin
             $item->alloc_status = $item['status']==1?'待分配':'已分配';
 
             $alloc_user = db('call_alloc_log')->where(['custom_id'=>$item['id'],'status'=>1])->value('user_id');
-            $item->alloc_user = $item['status']==1?'无':($item['status']==2?'回收':($item['status']==3?'公海':$alloc_user));
+            $item->alloc_user = $item['status']==1?'无':($item['status']==2?get_employ($alloc_user):($item['status']==3?'公海':get_employ($alloc_user)));
 
         });
 
