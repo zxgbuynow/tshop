@@ -79,6 +79,46 @@ class Task extends Admin
             }
 
         }
+
+        //所有者 分配日期  客户分类 客户名  电话  来源 记录时间
+        $mmm = [];
+        if (isset($map['cat_id'])) {
+            $mmm['category'] = $map['cat_id'];
+            unset($map['cat_id']);
+        }
+        if (isset($map['custom'])) {
+            $mmm['name'] = $map['custom'];
+            unset($map['custom']);
+        }
+        if (isset($map['mobile'])) {
+            $mmm['mobile'] = $map['mobile'];
+            unset($map['mobile']);
+        }
+        if (isset($map['source'])) {
+            $mmm['source'] = $map['source'];
+            unset($map['source']);
+        }
+        if (UID!=1) {
+            unset($map['user']);
+        }else{
+            if (isset($map['user'])) {
+                $mm['nickname'] = $map['user'];
+                $user_ids = db('admin_user')->where()->column('id');
+                if ($user_ids) {
+                    $map['call_alloc_log.user_id'] = array('in',$user_ids);
+                }
+            }
+            
+        }
+        
+        
+        if ($mmm) {
+            $custom_ids = db('call_custom')->where($mmm)->column('id');
+            if ($custom_ids) {
+                $map['call_alloc_log.custom_id'] = array('in',$custom_ids);
+            }
+        }
+// print_r($map);exit;
         $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($map){
             $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
@@ -91,6 +131,7 @@ class Task extends Admin
         }
         // print_r($map);exit;
 
+        $catlist = db('call_custom_cat')->where(['status'=>1])->column('id,title');
         // 分页数据
         $page = $data_list->render();
     
@@ -155,11 +196,22 @@ class Task extends Admin
                 });
             </script>
 EOF;
-        // print_r($msel);exit;
-        // 使用ZBuilder快速创建数据表格
+        // print_r($msel);exit; 
+        // 使用ZBuilder快速创建数据表格 所有者 客户分类 客户名  电话 分配日期 来源 记录时间
         return ZBuilder::make('table')
             ->setSearchArea([
                 ['select', 'tag', '类型', '', $mpsel, $msel],
+
+                ['text:6', 'custom', '客户名称','like'],
+                ['text:6', 'user', '所有者','like'],
+
+                ['text:6', 'mobile', '电话','like'],
+                ['text:6', 'source', '来源','like'],
+
+                ['select', 'cat_id', '客户分类', '', '', $catlist],
+
+                ['daterange', 'alloc_time', '分配时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
             ])
             ->addColumns([ // 批量添加数据列
