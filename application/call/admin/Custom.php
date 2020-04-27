@@ -36,15 +36,48 @@ class Custom extends Admin
             $title = '客户列表(2天未联系结果)';
             if ($params['tag']=='pass_second_contact_custom_count') {
                 
+                //处理所有者 如果用户ID不在数据中则无结果
+                if (isset($map['alloc_user'])) {
+                    $mmmmm['nickname'] = $map['alloc_user'];
+                    $alloc_users = db('admin_user')->where($mmmmm)->column('id');
+                    
+                    unset($map['alloc_user']);
+                }
+
                 if (UID!=1) {
                     $userin =  db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find();
                     if ($userin) {
                         $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
                     }
                     $m1['a.user_id'] = UID;
+                    
+
+                    
                     if ($userin) {
-                        $m1['a.user_id'] = array('in',$userids);
+                        // $m1['a.user_id'] = array('in',$userids);
+                        if ($alloc_users) {
+                            $intersect = array_intersect($userids,$alloc_users);
+                            $m1['a.user_id'] = '';
+                            if ($intersect) {
+                                $m1['a.user_id'] = array('in',$intersect);
+                            }
+                        }else{
+                            $m1['a.user_id'] = array('in',$userids);
+                        }
+                        
+                    }else{
+                        if ($alloc_user) {
+                            if (!in_array(UID, $alloc_user)) {
+                                $m1['a.user_id'] = '';
+                            }
+                        }
+                        
                     }
+                }else{
+                    if (isset($alloc_users)) {
+                        $m1['a.user_id'] = array('in',$alloc_users);
+                    }
+                    
                 }
                 
                 $m1['a.status'] = 1;
@@ -66,12 +99,39 @@ class Custom extends Admin
                     $userids = db('admin_user')->where(['role'=>$userin['role'] ])->column('id');
                     $mm['status'] = 1;
                     $mm['user_id'] = array('in',$userids);
+
+                    //处理所有者 如果权限组下用户ID在数据中则保留
+                    if (isset($map['alloc_user'])) {
+                        $mmmmm['nickname'] = $map['alloc_user'];
+                        $alloc_users = db('admin_user')->where($mmmmm)->column('id');
+                        $intersect = array_intersect($userids,$alloc_users);
+                        
+                        $mm['user_id'] = '';
+                        if ($intersect) {
+                            $mm['user_id'] = array('in',$intersect);
+                        }
+
+                        unset($map['alloc_user']);
+                    }
+
+                    
                     $customs = db('call_alloc_log')->where($mm)->column('custom_id');
                     $map['id'] = array('in',$customs);
                     
                 }else{
                     $mm['status'] = 1;
                     $mm['user_id'] = UID;
+
+                    //处理所有者 如果用户ID不在数据中则无结果
+                    if (isset($map['alloc_user'])) {
+                        $mmmmm['nickname'] = $map['alloc_user'];
+                        $alloc_users = db('admin_user')->where($mmmmm)->column('id');
+                        if (!in_array(UID, $alloc_user)) {
+                            $mm['user_id'] = '';
+                        }
+                        unset($map['alloc_user']);
+                    }
+                    
                     $customs = db('call_alloc_log')->where($mm)->column('custom_id');
                     $map['id'] = array('in',$customs);
                     
@@ -80,6 +140,16 @@ class Custom extends Admin
                     $map['id'] = '';
 
                 }
+            }else{
+                if (isset($map['alloc_user'])) {
+                    $mmmmm['nickname'] = $map['alloc_user'];
+                    $alloc_users = db('admin_user')->where($mmmmm)->column('id');
+                    $mm['user_id'] = array('in',$alloc_users);
+                    $mm['status']=1;
+                    $customs = db('call_alloc_log')->where($mm)->column('custom_id');
+                    $map['id'] = array('in',$customs);
+                    unset($map['alloc_user']);
+                }
             }
 
         }
@@ -87,12 +157,24 @@ class Custom extends Admin
         $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
 
+        //资源状态
+        if (isset($map['status'])) {
+            $map['status'] = $map['status'];
+            if ($map['status']==0) {
+                $map['status'] = array('in',['0','2','3']);
+            }
+        }
 
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
             $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
-            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 4, 'gbk').'</span>';
+            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 6, 'gbk').'</span>';
             $item->access_mobile = $access_moblie;
+
+            $item->alloc_status = $item['status']==1?'待分配':'已分配';
+
+            $alloc_user = db('call_alloc_log')->where(['custom_id'=>$item['id'],'status'=>1])->value('user_id');
+            $item->alloc_user = $item['status']==1?'无':($item['status']==2?'回收':($item['status']==3?'公海':$alloc_user));
 
         });
 
@@ -148,6 +230,8 @@ class Custom extends Admin
                 ['text:6', 'fee', '成本', 'like'],
                 ['text:6', 'extend_url', '推广链接', 'like'],
                 ['text:6', 'policy', '政策', 'like'],
+                ['text:6', 'alloc_user', '所有者', 'like'],
+                ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']]
 
             ];
@@ -161,6 +245,8 @@ class Custom extends Admin
                 ['text:6', 'note_area', '记录地区', 'like'],
                 ['text:6', 'extend_url', '推广链接', 'like'],
                 ['text:6', 'policy', '政策', 'like'],
+                ['text:6', 'alloc_user', '所有者', 'like'],
+                ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
             ];
@@ -185,8 +271,8 @@ class Custom extends Admin
                 }, '__data__'],
                 ['categoryst', '分类'],
                 ['source', '来源'],
-                ['email', '邮箱'],
-                ['address', '地址'],
+                ['alloc_user', '所有者'],
+                ['alloc_status', '资源状态'],
                 ['note_time', '记录时间'],
                 ['note_area', '记录地区'],
                 ['fee', '成本','callback',function($value, $data){
@@ -199,10 +285,13 @@ class Custom extends Admin
                     //     return '无权限';
                     // }
                 }, '__data__'],
-                ['extend_url', '推广链接'],
+                
                 ['policy', '政策'],
                 ['create_time', '创建时间','datetime'],
                 // ['status', '状态', 'switch'],
+                ['extend_url', '推广链接'],
+                ['email', '邮箱'],
+                ['address', '地址'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('custom', $btn_access,true)
@@ -400,7 +489,7 @@ class Custom extends Admin
         ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['brand_name' => '标题'])// 设置搜索框
+            ->setSearch(['title' => '标题'])// 设置搜索框
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['title', '标题'],
@@ -629,6 +718,10 @@ class Custom extends Admin
             $s['create_time'] = time();
             $s['batch_id'] = $import['batch_id'];
             CustomEXLogModel::create($s);
+
+            //更新客户导入时间
+            CustomModel::where(['batch_id'=>$import['batch_id']])->update(['create_time'=>time()]);
+            
             // 导入成功
             $this->success($import['message'], url('import'));
         }
@@ -711,6 +804,20 @@ class Custom extends Admin
 
         if ($group=='tab1') {
             $map['status'] = 1;
+
+            //custom_id user_id 
+            // if (isset($map['custom_id'])) {
+            //     $mm['name'] = $map['custom_id'];
+            //     $custom_ids = db('call_custom')->where($mm)->value('id');
+            //     $map['custom_id'] = array('in',$custom_ids);
+            // }
+
+            // if (isset($map['user_id'])) {
+            //     $mm['nickname'] = $map['user_id'];
+            //     $custom_ids = db('admin_user')->where($mm)->value('id');
+            //     $map['user_id'] = array('in',$custom_ids);
+            // }
+            
             // 数据列表
             $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
 
@@ -718,16 +825,26 @@ class Custom extends Admin
             $page = $data_list->render();
 
      
-            // 使用ZBuilder快速创建数据表格
+            // 使用ZBuilder快速创建数据表格 客户名称 电话 所有者 呼叫次数 分配时间 分配次数 回收时间
             return ZBuilder::make('table')
                 // ->hideCheckbox()
                 ->setPageTitle('回收列表') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
                 ->setSearchArea([
-                    ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                    ['text:6', 'custom', '客户名称','like'],
+                    ['text:6', 'user', '所有者','like'],
+
+                    ['text:6', 'mobile', '电话','like'],
+                    ['text:6', 'call_count', '呼叫次数','like'],
+                    ['text:6', 'alloc_count', '分配次数','like'],
+                   
+                    ['daterange', 'alloc_time', '分配时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+
+                    ['daterange', 'create_time', '回收时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['select', 'project_id', '项目', '', '', $project],
                     ['select', 'source', '平台来源', '', '', $list_source],
+
 
                 ])
                 ->addColumns([ // 批量添加数据列
@@ -741,14 +858,14 @@ class Custom extends Admin
                     ['call_count', '呼叫次数'],
                     ['alloc_count', '分配次数'],
 
-                    ['first_standard', '第1天达标情况'],
-                    ['second_standard', '第2天达标情况'],
-                    ['third_standard', '第3天达标情况'],
-                    ['fourth_standard', '第4天达标情况'],
-                    ['fifth_standard', '第5天达标情况'],
+                    // ['first_standard', '第1天达标情况'],
+                    // ['second_standard', '第2天达标情况'],
+                    // ['third_standard', '第3天达标情况'],
+                    // ['fourth_standard', '第4天达标情况'],
+                    // ['fifth_standard', '第5天达标情况'],
 
-                    ['create_time', '加入公海时间','datetime'],
-                    ['user', '操作人'],
+                    ['create_time', '回收时间','datetime'],
+                    ['user', '所有者'],
                     // ['status', '状态', 'switch'],
                     // ['right_button', '操作', 'btn']
                 ])
@@ -756,7 +873,7 @@ class Custom extends Admin
                 ->addTopButton('custom', $btn_alloc,['title' => '分配员工'])
                 // ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
-                ->raw('project,user') // 使用原值
+                ->raw('project') // 使用原值
                 ->fetch(); // 渲染模板
         }
         
@@ -768,12 +885,21 @@ class Custom extends Admin
 
             // 分页数据
             $page = $data_list->render();
+
+            //项目政策 呼叫次数 分配次数 所有者 客户名称 电话  分配时间  
             // 使用ZBuilder快速创建数据表格
             return ZBuilder::make('table')
                 // ->hideCheckbox()
                 ->setPageTitle('公海列表') // 设置页面标题
                 ->setTabNav($list_tab,  $group)
                 ->setSearchArea([
+                    ['text:6', 'custom', '客户名称','like'],
+                    ['text:6', 'user', '所有者','like'],
+
+                    ['text:6', 'mobile', '电话','like'],
+                    ['text:6', 'call_count', '呼叫次数','like'],
+                    ['text:6', 'alloc_count', '分配次数','like'],
+
                     ['daterange', 'create_time', '加入时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['daterange', 'note_time', '留言时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                     ['select', 'project_id', '项目', '', '', $project],
@@ -798,13 +924,13 @@ class Custom extends Admin
                     ['fifth_standard', '第5天达标情况'],
 
                     ['create_time', '加入公海时间','datetime'],
-                    ['user', '操作人'],
+                    ['user', '所有者'],
                 ])
                 ->addTopButton('custom', $btn_alloc,['title' => '分配员工'])
                 // ->addTopButton('add', ['href' => url('add')])
                 // ->addRightButton('delete')
                 ->setRowList($data_list)// 设置表格数据
-                ->raw('project,user') // 使用原值
+                ->raw('project') // 使用原值
                 ->fetch(); // 渲染模板
         }
 
@@ -856,6 +982,7 @@ class Custom extends Admin
                 // print_r($sl);exit;
                 $RoleModel = new AlloclgModel();
                 $RoleModel->saveAll($sl);
+
 
                 $this->success('分配成功', null, '_parent_reload');
             } else {

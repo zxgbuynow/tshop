@@ -143,7 +143,9 @@ class Calllog extends Admin
         $map = $this->getMaps();
         
         // 数据列表
-        $data_list = CalllogModel::where($map)->order('id desc')->paginate();
+        $data_list = CalllogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->create_time = date('Y-m-d H:i',$item['create_time']);
+        });
 
         
         // 设置表头信息（对应字段名,宽度，显示表头名称）

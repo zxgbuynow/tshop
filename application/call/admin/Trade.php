@@ -28,10 +28,30 @@ class Trade extends Admin
         // 获取查询条件
         $map = $this->getMap();
 
+        if (isset($map['custom_id'])) {
+            $mm['name'] = $map['custom_id'];
+            $custom_ids = db('call_custom')->where($mm)->value('id');
+            $map['custom_id'] = array('in',$custom_ids);
+        }
+
+        if (isset($map['menger'])) {
+            $mm['nickname'] = $map['menger'];
+            $custom_ids = db('admin_user')->where($mm)->value('id');
+            $map['menger'] = array('in',$custom_ids);
+        }
+
+        if (isset($map['project_id'])) {
+            $mmm['col1'] = $map['project_id'];
+            $project_ids = db('call_project_list')->where($mm)->value('id');
+            $map['project_id'] = array('in',$project_ids);
+        }
+
         // 数据列表
         $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->menger = db('admin_user')->where(['id'=>$item['menger']])->value('nickname');
-        });;
+            $item->sign_area_city = db('packet_common_area')->where(['area_code'=>$item['sign_area_city']])->value('area_name');
+            $item->sign_area_province = db('packet_common_area')->where(['area_code'=>$item['sign_area_province']])->value('area_name');
+        });
 
         // 分页数据
         $page = $data_list->render();
@@ -43,41 +63,211 @@ class Trade extends Admin
             'href' => url('setting',['id'=>'__id__'])
         ];
 
+        $catelsbt = [
+            'title' => '设置合同类型',
+            'icon'  => 'fa fa-fw fa-navicon ',
+            'href' => url('catls',['id'=>'__id__'])
+        ];
+
+        $btnexport = [
+            'title' => '导出',
+            'icon'  => 'fa fa-fw fa-file-excel-o',
+            'href'  => url('export',http_build_query($this->request->param()))
+        ];
+
         $btnAdd = ['icon' => 'fa fa-plus', 'title' => '合同商品明细列表', 'href' => url('order', ['id' => '__id__'])];
 
         $itemAdd = ['icon' => 'fa fa-plus', 'title' => '添加商品', 'href' => url('item')];
         $tradeLog = ['icon' => 'fa  fa-fw fa-envelope-o', 'title' => '变更合同日志', 'href' => url('tradeLog',['id'=>'__id__'])];
 
+        $project = db('call_project_list')->where(['status'=>1])->column('id,col1');
+        $list_province = db('packet_common_area')->where(['level'=>1])->column('area_code,area_name');
+        $list_city = db('packet_common_area')->where(['level'=>2])->column('area_code,area_name');
+        //商品名？
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setSearch(['title' => '合同标题'])// 设置搜索框
+            ->setSearchArea([
+                ['text:6', 'title', '合同名称','like'],
+                ['text:6', 'total', '合同金额','like'],
+                ['text:6', 'brokerage', '可提成金额','like'],
+                ['text:6', 'payment', '当日实际收款','like'],
+                ['text:6', 'surplus', '余款','like'],
+                ['text:6', 'menger', '所有者','like'],
+                ['text:6', 'custom_id', '客户名称','like'],
+                ['text:6', 'contactMobile', '电话','like'],
+
+                ['select', 'project_id', '项目', '', '', $project],
+                ['select', 'status', '合同状态','','',['progress'=>'进行','finsh'=>'完成','end'=>'人工结束']],
+                ['daterange', 'sign_time', '签约时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+
+            ])
+            ->addFilter('sign_area_province', $list_province) // $list_province 是用于将省份id转为省份名称
+            ->addFilter('sign_area_city', $list_city) // $list_city 是用于将城市id转为城市名称
+            ->addFilterMap('sign_area_city', 'sign_area_province')
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['project', '关联项目'],
                 ['title', '合同标题'],
                 ['total', '合同金额'],
-
-                // ['payment', '支付金额'],
-                // ['brokerage', '提成'],
-                // ['surplus', '余额'],
+                ['payment', '当日实际收款'],
+                ['brokerage', '可提成金额'],
+                ['surplus', '余额'],
                 ['signcity', '签订城市'],
                 ['should_time', '应收日期','date'],
                 ['sign_time', '签约时间','datetime'],
                 ['create_time', '创建时间','datetime'],
                 ['statustx', '状态'],
                 ['menger', '负责人'],
+                ['sign_area_province', '省'],
+                ['sign_area_city', '市'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButton('add', ['href' => url('add')])
             ->addTopButton('custom', $itemAdd)
             ->addRightButton('edit')
             ->addRightButton('custom', $btnAdd)
+            ->addTopButton('custom', $catelsbt)
+            ->addTopButton('custom', $btnexport)
             ->addRightButton('custom', $tradeLog,true)
             ->addTopButton('custom', $btn_access,true)
             ->setRowList($data_list)// 设置表格数据
             ->raw('project,statustx,signcity') // 使用原值
             ->fetch(); // 渲染模板
         
+    }
+
+    /**
+     * [classNReportexport 导出]
+     * @return [type] [description]
+     */
+    public function export()
+    {
+        $map = $this->getMaps();
+
+        $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
+            $item->menger = db('admin_user')->where(['id'=>$item['menger']])->value('nickname');
+            $item->username = db('call_custom')->where(['id'=>$item['custom_id']])->value('name');
+            $item->should_time = date('Y-m-d',$item['should_time']);
+            $item->sign_time = date('Y-m-d H:i',$item['should_time']);
+            $item->create_time = date('Y-m-d H:i',$item['create_time']);
+        });
+        
+        // 设置表头信息（对应字段名,宽度，显示表头名称）
+        $cellName = [
+            ['id', 'auto', 'ID'],
+            ['project', 'auto', '关联项目'],
+            ['title','auto',  '合同标题'],
+            ['total','auto',  '合同金额'],
+            ['payment', 'auto', '当日实际收款'],
+            ['brokerage','auto',  '可提成金额'],
+            ['surplus','auto',  '余额'],
+            ['signcity', 'auto', '签订城市'],
+            ['should_time','auto',  '应收日期','date'],
+            ['sign_time', 'auto', '签约时间','datetime'],
+            ['create_time', 'auto', '创建时间','datetime'],
+            ['statustx','auto',  '状态'],
+            ['menger', 'auto', '所有者'],
+            ['username','auto',  '客户名称'],
+            ['contactMobile','auto',  '电话'],
+        ];
+        // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
+        plugin_action('Excel/Excel/export', ['合同数据', $cellName, $data_list]);
+    }
+
+    /**
+     * [catls 分类列表]
+     * @return [type] [description]
+     */
+    public function catls()
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        // 数据列表
+        $data_list = TradecatModel::where($map)->order('id desc')->paginate();
+
+        // 分页数据
+        $page = $data_list->render();
+
+
+        $catedit_bt = [
+            'title' => '编辑合同分类',
+            'icon'  => 'fa fa-fw fa-pencil ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('catedit',['id'=>'__id__'])
+        ];
+
+        $catdel_bt = [
+            'title' => '删除合同分类',
+            'icon'  => 'fa fa-fw fa-trash-o ',
+            'class' => 'btn btn-default ajax-get confirm',
+            'href' => url('catdelete',['id'=>'__id__']),
+            'data-title' => '删除后无法恢复'
+        ];
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->setSearch(['title' => '标题'])// 设置搜索框
+            ->hideCheckbox()
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['title', '标题'],
+                ['right_button', '操作', 'btn']
+            ])
+            // ->addTopButton('add', ['href' => url('add')])
+            ->addRightButton('custom',$catedit_bt,true)
+            ->addRightButton('custom',$catdel_bt)
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
+    }
+
+    /**
+     * [catedit 编辑]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function catedit($id=null)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data = $this->request->post();
+            
+            if ($props = TradecatModel::update($data)) {
+                $this->success('编辑成功', null,'_parent_reload');
+            } else {
+                $this->error('编辑失败',null,'_close_pop');
+            }
+        }
+
+        // 显示添加页面
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['hidden', 'id'],
+                ['text', 'title', '分类标题'],
+            ])
+            ->setFormData(TradecatModel::get($id))
+            ->fetch();
+    }
+
+    /**
+     * [catdelete 删了]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function catdelete($id=null)
+    {
+        // 保存数据
+        if ($this->request->isPost()) {
+            // 表单数据
+            $data['id'] = $id;
+            if ($props = TradecatModel::where($data)->delete()) {
+                $this->success('删除成功', null);
+            } else {
+                $this->error('删除失败',null);
+            }
+        }
     }
     /**
      * [tradeLog 日志]
@@ -396,9 +586,9 @@ class Trade extends Admin
                 ['select', 'type', '合同类型','',$type],
                 ['select', 'menger', '负责人','',$user],
                 ['text', 'total', '合同金额'],
-                ['text', 'payment', '已付款金额'],
-                // ['text', 'brokerage', '提成'],
-                ['text', 'surplus', '未付金额'],
+                ['text', 'payment', '当日实际收款'],
+                ['text', 'brokerage', '可提成金额'],
+                ['text', 'surplus', '余额'],
                 // ['select', 'item_id', '商品','',$list_item],
                 // ['text', 'num', '商品个数'],
                 // ['text', 'note', '备注'],
@@ -524,9 +714,9 @@ class Trade extends Admin
                 ['select', 'type', '合同类型','',$type],
                 ['select', 'menger', '负责人','',$user],
                 ['text', 'total', '合同金额'],
-                ['text', 'payment', '已付款金额'],
-                // ['text', 'brokerage', '提成'],
-                ['text', 'surplus', '未付金额'],
+                ['text', 'payment', '当日实际收款'],
+                ['text', 'brokerage', '可提成金额'],
+                ['text', 'surplus', '余额'],
                 // ['select', 'item_id', '商品','',$list_item],
                 // ['text', 'num', '商品个数'],
                 

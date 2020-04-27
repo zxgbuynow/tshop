@@ -91,3 +91,6 @@ CREATE TABLE `call_custom_note` (
 
 ALTER TABLE `tshop1`.`call_ondate` 
 ADD COLUMN `is_notice` tinyint(1) NULL DEFAULT 0 COMMENT '没有提醒' AFTER `note`;
+
+ALTER TABLE `tshop1`.`call_recover_data` 
+ADD COLUMN `user` varchar(50) NULL COMMENT '操作人员' AFTER `is_bad`;

@@ -354,6 +354,8 @@ EOF;
         //清空分配日志
         db('call_alloc_log')->where($map)->update(['status'=>2]);//2为特殊处理掉的分配
 
+        
+        
         $this->success('操作成功', null, '_parent_reload');
 
     }
@@ -513,10 +515,13 @@ EOF;
         $data['fourth_standard'] = db('call_log')->where($map4)->count();
         $data['fifth_standard'] = db('call_log')->where($map5)->count();
         $data['user_id'] = UID;
+        $data['user'] = db('admin_user')->where(['id'=>UID])->value('nickname');
         //是否异常
         $data['is_bad'] = time()-strtotime(($ct+86400*5))>0?0:1;
         //只存在一条数据
-        if (db('call_recover_data')->where(['custom_id'=>$custom_id])->find()) {
+        $mmm['custom_id'] = $custom_id;
+        $mmm['status'] = 9;
+        if (db('call_recover_data')->where($mmm)->find()) {
             $this->success('操作成功', null, '_parent_reload');
         }
         db('call_recover_data')->insert($data);
