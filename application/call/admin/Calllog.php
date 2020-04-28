@@ -190,15 +190,15 @@ class Calllog extends Admin
         $ret = json_decode($status,true);  
         // print_r($status);exit;
         if ($ret['status']==0) {
-            continue;
+            echo '没有数据';exit;
         }
         if ($ret['status']==1&&!isset($ret['msg']['data'])) {
-            continue;
+            echo '同步完成';exit;
         }
         if (!$ret['msg']['data']) {
             //没有数据更新状态
             db('call_log')->where(['id'=>$id])->update(['status'=>1]);
-            continue;
+            echo '同步完成';exit;
         }
         //处理更新
         switch ($ret['msg']['data'][0]['calltype']) {
