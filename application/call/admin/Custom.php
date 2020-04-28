@@ -964,13 +964,14 @@ class Custom extends Admin
                 // $insert_id = 999;
                 //log
                 $sl = [];
+                $cus = [];
                 $ids = explode(',', $data['ids']);
                 foreach ($ids as $key => $value) {
                     //回收数据id
                     db('call_recover_data')->where(['id'=>$value])->update(['status'=>0]);
                     $custom_id = db('call_recover_data')->where(['id'=>$value])->value('custom_id');
                     $sl[$key]['batch_id'] = db('call_custom')->where(['id'=>$custom_id])->value('batch_id');
-
+                    array_push($cus, $custom_id);
                     $sl[$key]['alloc_count'] = 1;
                     $sl[$key]['alloc_id'] = $insert_id;
                     $sl[$key]['custom_id'] = $custom_id;
@@ -981,6 +982,8 @@ class Custom extends Admin
                     $batch_id = $sl[$key]['batch_id'];
                 }
                 db('call_alloc')->where(['id'=>$insert_id])->update(['batch_id'=>$batch_id]);
+                $mmm['id'] = array('in',$cus);
+                db('call_custom')->where($mmm)->update(['status'=>1]);
                 // print_r($sl);exit;
                 $RoleModel = new AlloclgModel();
                 $RoleModel->saveAll($sl);
