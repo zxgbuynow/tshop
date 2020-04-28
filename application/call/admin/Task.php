@@ -129,6 +129,9 @@ class Task extends Admin
         $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($map){
             $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
+            $category = db('call_custom')->where(['id'=>$item['custom_id']])->value('category');
+            $cate = db('call_custom_cat')->where(['id'=>$category])->value('title');
+            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 6, 'gbk').'</span>';
         });
         
 
@@ -225,6 +228,7 @@ EOF;
                 ['id', 'ID'],
                 // ['user', '员工'],
                 ['custom', '客户'],
+                ['categoryst', '客户分类'],
                 ['mobile', '电话'],
                 ['alloc_count', '分配次数'],
                 ['create_time', '创建时间','datetime'],
