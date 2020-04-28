@@ -231,6 +231,7 @@ class Custom extends Admin
                 ['text:6', 'extend_url', '推广链接', 'like'],
                 ['text:6', 'policy', '政策', 'like'],
                 ['text:6', 'alloc_user', '所有者', 'like'],
+                ['select', 'category', '分类', '', '', $catList],
                 ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']]
 
@@ -246,6 +247,7 @@ class Custom extends Admin
                 ['text:6', 'extend_url', '推广链接', 'like'],
                 ['text:6', 'policy', '政策', 'like'],
                 ['text:6', 'alloc_user', '所有者', 'like'],
+                ['select', 'category', '分类', '', '', $catList],
                 ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
