@@ -10,6 +10,7 @@ use app\admin\model\Config as ConfigModel;
 use app\call\model\Cat as CatModel;
 use app\call\model\Alloclg as AlloclgModel;
 use app\call\model\Alloc as AllocModel;
+use app\call\model\CustomNote as CustomNoteModel;
 use think\Cache;
 use think\Db;
 use \think\Request;
@@ -205,7 +206,7 @@ class Custom extends Admin
         $btn_call = [
             'title' => '呼叫',
             'icon'  => 'fa fa-fw fa-phone',
-            'class' => 'btn btn-xs btn-default ajax-get',
+            'class' => 'btn btn-xs btn-default ajax-get ring-up',
             'href' => url('ringup',['id'=>'__id__'])
         ];
 
@@ -216,11 +217,31 @@ class Custom extends Admin
             'href' => url('msg',['id'=>'__id__'])
         ];
 
-        
+        $btn_cus = [
+            'title' => '客户信息',
+            // 'icon'  => 'fa fa-fw fa-whatsapp ',
+            'icon'  => 'fa fa-fw fa-user ',
+            'class' => 'btn btn-xs btn-default  ajax-get get-user-info',
+            'href' => url('call',['id'=>'__id__'])
+        ];
 
         $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
         $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
 
+        $js = <<<EOF
+            <script type="text/javascript">
+               
+                $(function(){
+                    console.log(1113)
+                    $('.ring-up').click(function(e){
+                        $('.get-user-info').removeClass('show-user-info');
+                        $(this).prev().addClass('show-user-info')
+
+                    })
+                    
+                });
+            </script>
+EOF;
         if (UID==1) {
             $searchArr = [
                 ['text:6', 'name', '客户名称', 'like'],
@@ -304,15 +325,158 @@ class Custom extends Admin
             ->addTopButton('custom', $btn_access,true)
             ->addTopButton('custom', $catelsbt)
             ->addTopButton('custom', $btnexport)
+            ->addRightButton('custom',$btn_cus, ['title' => '客户信息'])
             ->addRightButton('custom',$btn_call,['title'=>'呼叫','area' => ['200px', '200px']])
             ->addRightButton('custom',$btn_msg,['title'=>'短信','area' => ['800px', '500px']])
+            
             // ->addRightButton('custom', $btn_call)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
+            ->setExtraJs($js)
             ->fetch(); // 渲染模板
         
     }
 
+    /**
+     * [call description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function call($id = null)
+    {
+        if ($id === null) $this->error('缺少参数');
+
+        $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
+        $custom = db('call_custom')->where(['id'=>$custom_id])->find();
+        $category = db('call_custom_cat')->column('id,title');
+
+        if ($this->request->isPost()) {
+            //验证签约后不能再修改
+            if ($custom['category']==6) {
+                $this->error('客户已签约不能修改！请联系管理员');
+            }
+            // 表单数据
+            $data = $this->request->post();
+            $data['update_time'] =  time();
+            $data['id'] = $custom_id;
+            $data['category'] = $data['category'];
+            $notedt['content'] = $data['note'];
+            unset($data['note']);
+            //并记录
+            if (isset($notedt['content'])) {
+                //custom_id user_id create_time content
+                $notedt['custom_id'] = $custom_id;
+                $notedt['user_id'] = UID;
+                $notedt['status'] = 1;
+                $notedt['create_time'] = time();
+
+                CustomNoteModel::create($notedt);
+            }
+            if ($props = CustomModel::update($data)) {
+                //生成日志
+                if ($data['category']>0) {
+                    $s['create_time'] = time();
+                    $s['category'] = $data['category'];
+                    $s['custom_id'] = $custom_id;
+                    $s['export_time'] = $custom['create_time'];
+                    $s['employ_id'] = UID;
+                    db('call_report_custom_cat')->insert($s);
+                }
+                
+
+                if ($data['category']==6) {//当签约时
+                    //生成推送任务 $tag $content $aciton
+                    $ep = db('admin_user')->where(['id'=>UID])->find();
+                    $admin = db('admin_user')->where(['id'=>1])->find();
+                    $content = $custom['name'].'已签约,操作员工'.$ep['nickname'].date('Y-m-d H:i',time());//张三|客户名称]已签约，操作员工[李四|操作人]，[2020-2-6|修改时间
+                    make_crontab('push_msg_24','call/index',$content,$admin['wechat_name']);
+                }
+                
+                $this->success('修改成功');
+            } else {
+                $this->error('修改失败');
+            }
+        }
+
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+        $calllog = db('call_report_custom_cat')->where(['custom_id'=>$custom_id,'employ_id'=>UID])->select();
+        foreach ($calllog as $key => &$value) {
+            $value['custom'] = $custom['name'];
+            $value['create_time'] = date('Y-m-d H:i',$value['create_time']);
+            $value['category'] = $category[$value['category']];
+           
+        }
+        $abam['status'] = 1;
+        //多id查询
+        $alloc_id = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        $aba = Db::query("select * from call_speechcraft where status = 1 and  CONCAT(',',alloc_id,',') like '%,".$alloc_id.",%' ");
+        // $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        // $aba = db('call_speechcraft')->where($abam)->order('sort ASC')->select(); 
+        foreach ($aba as $key => &$value) {
+            $value['custom'] = $value['title'];
+            $value['create_time'] = $value['tags'];
+            $value['category'] = $value['content'];
+        }
+        $custom['mobile'] = $access_moblie?$custom['mobile']:replaceTel($custom['mobile']);
+        $custom['fee'] = $access_moblie?$custom['fee']:'无权限';
+        $custom['calllog']['body'] = $calllog;
+        $custom['calllog']['header'] = ['客户','分类','时间'];
+        $custom['aba']['body'] = $aba;
+        $custom['aba']['header'] = ['标题','内容','标识'];
+       
+        $customNote = CustomNoteModel::where(['custom_id'=>$custom_id,'status'=>1])->select();
+        foreach ($customNote as $key => &$value) {
+            $value['custom'] = db('admin_user')->where(['id'=>$value['user_id']])->value('nickname');
+            $value['category'] = date('Y-m-d H:i',$value['create_time']);
+            $value['create_time'] = $value['content'];
+        }
+        $custom['cusnote']['body'] = $customNote;
+        $custom['cusnote']['header'] = ['销售联系人','联系时间','联系小记'];
+        // print_r($calllog);exit;
+         // print_r($custom);exit;
+        //用户信息
+        return ZBuilder::make('form')
+            ->addFormItems([
+                ['static','name', '客户名称'],
+                ['static','tel', '客户电话'],
+                ['static','mobile', '客户手机'],
+                ['static','fee', '成本'],
+                ['static','source', '来源'],
+                ['static','email', '邮箱'],
+                ['static','note_time', '记录时间'],
+                ['static','note_area', '记录地区'],
+                ['select', 'category', '设置客户分类', '', $category],
+                ['mtable', 'calllog', '客户分类轨迹'],
+                ['mtable', 'aba', '销售话术'],
+                ['mtable', 'cusnote', '客户联系轨迹'],
+                ['textarea', 'note', '联系小记'],
+
+                
+            ])
+            ->setFormData($custom)
+            ->layout(['tel' => 3, 'name' => 3, 'mobile' => 3, 'source' => 3,'email' => 3, 'address' => 3,'note_time'=>3,'note_area'=>3,'fee'=>3])
+            ->fetch();
+        // //通话 
+        // $data['phone'] = isset(get_mobile($custom_id)['mobile'])?get_mobile($custom_id)['mobile']:get_mobile($custom_id)['tel'];
+        // $data['callback'] = 'cb_callout';
+        
+        // $ret = ring_up('callout',$data);
+
+        // if ($ret) {
+        //     $result = [];
+        //     preg_match_all("/(?:\()(.*)(?:\))/i",$ret, $result); 
+        //     $json =json_decode($result[1][0],true);
+
+        //     if ($json['status']==1) {
+        //         //显示客户信息
+        //         echo '<h1>呼叫成功</h1>';exit;
+        //     }else{
+        //         echo '<h1>呼叫失败</h1>';exit;
+        //     }
+        // }
+        
+    }
     
     /**
      * [msg 短信]
@@ -390,9 +554,8 @@ class Custom extends Admin
         if (!$params['extNum']) {
             $this->error('没有绑定分机号', null, '_close_pop');
         }
-        $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
-        // $params['transactionId'] = UID.time();
-        // print_r($params);exit;
+        // $params['transactionId'] = get_auth_call_sign(['uid'=>UID,'calltime'=>time()]);
+        $params['transactionId'] = UID.time();
         $status = ring_up_new('ClickCall',$params);
         //弹框
         $ret = json_decode($status,true);
@@ -407,7 +570,7 @@ class Custom extends Admin
         //创建空的通话记录
         $s['alloc_log_id'] = $id;
         $s['user_id'] = UID;
-        $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role_id');
+        $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role');
         $s['callType'] = 2;//按实际更新
         $s['calledNum'] = $params['telNum'];
         $s['create_time'] = time();

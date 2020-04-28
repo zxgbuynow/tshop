@@ -484,7 +484,6 @@ EOF;
         $status = ring_up_new('ClickCall',$params);
         //弹框
         $ret = json_decode($status,true);
-
         if ($ret['status']==0) {
             // return json(['code' => 0, 'msg' => $ret['msg']]);
             $this->error($ret['msg'], null, '_close_pop');
