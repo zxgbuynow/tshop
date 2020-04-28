@@ -704,6 +704,7 @@ class Trade extends Admin
         //区
         $list_area1 = db('packet_common_area')->where(['parent_code'=>$info['sign_area_city1']])->column('area_code,area_name');
         
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
         $customs = [];
         foreach ($custom as $key => $value) {
             $customs[$value['id']]= $access_moblie?$value['name'].' '.replaceTel($value['mobile']):$value['name'].' '.$value['mobile'];
