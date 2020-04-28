@@ -98,27 +98,34 @@ class Task extends Admin
             $mmm['source'] = $map['source'];
             unset($map['source']);
         }
+        if (isset($map['note_time'])) {
+            $mmm['note_time'] = $map['note_time'];
+            unset($map['note_time']);
+        }
         if (UID!=1) {
             unset($map['user']);
         }else{
+
             if (isset($map['user'])) {
                 $mm['nickname'] = $map['user'];
-                $user_ids = db('admin_user')->where()->column('id');
+                $user_ids = db('admin_user')->where($mm)->column('id');
                 if ($user_ids) {
                     $map['call_alloc_log.user_id'] = array('in',$user_ids);
                 }
+                unset($map['user']);
             }
             
         }
-        
-        
+        if (isset($map['alloc_time'])) {
+            $map['call_alloc_log.create_time'] = $map['alloc_time'];
+            unset($map['alloc_time']);
+        }
         if ($mmm) {
             $custom_ids = db('call_custom')->where($mmm)->column('id');
             if ($custom_ids) {
                 $map['call_alloc_log.custom_id'] = array('in',$custom_ids);
             }
         }
-// print_r($map);exit;
         $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($map){
             $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
