@@ -703,7 +703,7 @@ class Trade extends Admin
         $list_city1 = db('packet_common_area')->where(['parent_code'=>$info['sign_area_province1']])->column('area_code,area_name');
         //区
         $list_area1 = db('packet_common_area')->where(['parent_code'=>$info['sign_area_city1']])->column('area_code,area_name');
-        
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
         $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
         $customs = [];
         foreach ($custom as $key => $value) {
