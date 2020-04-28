@@ -160,11 +160,11 @@ class Custom extends Admin
         //资源状态
         if (isset($map['status'])) {
             $map['status'] = $map['status'];
-            if ($map['status']==0) {
+            if ($map['status'][1]==0) {
                 $map['status'] = array('in',['0','2','3']);
             }
         }
-
+        // print_r($map);exit;
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
             $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
