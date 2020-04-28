@@ -76,6 +76,12 @@ class Calllog extends Admin
         //     'icon'  => 'fa fa-fw fa-pinterest-p',
         //     'href'  => url('downcord',['id'=>'__id__'])
         // ];
+        $btn_sync = [
+            // 'class' => 'btn btn-info',
+            'title' => '手动同步数据',
+            'icon'  => 'fa fa-fw fa-clock-o',
+            'href'  => url('sync',['id'=>'__id__'])
+        ];
         $btn_down = [
             // 'class' => 'btn btn-info',
             'title' => '下载并播放录音',
@@ -125,7 +131,7 @@ class Calllog extends Admin
             ->setRowList($data_list)// 设置表格数据
             // ->addRightButton('custom',$btn_down)
             ->addRightButton('custom',$btn_down,['title'=>'播放录音','area' => ['320px', '120px']])
-            // ->addRightButton('custom',$btn_down,['title'=>'下载并播放录音','area' => ['200', '200px']])
+            ->addRightButton('custom',$btn_sync,['title'=>'手动同步数据','area' => ['200', '200px']])
             ->addTopButton('custom', $btnexport)
             ->replaceRightButton(['recordURL' => ['eq','']], '<button class="btn btn-danger btn-xs" type="button" disabled>不可操作</button>') // 修改id为1的按钮
             // ->raw('user') // 使用原值
@@ -167,7 +173,54 @@ class Calllog extends Admin
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
         plugin_action('Excel/Excel/export', ['通话记录', $cellName, $data_list]);
     }
-    
+    /**
+     * [sync 同步]
+     * @param  string $id [description]
+     * @return [type]     [description]
+     */
+    public function sync($id='')
+    {
+        if ($id === null) $this->error('缺少参数');
+
+        $params['transactionId'] = db('call_log')->where(['id'=>$id])->value('code');
+        if (!$params['transactionId']) {
+            $this->error('transactionId缺失');
+        }
+        $status = ring_up_new('getOneRecord',$params);
+        $ret = json_decode($status,true);  
+        // print_r($status);exit;
+        if ($ret['status']==0) {
+            continue;
+        }
+        if ($ret['status']==1&&!isset($ret['msg']['data'])) {
+            continue;
+        }
+        if (!$ret['msg']['data']) {
+            //没有数据更新状态
+            db('call_log')->where(['id'=>$id])->update(['status'=>1]);
+            continue;
+        }
+        //处理更新
+        switch ($ret['msg']['data'][0]['calltype']) {
+            case 'outcall':
+                $type = '2';
+                break;
+            case 'from-internal':
+                $type = '4';
+                break;
+            
+            default:
+                break;
+        }
+        $s['callType'] = $type;
+        $s['timeLength'] = $ret['msg']['data'][0]['billsec'];
+        $s['addtime'] = $ret['msg']['data'][0]['addtime'];
+        $s['recordURL'] = $ret['msg']['data'][0]['userfield'];
+        $s['status'] = 1;
+
+        db('call_log')->where(['code'=>$params['transactionId']])->update($s);
+        echo '同步成功';exit;
+    }
     /**
      * [downCord 下载]
      * @param  string $id [description]
