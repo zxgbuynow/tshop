@@ -40,11 +40,11 @@ class Trade extends Admin
             $map['menger'] = array('in',$custom_ids);
         }
 
-        if (isset($map['project_id'])) {
-            $mmm['col1'] = $map['project_id'];
-            $project_ids = db('call_project_list')->where($mm)->value('id');
-            $map['project_id'] = array('in',$project_ids);
-        }
+        // if (isset($map['project_id'])) {
+        //     $mmm['col1'] = $map['project_id'];
+        //     $project_ids = db('call_project_list')->where($mm)->value('id');
+        //     $map['project_id'] = array('in',$project_ids);
+        // }
 
         // 数据列表
         $data_list = TradeModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
