@@ -693,7 +693,8 @@ class Trade extends Admin
         $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
         $user = db('admin_user')->where('id','gt','1')->column('id,nickname');
         $type  = TradecatModel::column('id,title');
-        $custom = db('call_custom')->column('id,mobile');
+        // $custom = db('call_custom')->column('id,mobile');
+        $custom = db('call_custom')->select();
         //市
         $list_city = db('packet_common_area')->where(['parent_code'=>$info['sign_area_province']])->column('area_code,area_name');
         //区
@@ -702,6 +703,12 @@ class Trade extends Admin
         $list_city1 = db('packet_common_area')->where(['parent_code'=>$info['sign_area_province1']])->column('area_code,area_name');
         //区
         $list_area1 = db('packet_common_area')->where(['parent_code'=>$info['sign_area_city1']])->column('area_code,area_name');
+        
+        $customs = [];
+        foreach ($custom as $key => $value) {
+            $customs[$value['id']]= $access_moblie?$value['name'].' '.replaceTel($value['mobile']):$value['name'].' '.$value['mobile'];
+            // $customs[$key]['id'] = $value['id'];
+        }
         // 显示添加页面
         return ZBuilder::make('form')
             ->addFormItems([
@@ -709,7 +716,7 @@ class Trade extends Admin
                 ['text', 'title', '合同名称'],
                 ['text', 'serialNO', '合同序列号'],
                 ['text', 'contactMobile', '手机号'],
-                ['select', 'custom_id', '客户','',$custom],
+                ['select', 'custom_id', '客户','',$customs],
                 ['select', 'project_id', '项目','',$list_project],
                 ['select', 'type', '合同类型','',$type],
                 ['select', 'menger', '负责人','',$user],
