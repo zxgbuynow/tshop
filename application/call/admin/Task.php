@@ -82,9 +82,13 @@ class Task extends Admin
 
         //所有者 分配日期  客户分类 客户名  电话  来源 记录时间
         $mmm = [];
-        if (isset($map['cat_id'])) {
-            $mmm['category'] = $map['cat_id'];
-            unset($map['cat_id']);
+        // if (isset($map['cat_id'])) {
+        //     $mmm['category'] = $map['cat_id'];
+        //     unset($map['cat_id']);
+        // }
+        if (isset($map['project_id'])) {
+            $mmm['project_id'] = $map['project_id'];
+            unset($map['project_id']);
         }
         if (isset($map['custom'])) {
             $mmm['name'] = $map['custom'];
@@ -132,6 +136,8 @@ class Task extends Admin
             $category = db('call_custom')->where(['id'=>$item['custom_id']])->value('category');
             $cate = db('call_custom_cat')->where(['id'=>$category])->value('title');
             $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 6, 'gbk').'</span>';
+            $project_id = db('call_custom')->where(['id'=>$item['custom_id']])->value('project_id');
+            $item->project_id = db('call_project_list')->where(['id'=>$project_id])->value('col1');
         });
         
 
@@ -141,7 +147,8 @@ class Task extends Admin
         }
         // print_r($map);exit;
 
-        $catlist = db('call_custom_cat')->where(['status'=>1])->column('id,title');
+        // $catlist = db('call_custom_cat')->where(['status'=>1])->column('id,title');
+        $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
         // 分页数据
         $page = $data_list->render();
     
@@ -218,7 +225,8 @@ EOF;
                 ['text:6', 'mobile', '电话','like'],
                 ['text:6', 'source', '来源','like'],
 
-                ['select', 'cat_id', '客户分类', '', '', $catlist],
+                // ['select', 'cat_id', '客户分类', '', '', $catlist],
+                ['select', 'project_id', '项目', '', '', $list_project],
 
                 ['daterange', 'alloc_time', '分配时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
@@ -228,6 +236,7 @@ EOF;
                 ['id', 'ID'],
                 // ['user', '员工'],
                 ['custom', '客户'],
+                ['project_id', '项目'],
                 ['categoryst', '客户分类'],
                 ['mobile', '电话'],
                 ['alloc_count', '分配次数'],

@@ -176,6 +176,8 @@ class Custom extends Admin
             $alloc_user = db('call_alloc_log')->where(['custom_id'=>$item['id'],'status'=>1])->value('user_id');
             $item->alloc_user = $item['status']==1?'无':($item['status']==2?get_employ($alloc_user):($item['status']==3?'公海':get_employ($alloc_user)));
 
+            $item->project_id = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
+
         });
 
         // 分页数据
@@ -217,7 +219,7 @@ class Custom extends Admin
         
 
         $catList = db('call_custom_cat')->where(['status'=>1])->column('id,title');
-
+        $list_project = db('call_project_list')->where(['status'=>1])->column('id,col1');
 
         if (UID==1) {
             $searchArr = [
@@ -232,6 +234,7 @@ class Custom extends Admin
                 ['text:6', 'policy', '政策', 'like'],
                 ['text:6', 'alloc_user', '所有者', 'like'],
                 ['select', 'category', '分类', '', '', $catList],
+                ['select', 'project_id', '项目', '', '', $list_project],
                 ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']]
 
@@ -248,6 +251,7 @@ class Custom extends Admin
                 ['text:6', 'policy', '政策', 'like'],
                 ['text:6', 'alloc_user', '所有者', 'like'],
                 ['select', 'category', '分类', '', '', $catList],
+                ['select', 'project_id', '项目', '', '', $list_project],
                 ['select', 'status', '资源状态', '','',['1'=>'待分配','0'=>'已分配']],
                 ['daterange', 'note_time', '记录时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
@@ -272,6 +276,7 @@ class Custom extends Admin
                     }
                 }, '__data__'],
                 ['categoryst', '分类'],
+                ['project_id', '项目'],
                 ['source', '来源'],
                 ['alloc_user', '所有者'],
                 ['alloc_status', '资源状态'],
