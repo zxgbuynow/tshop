@@ -532,7 +532,7 @@ EOF;
                                 $rs['user_id'] = $data['user_ids'][$key];
                                 $rs['alloc_id'] = $insert_id;
                                 $rs['create_time'] = time();
-                                $rs['batch_id'] = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
+                                $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
                                 array_push($r,$rs);
                             }
                         }
@@ -547,7 +547,7 @@ EOF;
                             $r[$i]['custom_id'] = $data['custom_id'][$i];
                             $r[$i]['user_id'] = $data['user_id'];
                             $r[$i]['alloc_id'] = $insert_id;
-                            $r['batch_id'] = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID,'custom_id'=>$data['custom_id'][$i]])->value('batch_id');
+                            $r['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$data['custom_id'][$i]])->value('batch_id');
                             // $r[$i]['call_count'] = $data['call_count'];
                             $r[$i]['create_time'] = time();
                         } 
