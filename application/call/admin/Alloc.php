@@ -246,6 +246,12 @@ class Alloc extends Admin
                     //取其中数量
                     $m['status'] = 1;
                     $m['batch_id'] = $data['batch_id'];
+
+                    //排除回收的
+                    $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+                    if ($recids) {
+                        $m['id'] = array('not in',$recids);
+                    }
                     $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
 
                     $hts = [];
@@ -370,7 +376,12 @@ class Alloc extends Admin
             }
         }
 
-        $custom =  CustomModel::where(['status'=>1])->column('id,name');
+        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        $mmm['status'] = 1;
+        if ($recids) {
+            $mmm['id'] = array('not in',$recids);
+        }
+        $custom =  CustomModel::where($mmm)->column('id,name');
 
         $map['id'] = array('>',1);
         $map['is_maner'] = 1;//过滤非管理员
@@ -380,7 +391,7 @@ class Alloc extends Admin
         $map1['id'] = array('>',1);
         $role = RoleModel::where($map1)->column('id,name'); 
 
-        $tips = db('call_custom')->where(['status'=>1])->count();
+        $tips = db('call_custom')->where($mmm)->count();
         
         $batchs = CustomEXLogModel::column('batch_id,title'); 
 
@@ -469,6 +480,7 @@ EOF;
             if (!$customs) {
                 $mmm['id'] = '';
             }
+
             
             $custom =  CustomModel::where($mmm)->column('id,name');
 
