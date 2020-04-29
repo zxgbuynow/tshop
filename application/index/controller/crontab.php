@@ -486,7 +486,7 @@ class Crontab
         //查找要更新的数据
         // $map['status'] = 0;
         $map['code'] = array('neq','');
-        // $map['id'] = 12;
+        // $map['id'] = 7;
         $info = db('call_log')->where($map)->whereTime('create_time','-2 hours')->select();
         // print_r($info);exit;
         // error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
@@ -495,7 +495,7 @@ class Crontab
             $params['transactionId'] = $value['code'];
             $status = ring_up_new('getOneRecord',$params);
             $ret = json_decode($status,true);  
-
+// print_r($ret);exit;
             if ($ret['status']==0) {
                 continue;
             }
@@ -524,7 +524,21 @@ class Crontab
             $s['addtime'] = $ret['msg']['data'][0]['addtime'];
             $s['recordURL'] = $ret['msg']['data'][0]['userfield'];
             $s['status'] = 1;
-
+            $s['disposition'] = $ret['msg']['data'][0]['disposition'];
+            $mm['code'] = $value['code'];
+            $mm['disposition'] = array('neq','');
+            if (db('call_log')->where($mm)->find()) {
+                continue;
+            }
+            //更新该用户所有接通的数据
+            if ($s['disposition']=='ANSWERED') {
+                //is_answer user_id alloc_log_id custom_id
+                $mmm['code'] = $value['code'];
+                $mmm['user_id'] = $value['user_id'];
+                $mmm['custom_id'] = $value['custom_id'];
+                $mmm['alloc_log_id'] = $value['alloc_log_id'];
+                db('call_log')->where($mmm)->update(['is_answer'=>1]);
+            }
             error_log('updateCallLog update:'.time().':'.var_export($s,1). "\r\n",3,'/data/http/ringup/public/task.log');
             db('call_log')->where(['code'=>$value['code']])->update($s);
         }

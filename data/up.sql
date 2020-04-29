@@ -94,3 +94,8 @@ ADD COLUMN `is_notice` tinyint(1) NULL DEFAULT 0 COMMENT '没有提醒' AFTER `n
 
 ALTER TABLE `tshop1`.`call_recover_data` 
 ADD COLUMN `user` varchar(50) NULL COMMENT '操作人员' AFTER `is_bad`;
+
+ALTER TABLE `tshop1`.`call_log` 
+ADD COLUMN `disposition` varchar(20) NULL COMMENT '通话说明' AFTER `role_id`;
+ALTER TABLE `tshop1`.`call_log` 
+ADD COLUMN `is_answer` tinyint(1) NULL DEFAULT 0 COMMENT '是否未接' AFTER `disposition`;
