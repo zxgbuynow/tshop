@@ -131,7 +131,9 @@ class Home extends Admin
         $i = 1;
         $t = 10;//以最高通时数加10分钟做基数
         foreach ($calls as $key => &$value) {
+            $value['timel'] = date('i:s',$value['times']);
         	$value['times'] = ceil($value['times']/60);
+
         	if ($key==0) {
         		$t +=$value['times'];
         	}
