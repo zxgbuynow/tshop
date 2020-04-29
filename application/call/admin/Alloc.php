@@ -382,7 +382,6 @@ class Alloc extends Admin
             $mmm['id'] = array('not in',$recids);
         }
         $custom =  CustomModel::where($mmm)->column('id,name');
-
         $map['id'] = array('>',1);
         $map['is_maner'] = 1;//过滤非管理员
         $user =  UserModel::where($map)->column('id,username'); 
@@ -481,7 +480,7 @@ EOF;
                 $mmm['id'] = '';
             }
 
-            
+
             $custom =  CustomModel::where($mmm)->column('id,name');
 
             $map['role'] = $role;//取部门员工
@@ -648,10 +647,17 @@ EOF;
 
         $map['status'] = 1;
         $map['batch_id'] = $batch_id;
+
+        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        if ($recids) {
+            $map['id'] = array('not in',$recids);
+        }
+
         $count = db('call_custom')->where($map)->count();
         $arr['value'] = $count;
 
-        $list = db('call_custom')->where(['batch_id'=>$batch_id,'status'=>1])->select();
+
+        $list = db('call_custom')->where($map)->select();
         $arr['list'] = [];
         foreach ($list as $key => $value) {
           $arr['list'][$key]['key'] = $value['id']; 
