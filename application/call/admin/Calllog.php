@@ -120,6 +120,7 @@ class Calllog extends Admin
                 ['timeLength', '通话时长'],
                 ['code', '通话唯一标识'],
                 ['recordURL', '录音地址'],
+                ['disposition', '通话说明'],
                 ['extension', '分机号'],
                 // ['ownerAcc', '所有者帐号'],
                 // ['communicationNO', '通信号码'],
