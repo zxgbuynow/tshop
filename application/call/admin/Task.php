@@ -59,7 +59,8 @@ class Task extends Admin
                 $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
             }
             if ($map['tag'][1]=='no_contact_custom_count') {
-                $map['call_log.status'] = 0;
+                $map['call_log.disposition'] = 'NO ANSWER';
+                // $map['call_log.status'] = 0;
                 $map['call_log.timeLength'] = array('eq',0);
             }
             unset($map['tag']);
@@ -73,7 +74,8 @@ class Task extends Admin
                     $map['call_alloc_log.create_time'] = array('lt',time()-86400*2);
                 }
                 if ($params['tag']=='no_contact_custom_count') {
-                    $map['call_log.status'] = 0;
+                    // $map['call_log.status'] = 0;
+                    $map['call_log.disposition'] = 'NO ANSWER';
                     $map['call_log.timeLength'] = array('eq',0);
                 }
             }
