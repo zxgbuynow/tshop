@@ -573,7 +573,7 @@ EOF;
             $this->error($ret['msg'], null, '_close_pop');
         }
         //创建空的通话记录
-        $s['alloc_log_id'] = $id;
+        $s['alloc_log_id'] = db('call_alloc_log')->where(['custom_id'=>$id,'status'=>1,'user_id'=>UID])->value('id');
         $s['user_id'] = UID;
         $s['role_id'] = db('admin_user')->where(['id'=>UID])->value('role');
         $s['callType'] = 2;//按实际更新
