@@ -1144,7 +1144,7 @@ EOF;
                     db('call_recover_data')->where(['id'=>$value])->update(['status'=>0]);
                     $custom_id = db('call_recover_data')->where(['id'=>$value])->value('custom_id');
                     $sl[$key]['batch_id'] = db('call_custom')->where(['id'=>$custom_id])->value('batch_id');
-                    db('call_custom')->where(['id'=>$custom_id])->update(['status'=>1]);
+                    db('call_custom')->where(['id'=>$custom_id])->update(['status'=>2]);
                     // array_push($cus, $custom_id);
                     $sl[$key]['alloc_count'] = 1;
                     $sl[$key]['alloc_id'] = $insert_id;
