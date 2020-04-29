@@ -49,7 +49,7 @@ class Home extends Admin
             
         	// $no_contact_custom_count = 0;//新任务未接通未达标客户
             $m2['a.status'] = 1;
-            $m2['c.status'] = 0;
+            $m2['c.disposition'] = 'NO ANSWER';
             $m2['c.timeLength'] = array('eq',0);
             $no_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m2)->group('a.id')->count();//没有接通的
 
@@ -91,7 +91,8 @@ class Home extends Admin
             $m2['a.status'] = 1;
             $m2['c.timeLength'] = array('eq',0);
             $m2['a.user_id'] = UID;
-            $m2['c.status'] = 0;
+            // $m2['c.status'] = 0;
+            $m2['c.disposition'] = 'NO ANSWER';
             if ($userin) {
                 $m2['a.user_id'] = array('in',$userids);
             }
