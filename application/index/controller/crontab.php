@@ -484,10 +484,10 @@ class Crontab
     public function updateCallLog()
     {
         //查找要更新的数据
-        $map['status'] = 0;
+        // $map['status'] = 0;
         $map['code'] = array('neq','');
         // $map['id'] = 12;
-        $info = db('call_log')->where($map)->select();
+        $info = db('call_log')->where($map)->whereTime('create_time','-2 hours')->select();
         // print_r($info);exit;
         // error_log('updateCallLog:'.time().':'.var_export($info,1). "\r\n",3,'/data/http/ringup/public/task.log');
         //拉接口
