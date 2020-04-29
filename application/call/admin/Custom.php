@@ -174,12 +174,17 @@ class Custom extends Admin
 
             $item->alloc_status = $item['status']==1?'待分配':'已分配';
 
-            $alloc_user = db('call_alloc_log')->where(['custom_id'=>$item['id'],'status'=>1])->value('user_id');
-            $item->alloc_user = $item['status']==1?'无':($item['status']==2?get_employ($alloc_user):($item['status']==3?'公海':get_employ($alloc_user)));
+            if ($item['status']>1) {
+                $alloc_user = db('call_alloc_log')->where(['custom_id'=>$item['id']])->order('id desc')->find();
+            }
+            
+
+            $item->alloc_user = $item['status']==1?'无':($item['status']==2?get_employ($alloc_user['user_id']):($item['status']==3?'公海':get_employ($alloc_user['user_id'])));
 
             $item->project_id = db('call_project_list')->where(['id'=>$item['project_id']])->value('col1');
 
         });
+
 
         // 分页数据
         $page = $data_list->render();
