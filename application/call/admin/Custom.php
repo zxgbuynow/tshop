@@ -993,8 +993,13 @@ EOF;
             //     $map['user_id'] = array('in',$custom_ids);
             // }
             
+            $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+            $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+            
             // 数据列表
-            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
+            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
+                $item->mobile = $access_moblie?$item['mobile']:replaceTel($item['mobile']);
+            });
 
             // 分页数据
             $page = $data_list->render();
@@ -1055,8 +1060,14 @@ EOF;
 
         if ($group=='tab2') {
             $map['status'] = 9;
+            
             // 数据列表
-            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
+            // $data_list = RecoverdtModel::where($map)->order('id desc')->paginate();
+            $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+            $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+            $data_list = RecoverdtModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
+                $item->mobile = $access_moblie?$item['mobile']:replaceTel($item['mobile']);
+            });
 
             // 分页数据
             $page = $data_list->render();
