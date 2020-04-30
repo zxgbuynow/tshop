@@ -67,8 +67,8 @@ class Custom extends Admin
                         }
                         
                     }else{
-                        if ($alloc_user) {
-                            if (!in_array(UID, $alloc_user)) {
+                        if ($alloc_users) {
+                            if (!in_array(UID, $alloc_users)) {
                                 $m1['a.user_id'] = '';
                             }
                         }
