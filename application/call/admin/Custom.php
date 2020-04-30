@@ -351,7 +351,8 @@ EOF;
     {
         if ($id === null) $this->error('缺少参数');
 
-        $custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
+        //$custom_id = db('call_alloc_log')->where(['id'=>$id])->value('custom_id');
+        $custom_id = $id;
         $custom = db('call_custom')->where(['id'=>$custom_id])->find();
         $category = db('call_custom_cat')->column('id,title');
 
@@ -414,7 +415,8 @@ EOF;
         }
         $abam['status'] = 1;
         //多id查询
-        $alloc_id = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        // $alloc_id = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
+        $alloc_id = db('call_alloc_log')->where(['custom_id'=>$id])->order('create_time desc')->value('alloc_id');
         $aba = Db::query("select * from call_speechcraft where status = 1 and  CONCAT(',',alloc_id,',') like '%,".$alloc_id.",%' ");
         // $abam['alloc_id'] = db('call_alloc_log')->where(['id'=>$id])->value('alloc_id');
         // $aba = db('call_speechcraft')->where($abam)->order('sort ASC')->select(); 
