@@ -56,7 +56,7 @@ class Custom extends Admin
                     
                     if ($userin) {
                         // $m1['a.user_id'] = array('in',$userids);
-                        if ($alloc_users) {
+                        if (isset($alloc_users)) {
                             $intersect = array_intersect($userids,$alloc_users);
                             $m1['a.user_id'] = '';
                             if ($intersect) {
@@ -67,7 +67,7 @@ class Custom extends Admin
                         }
                         
                     }else{
-                        if ($alloc_users) {
+                        if (isset($alloc_users)) {
                             if (!in_array(UID, $alloc_users)) {
                                 $m1['a.user_id'] = '';
                             }
