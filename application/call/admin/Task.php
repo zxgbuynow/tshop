@@ -134,8 +134,11 @@ class Task extends Admin
                 $map['call_alloc_log.custom_id'] = array('in',$custom_ids);
             }
         }
-        $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($map){
-            $item->mobile = replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
+        $roleid = db('admin_user')->where(['id'=>UID])->value('role');
+        $access_moblie = db('admin_role')->where(['id'=>$roleid])->value('access_moblie');
+
+        $data_list = AlloclgModel::view('call_alloc_log', '*')->view('call_log', 'alloc_log_id,timeLength', 'call_alloc_log.id=call_log.alloc_log_id','LEFT')->where($map)->order('call_alloc_log.id desc')->group('call_alloc_log.id')->paginate()->each(function($item, $key) use ($access_moblie){
+            $item->mobile = $access_moblie?db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'):replaceTel(db('call_custom')->where(['id'=>$item['custom_id']])->value('mobile'));
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
             $category = db('call_custom')->where(['id'=>$item['custom_id']])->value('category');
             $cate = db('call_custom_cat')->where(['id'=>$category])->value('title');
@@ -144,7 +147,6 @@ class Task extends Admin
             $item->project_id = db('call_project_list')->where(['id'=>$project_id])->value('col1');
         });
         
-
         $mpsel = '';
         if (isset($params['tag'])) {
             $mpsel = $params['tag'];
