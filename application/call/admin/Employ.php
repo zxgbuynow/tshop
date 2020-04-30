@@ -79,13 +79,8 @@ class Employ extends Admin
             'class' => 'btn btn-xs btn-default ajax-get',
             'href' => url('contrl',['id'=>'__id__'])
         ];
-
-        // 使用ZBuilder快速创建数据表格
-        return ZBuilder::make('table')
-            ->setPageTitle('员工管理') // 设置页面标题
-            ->setTableName('admin_user') // 设置数据表名
-            ->setSearch(['id' => 'ID', 'username' => '用户名', 'email' => '邮箱']) // 设置搜索参数
-            ->addColumns([ // 批量添加列
+        if (UID==1) {
+            $col = [ // 批量添加列
                 ['id', 'ID'],
                 ['username', '用户名'],
                 ['nickname', '昵称'],
@@ -100,7 +95,32 @@ class Employ extends Admin
                 ['status', '状态', 'switch'],
                 ['is_maner', '主管', 'switch'],
                 ['right_button', '操作', 'btn']
-            ])
+            ];
+        }else{
+            $col = [ // 批量添加列
+                ['id', 'ID'],
+                ['username', '用户名'],
+                ['nickname', '昵称'],
+                ['role', '角色', 'select', RoleModel::getTree(null, false)],
+                ['email', '邮箱'],
+                ['mobile', '手机号'],
+                // ['extension', '签入分机号'],
+                ['wechat_name', '微信企业用户名','text.edit'],
+                ['extension', '绑定分机','text.edit'],
+                ['extensionst', '分机状态'],
+                ['create_time', '创建时间', 'datetime'],
+                ['status', '状态', 'switch'],
+                // ['is_maner', '主管', 'switch'],
+                ['right_button', '操作', 'btn']
+            ];
+        }
+        
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->setPageTitle('员工管理') // 设置页面标题
+            ->setTableName('admin_user') // 设置数据表名
+            ->setSearch(['id' => 'ID', 'username' => '用户名', 'email' => '邮箱']) // 设置搜索参数
+            ->addColumns($col)
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
             ->addRightButton('custom', $btn_transfer) // 添加授权按钮
             ->addRightButton('custom', $btn_contrl) // 添加授权按钮
