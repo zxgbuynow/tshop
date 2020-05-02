@@ -248,10 +248,10 @@ class Alloc extends Admin
                     $m['batch_id'] = $data['batch_id'];
 
                     //排除回收的
-                    // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
-                    // if ($recids) {
-                    //     $m['id'] = array('not in',$recids);
-                    // }
+                    $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+                    if ($recids) {
+                        $m['id'] = array('not in',$recids);
+                    }
                     $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
 
                     $hts = [];
@@ -376,11 +376,11 @@ class Alloc extends Admin
             }
         }
 
-        // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
         $mmm['status'] = 1;
-        // if ($recids) {
-        //     $mmm['id'] = array('not in',$recids);
-        // }
+        if ($recids) {
+            $mmm['id'] = array('not in',$recids);
+        }
         $custom =  CustomModel::where($mmm)->column('id,name');
         $map['id'] = array('>',1);
         $map['is_maner'] = 1;//过滤非管理员
@@ -489,7 +489,6 @@ EOF;
 
 
             $tips = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->count();
-
             $batch_id = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->value('batch_id');//只取一个批次；
             if ($this->request->isPost()) {
                 // 表单数据
@@ -511,9 +510,10 @@ EOF;
                 if ($data['custom_ids']>$tips) {
                     $this->error('不能大于可分配总数');
                 }
-
                 if ($props = AllocModel::create($sdata)) {
+                // if (1==1) {    
                     $insert_id = $props->id;
+                    // $insert_id = 999;
                     
                     if ($sdata['way']==1) {
                         //平均分处理
@@ -528,29 +528,43 @@ EOF;
 
                         $customs = db('call_alloc_log')->where(['status'=>1,'user_id'=>UID])->column('custom_id');
                         $average = ceil($custCts/$userCts);
-
                         $hcus = [];
                         $custCtarr = array_chunk($customs, $average);
                         $r = [];
-                        foreach ($custCtarr as $key => $value) {
-                            $cc = count($value);
-                            if (!isset($data['user_ids'][$key])) {
-                                continue;
+                        if ($average) {//平均分配选择单一人
+                            foreach ($custCtarr as $key => $value) {
+                                $cc = count($value);
+                                
+                                for ($i=0; $i < $cc; $i++) { 
+                                    $rs['custom_id'] = $value[$i];
+                                    $hcus[] = $value[$i];
+                                    $rs['user_id'] = $data['user_ids'][0];
+                                    $rs['alloc_id'] = $insert_id;
+                                    $rs['create_time'] = time();
+                                    $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
+                                    array_push($r,$rs);
+                                }
                             }
-                            for ($i=0; $i < $cc; $i++) { 
-                                $rs['custom_id'] = $value[$i];
-                                $hcus[] = $value[$i];
-                                $rs['user_id'] = $data['user_ids'][$key];
-                                $rs['alloc_id'] = $insert_id;
-                                $rs['create_time'] = time();
-                                $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
-                                array_push($r,$rs);
+                        }else{
+                            foreach ($custCtarr as $key => $value) {
+                                $cc = count($value);
+                                if (!isset($data['user_ids'][$key])) {
+                                    continue;
+                                }
+                                for ($i=0; $i < $cc; $i++) { 
+                                    $rs['custom_id'] = $value[$i];
+                                    $hcus[] = $value[$i];
+                                    $rs['user_id'] = $data['user_ids'][$key];
+                                    $rs['alloc_id'] = $insert_id;
+                                    $rs['create_time'] = time();
+                                    $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
+                                    array_push($r,$rs);
+                                }
                             }
                         }
                         
                         
                     }
-
                     if ($sdata['way']==2) {
                         $custCts = count($data['custom_id']);
                         $r = [];
@@ -648,10 +662,10 @@ EOF;
         $map['status'] = 1;
         $map['batch_id'] = $batch_id;
 
-        // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
-        // if ($recids) {
-        //     $map['id'] = array('not in',$recids);
-        // }
+        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        if ($recids) {
+            $map['id'] = array('not in',$recids);
+        }
 
         $count = db('call_custom')->where($map)->count();
         $arr['value'] = $count;
