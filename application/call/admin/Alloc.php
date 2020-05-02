@@ -248,10 +248,10 @@ class Alloc extends Admin
                     $m['batch_id'] = $data['batch_id'];
 
                     //排除回收的
-                    $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
-                    if ($recids) {
-                        $m['id'] = array('not in',$recids);
-                    }
+                    // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+                    // if ($recids) {
+                    //     $m['id'] = array('not in',$recids);
+                    // }
                     $customs = db('call_custom')->where($m)->order('id ASC')->limit($custCts)->column('id');
 
                     $hts = [];
@@ -376,11 +376,11 @@ class Alloc extends Admin
             }
         }
 
-        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
         $mmm['status'] = 1;
-        if ($recids) {
-            $mmm['id'] = array('not in',$recids);
-        }
+        // if ($recids) {
+        //     $mmm['id'] = array('not in',$recids);
+        // }
         $custom =  CustomModel::where($mmm)->column('id,name');
         $map['id'] = array('>',1);
         $map['is_maner'] = 1;//过滤非管理员
@@ -648,10 +648,10 @@ EOF;
         $map['status'] = 1;
         $map['batch_id'] = $batch_id;
 
-        $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
-        if ($recids) {
-            $map['id'] = array('not in',$recids);
-        }
+        // $recids = db('call_recover_data')->where(['status'=>1])->column('custom_id');
+        // if ($recids) {
+        //     $map['id'] = array('not in',$recids);
+        // }
 
         $count = db('call_custom')->where($map)->count();
         $arr['value'] = $count;
