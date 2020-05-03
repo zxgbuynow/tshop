@@ -465,6 +465,7 @@ EOF;
 
         }else{
 
+
             //是否是主管
             if (!db('admin_user')->where(['id'=>UID,'is_maner'=>1 ])->find()) {
                 $this->error('无权限');
@@ -522,7 +523,7 @@ EOF;
 
                         // }
                         $userCts = count($data['user_ids']);
-                        $custCts = count($data['custom_ids']);
+                        $custCts = $data['custom_ids'];
 
                         //取其中数量
 
@@ -531,35 +532,20 @@ EOF;
                         $hcus = [];
                         $custCtarr = array_chunk($customs, $average);
                         $r = [];
-                        if ($average) {//平均分配选择单一人
-                            foreach ($custCtarr as $key => $value) {
-                                $cc = count($value);
-                                
-                                for ($i=0; $i < $cc; $i++) { 
-                                    $rs['custom_id'] = $value[$i];
-                                    $hcus[] = $value[$i];
-                                    $rs['user_id'] = $data['user_ids'][0];
-                                    $rs['alloc_id'] = $insert_id;
-                                    $rs['create_time'] = time();
-                                    $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
-                                    array_push($r,$rs);
-                                }
+                        
+                        foreach ($custCtarr as $key => $value) {
+                            $cc = count($value);
+                            if (!isset($data['user_ids'][$key])) {
+                                continue;
                             }
-                        }else{
-                            foreach ($custCtarr as $key => $value) {
-                                $cc = count($value);
-                                if (!isset($data['user_ids'][$key])) {
-                                    continue;
-                                }
-                                for ($i=0; $i < $cc; $i++) { 
-                                    $rs['custom_id'] = $value[$i];
-                                    $hcus[] = $value[$i];
-                                    $rs['user_id'] = $data['user_ids'][$key];
-                                    $rs['alloc_id'] = $insert_id;
-                                    $rs['create_time'] = time();
-                                    $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
-                                    array_push($r,$rs);
-                                }
+                            for ($i=0; $i < $cc; $i++) { 
+                                $rs['custom_id'] = $value[$i];
+                                $hcus[] = $value[$i];
+                                $rs['user_id'] = $data['user_ids'][$key];
+                                $rs['alloc_id'] = $insert_id;
+                                $rs['create_time'] = time();
+                                $rs['batch_id'] = db('call_alloc_log')->where(['user_id'=>UID,'custom_id'=>$value[$i]])->value('batch_id');
+                                array_push($r,$rs);
                             }
                         }
                         
