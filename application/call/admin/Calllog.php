@@ -62,7 +62,7 @@ class Calllog extends Admin
         // 数据列表
         $data_list = CalllogModel::where($map)->order('id desc')->paginate()->each(function($item, $key) use ($map){
             $item->calledNum = UID==1?$item['calledNum']:replaceTel($item['calledNum']);
-            $item->timeLength = date('i:s',$item['timeLength']);
+            $item->timeLength = times_exchange_His($item['timeLength']);
             $item->username = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
             $item->customname = db('call_custom')->where(['id'=>$item['custom_id']])->value('name');
         });
