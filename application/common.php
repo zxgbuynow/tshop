@@ -1519,6 +1519,36 @@ if (!function_exists('time_tran')) {
     }
 }
 
+
+if (!function_exists('times_exchange_His')) {
+    function times_exchange_His($timer)
+    {
+        $day  = floor($timer / 86400);
+        $hour  = floor($timer % 86400 / 3600);
+        $min  = floor($timer % 86400 / 60);
+        $sec  = floor($timer % 86400 % 60);
+        $ret = '';
+        if ($day > 0) {
+            $ret .=$day.'天 '; 
+        }
+        if ($hour > 0&& $hour < 24) {
+            $ret .=$hour.':'; 
+        }else{
+            $ret .= '00:';
+        }
+        if ($min > 0&& $min < 60) {
+            $ret .= $min.':'; 
+        }else{
+            $ret .= '00:';
+        }
+        if ($sec > 0) {
+            $ret .= $sec; 
+        }else{
+            $ret .= '00'; 
+        }
+        return $ret;
+    }
+}
 if (!function_exists('push_wm_msg')) {
 
     /**
