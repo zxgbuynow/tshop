@@ -1519,13 +1519,13 @@ if (!function_exists('time_tran')) {
     }
 }
 
-
 if (!function_exists('times_exchange_His')) {
     function times_exchange_His($timer)
     {
         $day  = floor($timer / 86400);
         $hour  = floor($timer % 86400 / 3600);
-        $min  = floor($timer % 86400 / 60);
+        // $min  = floor($timer % 86400 / 60);
+        $min = floor((($timer % (3600*24)) % 3600) / 60);
         $sec  = floor($timer % 86400 % 60);
         $ret = '';
         if ($day > 0) {
