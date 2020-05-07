@@ -508,6 +508,7 @@ EOF;
                 if (!$sdata['batch_id']) {
                     $this->error('导入批次必填');
                 }
+                
                 if ($data['custom_ids']>$tips) {
                     $this->error('不能大于可分配总数');
                 }
@@ -517,6 +518,9 @@ EOF;
                     // $insert_id = 999;
                     
                     if ($sdata['way']==1) {
+                        if (!$data['user_ids']) {
+                            $this->error('员工必填');
+                        }
                         //平均分处理
                         // if (!$data['user_ids']) {
                         //     $data['user_ids'] = implode(',', db('admin_user')->where(['id'=>$data['role_id']])->column('id'));
@@ -552,6 +556,9 @@ EOF;
                         
                     }
                     if ($sdata['way']==2) {
+                        if (!$data['user_id']) {
+                            $this->error('员工必填');
+                        }
                         $custCts = count($data['custom_id']);
                         $r = [];
                         for ($i=0; $i < $custCts; $i++) { 

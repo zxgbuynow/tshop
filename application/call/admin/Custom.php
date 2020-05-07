@@ -721,15 +721,12 @@ EOF;
         if ($id==6) {
             $this->error('已签约不能删除',null,'_close_pop');
         }
-        // 保存数据
-        if ($this->request->isPost()) {
-            // 表单数据
-            $data['id'] = $id;
-            if ($props = CatModel::where($data)->delete()) {
-                $this->success('删除成功', null);
-            } else {
-                $this->error('删除失败',null);
-            }
+        // 表单数据
+        $data['id'] = $id;
+        if ($props = CatModel::where($data)->delete()) {
+            $this->success('删除成功', null);
+        } else {
+            $this->error('删除失败',null);
         }
     }
     
@@ -789,7 +786,13 @@ EOF;
             'href' => url('downtmp')
         ];
 
-
+        $btn_del = [
+            'title' => '删除客户',
+            'icon'  => 'fa fa-fw fa-trash-o ',
+            'class' => 'btn btn-default ajax-get confirm',
+            'href' => url('batchdel',['id'=>'__id__']),
+            'data-title' => '删除后无法恢复'
+        ];
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->setPageTips('下载模板时，请填充对应的项目ID号','danger')
@@ -797,14 +800,41 @@ EOF;
             ->addColumns([ // 批量添加数据列
                 ['id', 'ID'],
                 ['title', '分批导入表名'],
-                ['rate', '净得率']
+                ['rate', '净得率'],
+                ['right_button', '操作', 'btn']
             ])
             ->addTopButton('custom', $btn_access)
             ->addTopButton('custom', $btn_down)
+            ->addRightButton('custom', $btn_del)
             // ->addRightButton('del')
             ->setRowList($data_list)// 设置表格数据
             ->fetch(); // 渲染模板
     }
+
+    /**
+     * [batchdel
+     * 
+     *   删了]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    public function batchdel($id=null)
+    {
+        if ($id === null) $this->error('缺少参数');
+
+        // 表单数据
+        $data['id'] = $id;
+        $batch_id = CustomEXLogModel::where($data)->value('batch_id');
+        if ($props = CustomEXLogModel::where($data)->delete()) {
+            //删除客户
+            $m['batch_id'] = $batch_id;
+            db('call_custom')->where($m)->delete();
+            $this->success('删除成功', null);
+        } else {
+            $this->error('删除失败',null);
+        }
+    }
+
     /**
      * [btn_down description]
      * @return [type] [description]
