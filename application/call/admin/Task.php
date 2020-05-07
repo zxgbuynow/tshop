@@ -142,7 +142,7 @@ class Task extends Admin
             $item->alloc_count = db('call_alloc_log')->where(['custom_id'=>$item['custom_id']])->count();
             $category = db('call_custom')->where(['id'=>$item['custom_id']])->value('category');
             $cate = db('call_custom_cat')->where(['id'=>$category])->value('title');
-            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 6, 'gbk').'</span>';
+            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 7, 'gbk').'</span>';
             $project_id = db('call_custom')->where(['id'=>$item['custom_id']])->value('project_id');
             $item->project_id = db('call_project_list')->where(['id'=>$project_id])->value('col1');
         });

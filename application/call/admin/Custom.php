@@ -169,7 +169,7 @@ class Custom extends Admin
         // 数据列表
         $data_list = CustomModel::where($map)->order('id desc')->paginate()->each(function($item,$key) use ($access_moblie){
             $cate = db('call_custom_cat')->where(['id'=>$item['category']])->value('title');
-            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 6, 'gbk').'</span>';
+            $item->categoryst = '<span title='.$cate.'> '. mb_substr($cate, 0, 7, 'gbk').'</span>';
             $item->access_mobile = $access_moblie;
 
             $item->alloc_status = $item['status']==1?'待分配':'已分配';
