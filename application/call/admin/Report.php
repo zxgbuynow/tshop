@@ -162,7 +162,7 @@ class Report extends Admin
             ->addFilter('role_id', $roles)
             // ->addTimeFilter('create_time') // 添加时间段筛选
             ->setSearchArea([
-                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
             ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
@@ -318,7 +318,7 @@ class Report extends Admin
         return ZBuilder::make('table')
             // ->addTimeFilter('update_time') // 添加时间段筛选
             ->setSearchArea([
-                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
             ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
@@ -437,7 +437,7 @@ class Report extends Admin
         return ZBuilder::make('table')
             // ->addTimeFilter('update_time') // 添加时间段筛选
             ->setSearchArea([
-                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'update_time', '时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
             ])
             ->hideCheckbox()
             ->addColumns([ // 批量添加数据列
@@ -1823,8 +1823,8 @@ class Report extends Admin
         return ZBuilder::make('table')
             ->hideCheckbox()
             ->setSearchArea([
-                ['daterange', 'should_time', '应收日期', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
-                ['daterange', 'sign_time', '签约日期', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'should_time', '应收日期', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'sign_time', '签约日期', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                 ['text', 'contactMobile', '手机号'],
                 ['text', 'serialNO', '合同编号'],
                 ['text', 'custom', '客户系统名'],
@@ -1987,7 +1987,7 @@ class Report extends Admin
         return ZBuilder::make('table')
             ->hideCheckbox()
             ->setSearchArea([
-                ['daterange', 'create_time', '导入日期', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'create_time', '导入日期', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
 
             ])
             ->addColumns([ // 批量添加数据列
@@ -2147,7 +2147,7 @@ class Report extends Admin
         return ZBuilder::make('table')
             ->hideCheckbox()
             ->setSearchArea([
-                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
                 ['select', 'role_id', '部门', '', '', $roles],
             ])
             ->addColumns([ // 批量添加数据列
