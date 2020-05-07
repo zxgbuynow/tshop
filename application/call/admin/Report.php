@@ -242,7 +242,7 @@ class Report extends Admin
 
         ];
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
-        plugin_action('Excel/Excel/export', ['呼出时长报表', $cellName, $data]);
+        plugin_action('Excel/Excel/export', ['呼出时长报表', $cellName, $data_list]);
     }
 
     /**
