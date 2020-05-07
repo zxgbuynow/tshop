@@ -120,7 +120,7 @@ class Report extends Admin
                     $m['timeLength'] = array('gt',0);
                     $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
                     // $item->time_minu = number_format($item['times']/60,2);
-                    $item->time_minu = date('i:s',$item['times']);
+                    $item->time_minu = times_exchange_His($item['times']);
                     $item->get_count = CalllogModel::where($m)->count();
                     $item->call_rate = (number_format($item->get_count/$item->call_count,2)*100).'%';
                 });
@@ -170,7 +170,7 @@ class Report extends Admin
                 ['user', '员工'],
                 ['role', '部门'],
                 ['times', '呼出通话时长(秒)'],
-                ['time_minu', '呼出通话时长(分)'],
+                ['time_minu', '呼出通话时长'],
                 ['get_count', '接通数'],
                 ['call_count', '呼叫数'],
                 ['call_rate', '接通率'],
@@ -218,7 +218,7 @@ class Report extends Admin
                     $m['user_id'] = $item['user_id'];
                     $m['timeLength'] = array('gt',0);
                     $item->timerange = $map['create_time'][1][0].'~'.$map['create_time'][1][1];
-                    $item->time_minu = date('i:s',$item['times']);
+                    $item->time_minu = times_exchange_His($item['times']);
                     $item->get_count = CalllogModel::where($m)->count();
                     $item->call_rate = (number_format($item->get_count/$item->call_count,2)*100).'%';
                     $item->__INDEX__ = $key+1;
@@ -233,7 +233,7 @@ class Report extends Admin
             ['user','auto', '员工'],
             ['role', 'auto', '部门'],
             ['times','auto',  '呼出通话时长(秒)'],
-            ['time_minu', 'auto', '呼出通话时长(分)'],
+            ['time_minu', 'auto', '呼出通话时长'],
             ['get_count', 'auto', '接通数'],
             ['call_count','auto',  '呼叫数'],
             ['call_rate', 'auto', '接通率'],
@@ -943,7 +943,7 @@ class Report extends Admin
                     $m2['create_time'] = $map['note_time'];
                     $m2['calledNum'] = array('in',$mbs);
                     // print_r($mbs);exit;
-                    $item->timeLg = date('i:s',CalllogModel::where($m2)->sum('timeLength'));
+                    $item->timeLg = times_exchange_His(CalllogModel::where($m2)->sum('timeLength'));
                     $item->pec = ceil($item->timeLg/$item['counts']);
 
             });
@@ -978,7 +978,7 @@ class Report extends Admin
                 ['project', '项目'],
                 ['source', '客户来源'],
                 ['total', '留言总数量'],
-                ['timeLg', '平台通话时长(分)'],
+                ['timeLg', '平台通话时长'],
                 ['counts', '签单数量'],
                 ['pec', '每单的分钟数'],
             ])
@@ -1013,8 +1013,8 @@ class Report extends Admin
                     $m2['calledNum'] = array('in',$mbs);
                     // print_r($mbs);exit;
                     $times = CalllogModel::where($m2)->sum('timeLength');
-                    $item->timeLg = date('i:s',$times);//date('i:s',120.83)
-                    $item->pec = date('i:s',$times/$item['counts']);
+                    $item->timeLg = times_exchange_His($times);//date('i:s',120.83)
+                    $item->pec = times_exchange_His($times/$item['counts']);
                     $item->timerange = $map['note_time'][1][0].'~'.$map['note_time'][1][1];
 
             });
@@ -1028,7 +1028,7 @@ class Report extends Admin
             ['project','auto', '项目'],
             ['source', 'auto','客户来源'],
             ['total', 'auto','留言总数量'],
-            ['timeLg', 'auto','平台通话时长(分)'],
+            ['timeLg', 'auto','平台通话时长'],
             ['counts','auto', '签单数量'],
             ['pec', 'auto','每单的分钟数'],
             ['timerange','auto', '查询时间段'],
@@ -2116,7 +2116,7 @@ class Report extends Admin
 
                         $item->role = db('admin_role')->where(['id'=>$item['role_id']])->value('name');
 
-                        $item->timeLengths = date('i:s',$item['timeLengths']);
+                        $item->timeLengths = times_exchange_His($item['timeLengths']);
 
                     });
             }else{
@@ -2279,7 +2279,7 @@ class Report extends Admin
 
                         $item->role = db('admin_role')->where(['id'=>$data['role_id'][1]])->value('name');
 
-                        $item->timeLengths = date('i:s',$item['timeLengths']);
+                        $item->timeLengths = times_exchange_His($item['timeLengths']);
 
                     });
             }else{
@@ -2295,7 +2295,7 @@ class Report extends Admin
             ['user', 'auto','员工'],
             ['role', 'auto','部门'],
             ['alloc_time','auto', '分配时间'],
-            ['timeLengths', 'auto','通话时长(分)'],
+            ['timeLengths', 'auto','通话时长'],
             ['alloc_sum', 'auto','分配数量'],
             ['gtback', 'auto','回收数量'],
             ['standard_num', 'auto','部门达标数量(部门)'],
