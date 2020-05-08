@@ -4,7 +4,7 @@ namespace app\call\admin;
 use app\admin\controller\Admin;
 use app\common\builder\ZBuilder;
 use app\user\model\Role as RoleModel;
-
+use think\Db;
 /**
  * 首页后台控制器
  */
@@ -44,9 +44,30 @@ class Home extends Admin
             $m1['a.status'] = 1;
             // $m1['c.timeLength'] = array('eq',0);
             // $m1[] = ['a.create_time','gt',time()-86400*2];
-            $m1['c.create_time'] = array('lt',time()-86400*2);
-            $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->count();
+            // $m1['c.create_time'] = array('lt',time()-86400*2);
+            // $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->count();
+
+            $subQuery  = Db::table("call_log")
+            ->where(['status'=>1])
+            ->order(['id'=>'desc'])
+            ->buildSql();
+
+            $subsql = Db::table($subQuery." a")
+            ->field("custom_id,user_id,alloc_log_id,create_time as t")
+            ->group('custom_id,user_id')
+            ->order(['id'=>'desc'])
+            ->buildSql();
+
             
+            // $subsql = Db::table('call_log')->where(['status'=>1])->field('custom_id,user_id,alloc_log_id,create_time as t')->group('custom_id,user_id')->order('id desc')->buildSql();
+            // print_r($data);exit;
+            $mmm['status'] = 1;
+            $mmm['t'] = array('lt',time()-86400*2);
+            // $mmm['custom_id'] = array('not in',$custom_ids);
+            // print_r($mmm);exit;
+            $pass_second_contact_custom_count =  Db::table('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id,a.id')->join([$subsql=> 'w'], 'a.id = w.alloc_log_id')->where($mmm)->group('a.user_id,a.custom_id')->count();
+            // echo Db::table('call_alloc_log')->getlastsql();exit;
+            // print_r($pass_second_contact_custom_count);exit;
         	// $no_contact_custom_count = 0;//新任务未接通未达标客户
             $m2['a.status'] = 1;
             // $m2['c.disposition'] = 'NO ANSWER';
@@ -77,16 +98,44 @@ class Home extends Admin
             $m4['c.alloc_log_id'] = array('exp','is null');
             $will_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m4)->whereTime('a.create_time', 'today')->group('a.id')->count();//当天分配没有拨打记录
         	// $will_contact_custom_count = 0;//新任务未联系客户 新客户是没有通话时长的
+            
+
             $m1['c.status'] = 1;
             $m1['a.status'] = 1;
             // $m1['c.timeLength'] = array('eq',0);
             $m1['a.user_id'] = UID;
+            
+            //count
+            $mmm['status'] = 1;
+            $mmm['t'] = array('lt',time()-86400*2);
+
+            //subquery
+            $subm['status'] = 1;
+            $subm['user_id'] = UID;
+            $mmm['a.user_id'] = UID;
             if ($userin) {
-                $m1['a.user_id'] = array('in',$userids);
+                $subm['user_id'] = array('in',$userids);
+                $mmm['a.user_id'] = array('in',$userids);
             }
+
+            $subQuery  = Db::table("call_log")
+            ->where($subm)
+            ->order(['id'=>'desc'])
+            ->buildSql();
+
+            $subsql = Db::table($subQuery." a")
+            ->field("custom_id,user_id,alloc_log_id,create_time as t")
+            ->group('custom_id,user_id')
+            ->order(['id'=>'desc'])
+            ->buildSql();
+            
+            
+            $pass_second_contact_custom_count =  Db::table('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id,a.id')->join([$subsql=> 'w'], 'a.id = w.alloc_log_id')->where($mmm)->group('a.user_id,a.custom_id')->count();
+
             // $m1[] = ['a.create_time','gt',time()-86400*2];
-            $m1['c.create_time'] = array('lt',time()-86400*2);
-            $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->count();//有拨打记录，超过2天的（包含没有接通）
+            // $m1['c.create_time'] = array('lt',time()-86400*2);
+            // $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->count();//有拨打记录，超过2天的（包含没有接通）
+
 
         	// $pass_second_contact_custom_count = 0;//超2天未联系客户 分配后没有通话时长的
             $m2['a.status'] = 1;

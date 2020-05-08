@@ -99,3 +99,30 @@ ALTER TABLE `tshop1`.`call_log`
 ADD COLUMN `disposition` varchar(20) NULL COMMENT '通话说明' AFTER `role_id`;
 ALTER TABLE `tshop1`.`call_log` 
 ADD COLUMN `is_answer` tinyint(1) NULL DEFAULT 0 COMMENT '是否未接' AFTER `disposition`;
+
+ALTER TABLE `tshop`.`call_notice_log` 
+ADD INDEX `index_user_id`(`user_id`) USING BTREE,
+ADD INDEX `index_is_read`(`is_read`) USING BTREE;
+
+ALTER TABLE `tshop1`.`call_custom` 
+ADD INDEX `ind_project_id`(`project_id`) USING BTREE;
+
+ALTER TABLE `tshop1`.`call_alloc_log` 
+ADD INDEX `ind_alloc_id`(`alloc_id`) USING BTREE,
+ADD INDEX `ind_user_id`(`user_id`) USING BTREE,
+ADD INDEX `ind_custom_id`(`custom_id`) USING BTREE,
+ADD INDEX `ind_batch_id`(`batch_id`) USING BTREE;
+
+ALTER TABLE `tshop`.`call_log` 
+ADD INDEX `ind_alloc_log_id`(`alloc_log_id`) USING BTREE,
+ADD INDEX `ind_user_id`(`user_id`) USING BTREE,
+ADD INDEX `ind_role_id`(`role_id`) USING BTREE,
+ADD INDEX `ind_status`(`status`) USING BTREE,
+ADD INDEX `ind_is_answer`(`is_answer`) USING BTREE,
+ADD INDEX `ind_custom_id`(`custom_id`) USING BTREE;
+
+ALTER TABLE `tshop`.`call_alloc_log` 
+ADD INDEX `ind_create_time`(`create_time`) USING BTREE;
+
+ALTER TABLE `tshop`.`call_log` 
+ADD INDEX `ind_create_time`(`create_time`) USING BTREE;

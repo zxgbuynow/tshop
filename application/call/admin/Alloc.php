@@ -518,7 +518,7 @@ EOF;
                     // $insert_id = 999;
                     
                     if ($sdata['way']==1) {
-                        if (!$data['user_ids']) {
+                        if (!isset($data['user_ids'])) {
                             $this->error('员工必填');
                         }
                         //平均分处理
@@ -556,7 +556,7 @@ EOF;
                         
                     }
                     if ($sdata['way']==2) {
-                        if (!$data['user_id']) {
+                        if (!isset($data['user_id'])) {
                             $this->error('员工必填');
                         }
                         $custCts = count($data['custom_id']);

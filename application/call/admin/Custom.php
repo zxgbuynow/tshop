@@ -53,23 +53,27 @@ class Custom extends Admin
                     $m1['a.user_id'] = UID;
                     
 
-                    
+                    $subm['user_id'] = UID;
                     if ($userin) {
                         // $m1['a.user_id'] = array('in',$userids);
                         if (isset($alloc_users)) {
                             $intersect = array_intersect($userids,$alloc_users);
                             $m1['a.user_id'] = '';
+                            $subm['user_id'] = '';
                             if ($intersect) {
                                 $m1['a.user_id'] = array('in',$intersect);
+                                $subm['user_id'] = array('in',$intersect);
                             }
                         }else{
                             $m1['a.user_id'] = array('in',$userids);
+                            $subm['user_id'] = array('in',$userids);
                         }
                         
                     }else{
                         if (isset($alloc_users)) {
                             if (!in_array(UID, $alloc_users)) {
                                 $m1['a.user_id'] = '';
+                                $subm['user_id'] = '';
                             }
                         }
                         
@@ -77,14 +81,32 @@ class Custom extends Admin
                 }else{
                     if (isset($alloc_users)) {
                         $m1['a.user_id'] = array('in',$alloc_users);
+                        $subm['user_id'] = array('in',$alloc_users);
                     }
                     
                 }
                 
-                $m1['a.status'] = 1;
-                $m1['c.create_time'] = array('lt',time()-86400*2);
+                // $m1['a.status'] = 1;
+                // $m1['c.create_time'] = array('lt',time()-86400*2);
                 
-                $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->select();
+                // $pass_second_contact_custom_count = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m1)->group('a.id')->select();
+                $subm['status'] = 1;
+                $subQuery  = Db::table("call_log")
+                ->where($subm)
+                ->order(['id'=>'desc'])
+                ->buildSql();
+
+                $subsql = Db::table($subQuery." a")
+                ->field("custom_id,user_id,alloc_log_id,create_time as t")
+                ->group('custom_id,user_id')
+                ->order(['id'=>'desc'])
+                ->buildSql();
+
+                // $subsql = Db::table('call_log')->where(['status'=>1])->field('custom_id,user_id,alloc_log_id,create_time as t')->group('custom_id,user_id')->order('id desc')->buildSql();
+                $m1['status'] = 1;
+                $m1['t'] = array('lt',time()-86400*2);
+                $pass_second_contact_custom_count =  Db::table('call_alloc_log')->alias('a')->join([$subsql=> 'w'], 'a.id = w.alloc_log_id')->where($m1)->group('a.user_id,a.custom_id')->select();
+
                 if ($pass_second_contact_custom_count) {
                     $map['id'] = array('in',array_column($pass_second_contact_custom_count, 'custom_id'));
                 }else{
