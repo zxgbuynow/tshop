@@ -1840,7 +1840,8 @@ if (!function_exists('deep_array_map')) {
             if(is_array($v)){
                 return deep_array_map($v);
             }
-            return str_replace('%2B',' ',$v);
+            $v =  str_replace('%2B',' ',$v);
+            return str_replace('+',' ',$v);
         },$arr);
     }
 }

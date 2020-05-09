@@ -126,3 +126,7 @@ ADD INDEX `ind_create_time`(`create_time`) USING BTREE;
 
 ALTER TABLE `tshop`.`call_log` 
 ADD INDEX `ind_create_time`(`create_time`) USING BTREE;
+
+ALTER TABLE `tshop`.`call_custom` 
+ADD INDEX `ind_note_time`(`note_time`) USING BTREE,
+ADD INDEX `ind_category`(`category`) USING BTREE;

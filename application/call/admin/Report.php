@@ -627,7 +627,6 @@ class Report extends Admin
             $map['id'] = array('in',array_unique($ids));
             unset($map['sign_time']);
         }
-        
         if (!isset($map['note_time'])) {
             $map['id'] = '';//无时间查询过滤
             $data_list = CustomModel::where($map)->field('*,avg(fee) as avgffee,count(*) as counts')->order('avgffee DESC')->group('project_id,source')->paginate();
@@ -2051,47 +2050,47 @@ class Report extends Admin
                 //处理部门
                 if (isset($map['role_id'])) {
 
-                    $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
-                    // $user_ids = CalllogModel::where($map)->column('user_id');
-                    //部门计总
-                    $standard_num = 0;
-                    foreach ($user_ids as $key => $value) {
-                        $m['user_id'] = $value;
-                        $m['create_time'] = $map['create_time'];
-                        $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                        if ($timeLengths['timeLengths']>$roleCallSetting*60) {
-                            $standard_num++;
-                        }
-                    }
-                    $data['standard_num'][$map['role_id'][1]] = intval($standard_num) ;
+                    // $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
+                    // // $user_ids = CalllogModel::where($map)->column('user_id');
+                    // //部门计总
+                    // $standard_num = 0;
+                    // foreach ($user_ids as $key => $value) {
+                    //     $m['user_id'] = $value;
+                    //     $m['create_time'] = $map['create_time'];
+                    //     $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
+                    //     if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                    //         $standard_num++;
+                    //     }
+                    // }
+                    // $data['standard_num'][$map['role_id'][1]] = intval($standard_num) ;
 
-                    //7day
-                    $m3['a.create_time'] = array('gt',time()-86400*7);
-                    $data['day_nocontanct'][$map['role_id'][1]] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                    // //7day
+                    // $m3['a.create_time'] = array('gt',time()-86400*7);
+                    // $data['day_nocontanct'][$map['role_id'][1]] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
                     // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
                     // unset($map['role_id']);
                 }else{
 
-                    $role_ids = CalllogModel::where($map)->column('role_id');
+                    // $role_ids = CalllogModel::where($map)->column('role_id');
 
-                    foreach ($role_ids as $key => $value) {
-                        $user_ids = db('admin_user')->where(['role'=>$value])->column('id');
-                        //部门计总
-                        $standard_num = 0;
-                        foreach ($user_ids as $key => $value) {
-                            $m['user_id'] = $value;
-                            $m['create_time'] = $map['create_time'];
-                            $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                            if ($timeLengths['timeLengths']>$roleCallSetting*60) {
-                                $standard_num++;
-                            }
-                        }
-                        $data['standard_num'][$value] = $standard_num;
+                    // foreach ($role_ids as $key => $value) {
+                    //     $user_ids = db('admin_user')->where(['role'=>$value])->column('id');
+                    //     //部门计总
+                    //     $standard_num = 0;
+                    //     foreach ($user_ids as $key => $v) {
+                    //         $m['user_id'] = $v;
+                    //         $m['create_time'] = $map['create_time'];
+                    //         $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
+                    //         if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                    //             $standard_num++;
+                    //         }
+                    //     }
+                    //     $data['standard_num'][$value] = $standard_num;
 
-                        $m3['a.create_time'] = array('gt',time()-86400*7);
-                        $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                    //     $m3['a.create_time'] = array('gt',time()-86400*7);
+                    //     $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
 
-                    }
+                    // }
 
                 }
                 $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('timeLengths DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
@@ -2099,7 +2098,7 @@ class Report extends Admin
                         unset($m2);
                         //role alloc_time  alloc_sum gtback standard_num day_nocontanct
                         $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
-                        $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
+                        $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc_log')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
 
                         $m1['create_time'] = $data['create_time'];
                         $m1['user_id'] = $item['user_id'];
@@ -2111,8 +2110,8 @@ class Report extends Admin
                         $item->gtback = db('call_alloc_log')->where($m2)->count();
 
                         //role_id 
-                        $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
-                        $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
+                        // $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
+                        // $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
 
                         $item->role = db('admin_role')->where(['id'=>$item['role_id']])->value('name');
 
@@ -2126,7 +2125,7 @@ class Report extends Admin
         }
         
         
-        
+        $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']);//强行转换
         // 分页数据
         $page = $data_list->render();
         $btnexport = [
@@ -2141,8 +2140,14 @@ class Report extends Admin
             'class' => 'btn btn-default ajax-get',
             'href' => url('roleCallSetting',['tag'=>'timeLength'])
         ];
-        $roles = RoleModel::where(['status'=>1])->column('id,name'); 
 
+        $btn_ls = [
+            'title' => '部门汇总',
+            'icon'  => 'fa fa-fw fa-cog ',
+            'class' => 'btn btn-default ajax-get',
+            'href' => url('getrolelist')
+        ];
+        $roles = RoleModel::where(['status'=>1])->column('id,name'); 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
             ->hideCheckbox()
@@ -2158,17 +2163,146 @@ class Report extends Admin
                 ['timeLengths', '通话时长'],
                 ['alloc_sum', '分配数量'],
                 ['gtback', '回收数量'],
-                ['standard_num', '部门达标数量(部门)'],
-                ['day_nocontanct', '7天未联系客户(部门)'],
+                ['standard_num', '部门达标数量(部门)','callback',function($value,$data,$m,$roleCallSetting){
+                    if (!$roleCallSetting) {
+                        return 0;
+                    }
+                    $map = json_decode($m,true);
+                    if (isset($map['create_time'])) {
+                        $user_ids = db('admin_user')->where(['role'=>$data['role_id']])->column('id');
+                        //部门计总
+                        $standard_num = 0;
+                        foreach ($user_ids as $key => $value) {
+                            $mm['user_id'] = $value;
+                            $mm['create_time'] = $map['create_time'];
+                            $timeLengths = CalllogModel::where($mm)->field('SUM(timeLength) as timeLengths')->find();
+                            if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                                $standard_num++;
+                            }
+                        }
+                        return $standard_num;
+                    }
+                    return 0;
+
+                }, '__data__',json_encode($map),$roleCallSetting],
+                ['day_nocontanct', '7天未联系客户(部门)','callback',function($value,$data){
+
+                    $m3['a.create_time'] = array('gt',time()-86400*7);
+                    $day_nocontanct = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.custom_id')->count();
+                    return $day_nocontanct;
+
+                }, '__data__'],
                 ['create_time', '呼叫时间','datetime'],
             ])
             ->setRowList($data_list)// 设置表格数据
             ->addTopButton('custom', $btnexport)
             ->addTopButton('custom', $btn_access,true)
-            // ->addTopButton('custom', $btn_access)
+            // ->addTopButton('custom', $btn_ls,true)
             ->fetch(); // 渲染模板
     }
 
+    /**
+     * [getrolelist 部门汇总]
+     * @return [type] [description]
+     */
+    public function getrolelist()
+    {
+        cookie('__forward__', $_SERVER['REQUEST_URI']);
+
+        // 获取查询条件
+        $map = $this->getMap();
+
+        if (!isset(plugin_config('wechat')['roleCallSetting'])) {
+            $map['id']  = '';
+            $data_list = CalllogModel::where($map)->paginate();
+        }else{
+            $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']);//强行转换
+            // 数据列表
+            if (isset($map['create_time'])) {
+                $data = $map;
+                //处理部门
+                if (isset($map['role_id'])) {
+
+                    // $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
+                    // // $user_ids = CalllogModel::where($map)->column('user_id');
+                    // //部门计总
+                    // $standard_num = 0;
+                    // foreach ($user_ids as $key => $value) {
+                    //     $m['user_id'] = $value;
+                    //     $m['create_time'] = $map['create_time'];
+                    //     $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
+                    //     if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                    //         $standard_num++;
+                    //     }
+                    // }
+                    // $data['standard_num'][$map['role_id'][1]] = intval($standard_num) ;
+
+                    // //7day
+                    // $m3['a.create_time'] = array('gt',time()-86400*7);
+                    // $data['day_nocontanct'][$map['role_id'][1]] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+                    // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
+                    // unset($map['role_id']);
+                }else{
+
+                    // $role_ids = CalllogModel::where($map)->column('role_id');
+
+                    // foreach ($role_ids as $key => $value) {
+                    //     $user_ids = db('admin_user')->where(['role'=>$value])->column('id');
+                    //     //部门计总
+                    //     $standard_num = 0;
+                    //     foreach ($user_ids as $key => $v) {
+                    //         $m['user_id'] = $v;
+                    //         $m['create_time'] = $map['create_time'];
+                    //         $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
+                    //         if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                    //             $standard_num++;
+                    //         }
+                    //     }
+                    //     $data['standard_num'][$value] = $standard_num;
+
+                    //     $m3['a.create_time'] = array('gt',time()-86400*7);
+                    //     $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
+
+                    // }
+
+                }
+                $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths')->order('timeLengths DESC')->group('role_id')->paginate()->each(function($item, $key) use ($data){
+                        $item->role = db('admin_role')->where(['id'=>$item['role_id']])->value('name');
+                        $item->timeLengths = times_exchange_His($item['timeLengths']);
+                        //role_id 
+                        // $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
+                        // $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
+                    });
+            }else{
+                $map['id']  = '';
+                $data_list = CalllogModel::where($map)->paginate();
+            }
+        }
+        
+        
+        
+        // 分页数据
+        $page = $data_list->render();
+        
+        $roles = RoleModel::where(['status'=>1])->column('id,name'); 
+
+        // 使用ZBuilder快速创建数据表格
+        return ZBuilder::make('table')
+            ->hideCheckbox()
+            ->setSearchArea([
+                ['daterange', 'create_time', '时间', '', '', ['format' => 'YYYY-MM-DD HH:mm:ss', 'time-picker' => 'true', 'time' => 'true', 'time' => 'true']],
+                ['select', 'role_id', '部门', '', '', $roles],
+            ])
+            ->addColumns([ // 批量添加数据列
+                ['id', 'ID'],
+                ['role', '部门'],
+                ['timeLengths', '通话时长'],
+                ['standard_num', '部门达标数量'],
+                ['day_nocontanct', '7天未联系客户'],
+            ])
+            ->setRowList($data_list)// 设置表格数据
+            ->fetch(); // 渲染模板
+    }
     /**
      * [setting description]
      * @param  [type] $tag [description]
@@ -2201,7 +2335,9 @@ class Report extends Admin
     public function roleCallReportexport()
     {
         $map = $this->getMaps();
-        
+        if (!$map) $this->error('缺少参数');
+
+        $map = deep_array_map($map);
         // 数据列表
         if (!isset(plugin_config('wechat')['roleCallSetting'])) {
             $map['id']  = '';
@@ -2210,74 +2346,43 @@ class Report extends Admin
             $roleCallSetting = intval(plugin_config('wechat')['roleCallSetting']);//强行转换
             // 数据列表
             if (isset($map['create_time'])) {
-                $data = $map;
-                //处理部门
-                if (isset($map['role_id'])) {
-
-                    $user_ids = db('admin_user')->where(['role'=>$map['role_id']])->column('id');
-                    // $user_ids = CalllogModel::where($map)->column('user_id');
-                    //部门计总
-                    $standard_num = 0;
-                    foreach ($user_ids as $key => $value) {
-                        $m['user_id'] = $value;
-                        $m['create_time'] = $map['create_time'];
-                        $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                        if ($timeLengths['timeLengths']>$roleCallSetting*60) {
-                            $standard_num++;
-                        }
-                    }
-                    $data['standard_num'][$map['role_id'][1]] = intval($standard_num) ;
-
-                    //7day
-                    $m3['a.create_time'] = array('gt',time()-86400*7);
-                    $data['day_nocontanct'][$map['role_id'][1]] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
-                    // $map['user_id'] = array('in',array_column($user_ids, 'user_id'));
-                    // unset($map['role_id']);
-                }else{
-
-                    $role_ids = CalllogModel::where($map)->column('role_id');
-
-                    foreach ($role_ids as $key => $value) {
-                        $user_ids = db('admin_user')->where(['role'=>$map['role_id'][1]])->column('user_id');
-                        //部门计总
-                        $standard_num = 0;
-                        foreach ($user_ids as $key => $value) {
-                            $m['user_id'] = $value;
-                            $m['create_time'] = $map['create_time'];
-                            $timeLengths = CalllogModel::where($m)->field('SUM(timeLength) as timeLengths')->find();
-                            if ($timeLengths['timeLengths']>$roleCallSetting*60) {
-                                $standard_num++;
-                            }
-                        }
-                        $data['standard_num'][$value] = $standard_num;
-
-                        $m3['a.create_time'] = array('gt',time()-86400*7);
-                        $data['day_nocontanct'][$value] = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.id')->count();
-
-                    }
-
-                }
-                $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('timeLengths DESC')->group('user_id')->paginate()->each(function($item, $key) use ($data){
+                
+                $data_list = CalllogModel::where($map)->field('*,SUM(timeLength) as timeLengths,count(*) as call_count')->order('timeLengths DESC')->group('user_id')->paginate()->each(function($item, $key) use ($map,$roleCallSetting){
                         unset($m1);
                         unset($m2);
                         //role alloc_time  alloc_sum gtback standard_num day_nocontanct
                         $item->user = db('admin_user')->where(['id'=>$item['user_id']])->value('nickname');
-                        $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
+                        $item->alloc_time = date('Y-m-d H:i:s',db('call_alloc_log')->where(['id'=>$item['alloc_log_id']])->value('create_time')) ;
 
-                        $m1['create_time'] = $data['create_time'];
+                        $m1['create_time'] = $map['create_time'];
                         $m1['user_id'] = $item['user_id'];
                         $item->alloc_sum = db('call_alloc_log')->where($m1)->count();
 
-                        $m2['create_time'] = $data['create_time'];
+                        $m2['create_time'] = $map['create_time'];
                         $m2['user_id'] = $item['user_id'];
                         $m2['status'] = 2;
                         $item->gtback = db('call_alloc_log')->where($m2)->count();
 
-                        //role_id 
-                        $item->standard_num = isset($data[$item['role_id']]) ?$data[$item['role_id']]['standard_num']:0;
-                        $item->day_nocontanct = isset($data[$item['role_id']]['day_nocontanct'])?$data[$item['role_id']]['day_nocontanct']:0 ;
+                        $item->standard_num = 0;
+                        if (isset($map['create_time'])) {
+                            $user_ids = db('admin_user')->where(['role'=>$item['role_id']])->column('id');
+                            //部门计总
+                            $standard_num = 0;
+                            foreach ($user_ids as $key => $value) {
+                                $mm['user_id'] = $value;
+                                $mm['create_time'] = $map['create_time'];
+                                $timeLengths = CalllogModel::where($mm)->field('SUM(timeLength) as timeLengths')->find();
+                                if ($timeLengths['timeLengths']>$roleCallSetting*60) {
+                                    $standard_num++;
+                                }
+                            }
+                            $item->standard_num = $standard_num;
+                        }
 
-                        $item->role = db('admin_role')->where(['id'=>$data['role_id'][1]])->value('name');
+                        $m3['a.create_time'] = array('gt',time()-86400*7);
+                        $item->day_nocontanct = db('call_alloc_log')->alias('a')->field('a.custom_id,a.user_id')->join(' call_log c',' c.alloc_log_id = a.id','LEFT')->where($m3)->group('a.custom_id')->count();
+
+                        $item->role = db('admin_role')->where(['id'=>$item['role_id']])->value('name');
 
                         $item->timeLengths = times_exchange_His($item['timeLengths']);
 
@@ -2304,7 +2409,7 @@ class Report extends Admin
         ];
         
         // 调用插件（传入插件名，[导出文件名、表头信息、具体数据]）
-        plugin_action('Excel/Excel/export', ['净得率报表', $cellName, $data_list]);
+        plugin_action('Excel/Excel/export', ['部门通话报表', $cellName, $data_list]);
     }
     /**
      * 设置用户状态：删除、禁用、启用
