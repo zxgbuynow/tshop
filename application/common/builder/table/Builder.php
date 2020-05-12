@@ -1500,7 +1500,7 @@ class Builder extends ZBuilder
 
     /**
      * 设置Tab按钮列表
-     * @param array $tab_list Tab列表  ['title' => '标题', 'href' => 'http://www.dolphinphp.com']
+     * @param array $tab_list Tab列表  ['title' => '标题', 'href' => 'http://www.zgbuynow.com']
      * @param string $curr_tab 当前tab
      * @author zg
      * @return $this

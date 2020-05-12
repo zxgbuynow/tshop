@@ -1,4 +1,4 @@
-DolphinPHP
+zgbuynow
 ===============
 
 # 系统样式目录
