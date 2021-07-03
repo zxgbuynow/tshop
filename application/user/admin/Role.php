@@ -32,16 +32,17 @@ class Role extends Admin
 
         // 使用ZBuilder快速创建数据表格
         return ZBuilder::make('table')
-            ->setPageTitle('角色管理') // 页面标题
+            ->setPageTitle('部门管理') // 页面标题
             ->setTableName('admin_role') // 设置表名
             ->setSearch(['name' => '角色名称', 'id' => 'ID']) // 设置搜索参数
             ->addColumns([ // 批量添加列
                 ['id', 'ID'],
-                ['name', '角色名称'],
+                ['name', '部门名称'],
                 ['description', '描述'],
                 ['create_time', '创建时间', 'datetime'],
                 ['access', '是否可登录后台', 'switch'],
                 ['status', '状态', 'switch'],
+                ['access_moblie', '是否可查看手机号', 'switch'],
                 ['right_button', '操作', 'btn']
             ])
             ->addTopButtons('add,enable,disable,delete') // 批量添加顶部按钮
@@ -85,7 +86,7 @@ class Role extends Admin
         $menus = cache('access_menus');
         if (!$menus) {
             $sm['status'] = 1;
-            $sm['system_module'] = 0;
+            // $sm['system_module'] = 0;
             $modules = Db::name('admin_module')->where($sm)->column('name');
             $menus = MenuModel::where('module', 'in', $modules)->order('sort,id')->column('id,pid,sort,title,icon');
             $menus = Tree::toLayer($menus);
@@ -139,9 +140,9 @@ class Role extends Admin
 
         // 获取数据
         $info       = RoleModel::get($id);
-        $role_list  = RoleModel::getTree($id, '顶级角色');
+        $role_list  = RoleModel::getTree($id, '顶级部门');
         $sm['status'] = 1;
-        $sm['system_module'] = 0;
+        // $sm['system_module'] = 0;
         $modules    = Db::name('admin_module')->where($sm)->column('name');
 
         $menus      = MenuModel::where('module', 'in', $modules)->order('sort,id')->column('id,pid,sort,title,icon');

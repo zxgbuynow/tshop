@@ -1,13 +1,4 @@
 <?php
-// +----------------------------------------------------------------------
-// | 海豚PHP框架 [ DolphinPHP ]
-// +----------------------------------------------------------------------
-// | 版权所有 2016~2017 河源市卓锐科技有限公司 [ http://www.zrthink.com ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://dolphinphp.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( http://www.apache.org/licenses/LICENSE-2.0 )
-// +----------------------------------------------------------------------
 
 namespace plugins\Excel\controller;
 
@@ -100,13 +91,12 @@ class Excel extends Common
 //                }
             }
         }
-
         //下载
-        header("Pragma: public");
-        header("Expires: 0");
+        header("Pragma:public");
+        header("Expires:0");
         header("Cache-Control:must-revalidate, post-check=0, pre-check=0");
         header("Content-Type:application/force-download");
-        header("Content-Type:application/vnd.ms-execl");
+        header("Content-Type:application/vnd.ms-excel");
         header("Content-Type:application/octet-stream");
         header("Content-Type:application/download");;
         header('Content-Disposition:attachment;filename='.$fileName);
@@ -125,11 +115,12 @@ class Excel extends Common
      * @param int $type 导入模式，0默认为增量导入（导入并跳过已存在的数据），1为覆盖导入（导入并覆盖已存在的数据）
      * @param null $where 查询依据，做配合查询使用
      * @param null $main_field 作为判断导入模式依据的主要字段，比如指定为KSH，则用KSH这个字段来判断是否已存在数据库
+     * @param null $second_field 用于铺助判断主要字段是否存存
      * @author HongPing <hongping626@qq.com>
      * @alter 蔡伟明 <314013107@qq.com>
      * @return array
      */
-    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null)
+    public function import($file, $table = null, $fields = null, $type = 0, $where = null, $main_field = null, $second_field = null, $requre_fields = null)
     {
         if(!file_exists($file)){
             return ["error" => 1, 'message' => '文件未找到!']; //file not found!
@@ -140,7 +131,6 @@ class Excel extends Common
         if ($file_ext != 'xls' && $file_ext != 'xlsx') {
             return ["error" => 1, 'message' => '文件类型不正确!'];
         }
-
         $file_type = $file_ext == 'xls' ? 'Excel5' : 'Excel2007';
 
         $objReader = \PHPExcel_IOFactory::createReader($file_type); //需要在前面加反斜杠，因为命名空间
@@ -248,13 +238,19 @@ class Excel extends Common
 
         //查询已经存在的数据，用于判断导入模式做对比
         $exists_list = Db::name($table)->where($where)->group($main_field)->column($main_field);
-
         //整理数据
         $fields    = array_flip($fields); //反转键值
         $data_list = [];
         $dataAdd['list']   = [];
         $dataCover['list'] = [];
         $dataSkip['list']  = [];
+        $isget = 0;
+        $batch_id = md5(time());
+
+        //存当前手机号
+        $table_moble = [];
+        $table_moble1 = [];
+        $count = 0;
         foreach ($array as $key => $value) { //循环每一张工作表
             $firstRow = [];
             foreach ($value['Content'] as $row => $col) { //循环每一行数据
@@ -269,19 +265,47 @@ class Excel extends Common
                     if (empty($firstRow)) {
                         return ["error" => 8, 'message' => '没有表头数据，无法导入!'];
                     }
+                    $count ++;
                     foreach ($col as $index => $val) { //循环每一个单元格
                         if (isset($firstRow[$index])) {
                             $data[$firstRow[$index]] = trim($val);
+                            if ($firstRow[$index] == 'batch_id') {
+                                $data[$firstRow[$index]] = $batch_id;
+                            }
+                            if ($firstRow[$index] == 'mobile') {
+                                if (in_array($data[$main_field], $table_moble)) {
+                                    $table_moble1[] = trim($val);
+                                }
+                                $table_moble[] = trim($val);
+                            }
+                            if ($val==''&&in_array($firstRow[$index], $requre_fields)) {
+                                return ["error" => 11, 'message' => '字段'.$firstRow[$index].'必填，请检查数据'];
+                            }
                         }
+
                     }
 
+                    //按second_feild过滤 妖孽代码
+                    if ($second_field&&$isget==0) {
+                        $where[$second_field] = $data[$second_field];
+                        $exists_list = Db::name($table)->where($where)->group($main_field)->column($main_field);
+                        $isget = 1;
+                    }
                     // 判断导入模式
                     if ($type == 0) {//增量导入
                         if (in_array($data[$main_field], $exists_list)) {
                             $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
                             continue;//跳过已存在的考生
                         } else {
-                            $dataAdd['list'][] = $data[$main_field]; //记录新增的数据
+
+                            //判断是否在导入表中存在
+                            if (in_array($data[$main_field], $table_moble1)) {
+                                $dataSkip['list'][] = $data[$main_field]; //记录跳过的数据
+                                continue;//跳过已存在的考生
+                            }else{
+                                $dataAdd['list'][] = $data[$main_field]; //记录新增的数据
+                            }
+                            
                         }
                     } else {//覆盖导入
                         if (in_array($data[$main_field], $exists_list)) {
@@ -295,11 +319,13 @@ class Excel extends Common
 
                     $data_list[] = $data;
                 }
+
             }
         }
-
+        // return ["error" => 19, 'message' => '必填，请检查数据data_list!'.round(count($data_list)/$count*100,2).'%'];
         if ($data_list) {
             if (Db::name($table)->insertAll($data_list)) {
+            // if (1==1) {
                 //计算新增、覆盖、跳过的数量
                 $dataAdd['total']   = count($dataAdd['list']);
                 $dataCover['total'] = count($dataCover['list']);
@@ -309,12 +335,12 @@ class Excel extends Common
                 cache('dataCover', $dataCover);
                 cache('dataSkip', $dataSkip);
                 cache('nextUrl', null);
-                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。'];
+                return ["error" => 0, 'message' => '成功导入 '. count($data_list). ' 条数据。','tabNm'=>$sheet_name, 'batch_id'=>$batch_id,'rate'=>round(count($data_list)/$count*100,2).'%'];
             } else {
                 return ["error" => 9, 'message' => '导入失败!请重新导入。'];
             }
         } else {
-            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!'];
+            return ["error" => 10, 'message' => '上传的文件中，没有需要导入的数据!','tabNm'=>$sheet_name,'rate'=>'0%'];
         }
     }
 

@@ -40,6 +40,21 @@ class Admin extends Common
         // 检查权限
         if (!RoleModel::checkAuth()) $this->error('权限不足！');
 
+        //swiperAdvList
+        $_advmp['status'] = 1;
+        $_advmp['start_time'] = array('<',time());
+        $_advmp['end_time'] = array('>',time());
+        $_advList = db('call_adv')->where($_advmp)->order('create_time DESC')->column('title,content');
+        $_advpush = [];
+        foreach ($_advList as $key => $value) {
+            $_advpush[$key] = $key.'【'.$value.'】';
+        }
+        $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;',$_advpush ) ;
+        // $_advstr = implode('&nbsp;&nbsp;&nbsp;&nbsp;', array_column($_advList, 'content')) ;
+        $this->assign('swiperAdvList', $_advstr);
+
+
+
         // 设置分页参数
         $this->setPageParam();
         // 如果不是ajax请求，则读取菜单
@@ -52,28 +67,84 @@ class Admin extends Common
             $this->assign('_sidebar_menus', MenuModel::getSidebarMenu());
             // 获取面包屑导航
             $this->assign('_location', MenuModel::getLocation('', true));
+
+            //分机
+            $_exten['status'] = 1;
+            $_extens = db('call_extension')->where($_exten)->select();
+            $this->assign('_extens', $_extens);
+
+            $_newmessagemp['user_id'] = UID;
+            $_newmessagemp['is_read'] = 0;
+            $_newmessage = db('call_message_log')->where($_newmessagemp)->count();
+            $this->assign('_newmessage', $_newmessage);
+
+
+            //当前签入
+            $this->assign('_auth_sign', session('user_auth_extension')?session('user_auth_extension')['exten']:'');
+
             // 构建侧栏
-            $data = [
-                'table'      => 'admin_config', // 表名或模型名
-                'prefix'     => 1,
-                'module'     => 'admin',
-                'controller' => 'system',
-                'action'     => 'quickedit',
+            // $data = [
+            //     'table'      => 'admin_config', // 表名或模型名
+            //     'prefix'     => 1,
+            //     'module'     => 'admin',
+            //     'controller' => 'system',
+            //     'action'     => 'quickedit',
+            // ];
+            // $table_token = substr(sha1('_aside'), 0, 8);
+            // session($table_token, $data);
+            // $settings = [
+            //     [
+            //         'title'   => '站点开关',
+            //         'tips'    => '站点关闭后将不能访问',
+            //         'checked' => Db::name('admin_config')->where('id', 1)->value('value'),
+            //         'table'   => $table_token,
+            //         'id'      => 1,
+            //         'field'   => 'value'
+            //     ]
+            // ];
+            // ZBuilder::make('aside')
+            //     ->addBlock('switch', '系统设置', $settings);
+
+            $tab_list = [
+                'tabs-side-notice' => '<i class="fa fa-fw fa-bullhorn"></i> 系统提醒',
+                'tabs-side-able' => '<i class="fa fa-fw fa-file-o"></i> 技巧'
             ];
-            $table_token = substr(sha1('_aside'), 0, 8);
-            session($table_token, $data);
-            $settings = [
-                [
-                    'title'   => '站点开关',
-                    'tips'    => '站点关闭后将不能访问',
-                    'checked' => Db::name('admin_config')->where('id', 1)->value('value'),
-                    'table'   => $table_token,
-                    'id'      => 1,
-                    'field'   => 'value'
-                ]
-            ];
+
+            //提醒
+            $_notice = db('call_notice_log')->where(['is_read'=>0,'user_id'=>UID])->order('create_time DESC')->select(); 
+
+
+            $_notice_count = db('call_notice_log')->where(['is_read'=>0,'user_id'=>UID])->order('create_time DESC')->count(); 
+            $this->assign('_notice_count', $_notice_count);
+            $recent_list = [];
+            foreach ($_notice as $key => $value) {
+                $recent_list[$key]['title'] = $value['title'];
+                $recent_list[$key]['link']['title'] = $value['content'];
+                $recent_list[$key]['link']['url'] = url('call/notice/detail',['id'=>$value['id']]);
+                $recent_list[$key]['tips'] = time_tran($value['create_time']);
+                $recent_list[$key]['icon'] = 'fa fa-fw fa-bullhorn';
+            }
+
+            //技巧
+            $_speechs = db('call_speechcraft')->where(['status'=>1])->order('sort ASC')->select(); 
+            $speech_list = [];
+            foreach ($_speechs as $key => $value) {
+                $speech_list[$key]['title'] = $value['title'];
+                $speech_list[$key]['link']['title'] = '<span style="color:red">'.$value['content'].'</span>';
+                $speech_list[$key]['link']['url'] = '';
+                $speech_list[$key]['tips'] = $value['tags'];
+                $speech_list[$key]['icon'] = 'fa fa-commenting-o';
+            }
+            
+            
             ZBuilder::make('aside')
-                ->addBlock('switch', '系统设置', $settings);
+                ->setTabNav($tab_list, 'tabs-side-notice')
+                ->setTabCon('tabs-side-notice', [
+                    ['recent', '最近提醒', $recent_list],
+                ])
+                ->setTabCon('tabs-side-able', [
+                    ['recent', '话术提示', $speech_list],
+                ]);
         }
     }
 
@@ -201,7 +272,10 @@ class Admin extends Common
         ];
         // 验证是否操作管理员
         if (in_array($Model->getTable(), $protect_table) && $id == 1) {
-            $this->error('禁止操作超级管理员');
+            if (UID!=1) {
+                $this->error('禁止操作超级管理员'); 
+            }
+            
         }
 
         // 验证器
@@ -230,7 +304,6 @@ class Admin extends Common
 
         // 主键名
         $pk     = $Model->getPk();
-        print_r(12);exit;
 
         $result = $Model->where($pk, $id)->setField($field, $value);
 

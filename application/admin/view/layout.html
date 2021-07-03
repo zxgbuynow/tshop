@@ -265,29 +265,76 @@
                                 <i class="si si-settings pull-right"></i>个人设置
                             </a>
                         </li>
+                        <!-- <li>
+                            <a tabindex="-1" href="{:url('call/message/log')}">
+                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>消息中心
+                            </a>
+                        </li> -->
                         <li class="divider"></li>
                         <li>
                             <a tabindex="-1" href="{:url('user/publics/signout')}">
                                 <i class="si si-logout pull-right"></i>退出帐号
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </li>
+            <li>
+                <a class="btn btn-default" href="{:url('call/message/index')}" data-toggle="tooltip" data-placement="bottom" data-original-title="消息中心">
+                    <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right" style="background-color:red;top:3px">{$_newmessage|default=0}</span>
+                </a>
+            </li>
+            <!-- 
+            <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="message-num">消息中心</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li>
+                            <a tabindex="-1" href="{:url('call/message/log')}">
+                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right">{$_newmessage|default=0}</span>消息中心
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li> -->
+            {neq name="Think.session.user_auth.uid" value="1"}
+            <!-- <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="extension-no">{$_auth_sign|default='签入分机'}</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        {volist name="_extens" id="_exten"}
+                            <li>
+                                <a tabindex="-1" href="javascript:void(0)" class="extension-toggle" data-id="{$_exten.id}">
+                                    {$_exten.title}
+                                </a>
+                            </li>
+                        
+                        {/volist}
+                    </ul>
+                </div>
+            </li> -->
+            {/neq}
             <li>
                 <a class="btn btn-default ajax-get" href="{:url('admin/index/wipeCache')}" data-toggle="tooltip" data-placement="bottom" data-original-title="清空缓存">
                     <i class="fa fa-trash"></i>
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a class="btn btn-default" href="{:rtrim(home_url('/'), '/')}" target="_blank" data-toggle="tooltip" data-placement="bottom" data-original-title="打开前台">
                     <i class="fa fa-external-link-square"></i>
                 </a>
-            </li>
+            </li> -->
             <li>
                 <!-- Layout API, functionality initialized in App() -> uiLayoutApi() -->
                 <button class="btn btn-default" data-toggle="layout" data-action="side_overlay_toggle" title="侧边栏" type="button">
-                    <i class="fa fa-tasks"></i>
+                    <i class="fa fa-tasks"></i><span class="badge badge-primary" style="background-color:red;top:0px;float:left;margin:2px">{$_notice_count|default=0}</span>
                 </button>
             </li>
         </ul>
@@ -329,6 +376,24 @@
     <main id="main-container">
         <!-- Page Header -->
         {block name="page-header"}
+        <style type="text/css">
+            .row .alert{
+                padding-bottom: 0px; 
+                margin-bottom: 0px;
+            }
+        </style>
+        <div class="row" style="margin: 10px 10px;">
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button style="display: none;" type="button" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span></button>
+                <strong>
+                    <i class="fa fa-fw fa-bullhorn"></i>Notice!</strong>
+                <marquee>
+                    <p style="font-family: Impact; font-size: 18pt" class="swiper-adv-list">{$swiperAdvList} </p></marquee>
+            </div>
+        </div>
+
         {empty name="_pop"}
         <div class="bg-gray-lighter">
             <ol class="breadcrumb">
@@ -359,7 +424,7 @@
     {empty name="_pop"}
     <footer id="page-footer" class="content-mini content-mini-full font-s12 bg-gray-lighter clearfix">
         <div class="pull-right">
-            Crafted with <i class="fa fa-heart text-city"></i> by <a class="font-w600" href="{:config('dolphin.company_website')}" target="_blank">{:config('dolphin.company_name')}</a>
+            Crafted with <i class="fa fa-heart text-city"></i> by <a class="font-w600" href="javascript:;" target="_blank">{:config('web_site_copyright')}</a>
         </div>
         <div class="pull-left">
             <a class="font-w600" href="{:config('dolphin.product_website')}" target="_blank">{:config('dolphin.product_name')} {:config('dolphin.product_version')}</a> &copy; <span class="js-year-copy"></span>
@@ -367,6 +432,9 @@
     </footer>
     {/empty}
     <!-- END Footer -->
+
+    
+
 </div>
 <!-- END Page Container -->
 
@@ -459,7 +527,12 @@
         {/notempty}
     });
 </script>
-
+<style type="text/css">
+    .block > .nav-tabs > li.active > a, .block > .nav-tabs > li.active > a:hover, .block > .nav-tabs > li.active > a:focus{
+        color: #fff;
+        background-color: #1F98CA;
+    }
+</style>
 <!--页面js-->
 {block name="script"}{/block}
 
@@ -468,5 +541,44 @@
 
 {// 额外HTML代码 }
 {$extra_html|default=''}
+<script src='http://cdn.bootcss.com/socket.io/1.3.7/socket.io.js'></script>
+<script>
+    // 连接服务端
+    var socket = io('http://'+document.domain+':2120');
+    // uid可以是自己网站的用户id，以便针对uid推送以及统计在线人数
+    uid = {$Think.session.user_auth.uid};
+    console.log(uid)
+    // socket连接后以uid登录
+    socket.on('connect', function(){
+        socket.emit('login', uid);
+    });
+    // 后端推送来消息时
+    socket.on('new_msg', function(msg){
+        console.log("收到消息："+msg);
+        Dolphin.notify(msg, 'success');
+        // speckText(msg)
+    });
+    // 后端推送来在线数据时
+    socket.on('update_online_count', function(online_stat){
+        console.log(online_stat);
+    });
+
+    // 签入
+    $('.extension-toggle').click(function(e){
+        // Dolphin.loading();
+        var id = $(this).attr('data-id');
+        $.post("{:url('call/ajax/getEextensionSt')}", {id:id}, function(data) {
+            Dolphin.loading('hide');
+            console.log(data);
+            if (data.code) {
+                $('.extension-no').text(data.list.id);
+                Dolphin.notify(data.msg, 'success');
+            } else {
+                Dolphin.notify(data.msg, 'danger');
+            }
+        });
+    });
+
+</script>
 </body>
 </html>

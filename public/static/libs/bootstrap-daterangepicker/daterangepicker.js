@@ -847,7 +847,7 @@
                     }
                     if (!disabled)
                         cname += 'available';
-
+                    // console.log(calendar);
                     html += '<td class="' + cname.replace(/^\s+|\s+$/g, '') + '" data-title="' + 'r' + row + 'c' + col + '">' + calendar[row][col].date() + '</td>';
 
                 }

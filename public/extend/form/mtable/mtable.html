@@ -1,4 +1,4 @@
-<div class="form-group col-xs-12 specification {$extra_class|default=''}" id="form_group_{$name}">
+<div class="form-group col-md-{$_layout|default='12'} {$extra_class|default=''} " id="form_group_{$name}">
     <label class="col-xs-12" for="{$name}">{$title|htmlspecialchars}</label>
     <div class="col-sm-12">
         <div class="td">
@@ -6,17 +6,21 @@
             <table cellspacing="0" cellpadding="0" border="0" class="table table-bordered point-t" id="goods-table">
               <thead>
                 <tr>
-                  <th style="width:12%;">规格值</th>
-                  <th style="width:10%;">销售价 <span class="text-danger">*</span></th>
-                  <th style="width:10%;">原价</th>
-                  <th style="width:10%;">成本价</th>
-                  <th style="width:10%;">库存 <span class="text-danger">*</span></th>
-                  <th style="width:10%;">商品货号</th>
-                  <th style="width:10%;">条形码</th>
+                  {volist name="value['header']" id="hd"}
+                  <th >{$hd}</th>
+                  <!-- <th style="width:10%;">分类</th> -->
+                  <!-- <th style="width:10%;">时间</th> -->
+                  {/volist}
                 </tr>
               </thead>
-              <tbody id="dataNode">            
-                          
+              <tbody id="dataNode">
+                {volist name="value['body']" id="db"}
+                <tr>
+                  <td>{$db.custom}</td>
+                  <td>{$db.category}</td>
+                  <td>{$db.create_time}</td>
+                </tr>
+                {/volist} 
               </tbody>
             </table>
           </div>

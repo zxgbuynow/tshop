@@ -56,6 +56,7 @@ class Index extends Admin
                 ['email', '邮箱'],
                 ['mobile', '手机号'],
                 ['create_time', '创建时间', 'datetime'],
+                ['wechat_name', '微信企业用户名','text.edit'],
                 ['status', '状态', 'switch'],
                 ['right_button', '操作', 'btn']
             ])

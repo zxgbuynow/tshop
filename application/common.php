@@ -60,7 +60,27 @@ if (!function_exists('data_auth_sign')) {
         return $sign;
     }
 }
+if (!function_exists('get_auth_call_sign')) {
+    /**
+     * [get_auth_call_sign 呼叫签名]
+     * @param  array  $data [description]
+     * @return [type]       [description]
+     */
+    function get_auth_call_sign($data = [])
+    {
+        // 数据类型检测
+        if(!is_array($data)){
+            $data = (array)$data;
+        }
 
+        // 排序
+        ksort($data);
+        // url编码并生成query字符串
+        $code = http_build_query($data);
+        return md5($code);  
+        return data_auth_sign($data);
+    }
+}
 if (!function_exists('get_file_path')) {
     /**
      * 获取附件路径
@@ -1453,5 +1473,407 @@ if (!function_exists('generate_rand_str')) {
             $str .= $chars[ mt_rand(0, strlen($chars) - 1) ];
         }
         return $str;
+    }
+}
+if (!function_exists('time_tran')) {
+    /**
+     * 转换时间
+     * @param int $timer 时间戳
+     * @author zg
+     * @return string
+     */
+    function time_tran($timer)
+    {
+        $diff = $_SERVER['REQUEST_TIME'] - $timer;
+        $day  = floor($diff / 86400);
+        $free = $diff % 86400;
+        if ($day > 0) {
+            return $day . " 天前";
+        } else {
+            if ($free > 0) {
+                $hour = floor($free / 3600);
+                $free = $free % 3600;
+                if ($hour > 0) {
+                    return $hour . " 小时前";
+                } else {
+                    if ($free > 0) {
+                        $min = floor($free / 60);
+                        $free = $free % 60;
+                        if ($min > 0) {
+                            return $min . " 分钟前";
+                        } else {
+                            if ($free > 0) {
+                                return $free . " 秒前";
+                            } else {
+                                return '刚刚';
+                            }
+                        }
+                    } else {
+                        return '刚刚';
+                    }
+                }
+            } else {
+                return '刚刚';
+            }
+        }
+    }
+}
+
+if (!function_exists('times_exchange_His')) {
+    function times_exchange_His($timer)
+    {
+        $day  = floor($timer / 86400);
+        $hour  = floor($timer % 86400 / 3600);
+        // $min  = floor($timer % 86400 / 60);
+        $min = floor((($timer % (3600*24)) % 3600) / 60);
+        $sec  = floor($timer % 86400 % 60);
+        $ret = '';
+        if ($day > 0) {
+            $ret .=$day.'天 '; 
+        }
+        if ($hour > 0&& $hour < 24) {
+            $ret .=$hour.':'; 
+        }else{
+            $ret .= '00:';
+        }
+        if ($min > 0&& $min < 60) {
+            $ret .= $min.':'; 
+        }else{
+            $ret .= '00:';
+        }
+        if ($sec > 0) {
+            $ret .= $sec; 
+        }else{
+            $ret .= '00'; 
+        }
+        return $ret;
+    }
+}
+if (!function_exists('push_wm_msg')) {
+
+    /**
+    ** workerman push msg
+    **/
+    function push_wm_msg($to_uid,$content)
+    {
+        // 指明给谁推送，为空表示向所有在线用户推送
+        // $to_uid = "";
+        // 推送的url地址，使用自己的服务器地址
+        $push_api_url = "http://127.0.0.1:2121";
+        $post_data = array(
+           "type" => "publish",
+           "content" => $content,
+           "to" => $to_uid, 
+        );
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $push_api_url );
+        curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt ( $ch, CURLOPT_POSTFIELDS, $post_data );
+        curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
+    
+if (!function_exists('ring_up')) {
+
+    /**
+     * [ring_up 呼叫]
+     * @param  [type] $aciton [description]
+     * @param  [type] $params [description]
+     * @return [type]         [description]
+     */
+    function ring_up($aciton, $params)
+    {
+
+return 'cb_callout({"status":1,"Info":{ "result":"success", "phone":"18321271831"}})';
+        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        if (!$ser) {
+            return false;
+        }
+
+        $serv_url = $ser.'/'.$aciton;
+        
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $serv_url );
+        curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        curl_setopt ( $ch, CURLOPT_POSTFIELDS, $params );
+        curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
+
+if (!function_exists('ring_up_new')) {
+
+    /**
+     * [ring_up 呼叫]
+     * @param  [type] $aciton [description]
+     * @param  [type] $params [description]
+     * @return [type]         [description]
+     */
+    function ring_up_new($aciton, $params = [])
+    {
+
+        $ser = isset(plugin_config('wechat')['serv_url'])?plugin_config('wechat')['serv_url']:'';
+        if (!$ser) {
+            return false;
+        }
+        if ($params) {
+        
+            $serv_url = $ser.'?model='.$aciton.'&';
+            $serv_url .=http_build_query($params);
+        }else{
+            $serv_url = $ser.'?model='.$aciton;
+        }
+        $ch = curl_init ();
+        curl_setopt ( $ch, CURLOPT_URL, $serv_url );
+        // curl_setopt ( $ch, CURLOPT_POST, 1 );
+        curl_setopt ( $ch, CURLOPT_HEADER, 0 );
+        curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+        // curl_setopt ( $ch, CURLOPT_POSTFIELDS, $params );
+        // curl_setopt ($ch, CURLOPT_HTTPHEADER, array("Expect:"));
+        $return = curl_exec ( $ch );
+        curl_close ( $ch );
+        return $return;
+    }
+}
+
+if (!function_exists('notice_log')) {
+    /**
+     * 提醒
+     * @param null $action 标识
+     * @param null $user_id 执行行为的用户id
+     * @author huajie <banhuajie@163.com>
+     * @return bool|string
+     */
+    function notice_log($action = null,  $user_id = null, $deails = '', $is_push = false)
+    {
+        
+        // 参数检查
+        if(empty($action)){
+            return '参数不能为空';
+        }
+        
+        $action_info = model('call/notice')->where('tags', $action)->find();
+        if($action_info['status'] != 1){
+            return '该禁用或删除';
+        }
+        // 插入日志
+        $data = [
+            'title'   => $action_info['title'],
+            'create_time'     => request()->time(),
+            'notice_id'   => $action_info['id'],
+            'user_id'       => $user_id
+        ];
+        // $action_info['content'] = '[project|get_projectnm]组[custom|get_custom]客户已签单';
+        // 解析日志规则,生成日志
+        if(!empty($action_info['content'])){
+            if(preg_match_all('/\[(\S+?)\]/', $action_info['content'], $match)){
+                $log = [
+                    'employ'=>$user_id,
+                    'custom'=>isset($deails['custom'])? $deails['custom']:'',
+                    'project'=>isset($deails['project'])? $deails['project']:'',
+                    'ondate'=>isset($deails['ondate'])? $deails['ondate']:'',
+                ];
+                $replace = [];
+                foreach ($match[1] as $value){
+                    $param = explode('|', $value);
+                    if(isset($param[1])){
+                        $replace[] = call_user_func($param[1], $log[$param[0]]);
+                    }else{
+                        $replace[] = $log[$param[0]];
+                    }
+                }
+
+                $data['content'] = str_replace($match[0], $replace, $action_info['content']);
+            }else{
+                $data['content'] = $action_info['content'];
+            }
+        }
+        // 保存日志
+        model('call/NoticeLg')->insert($data);
+
+        //推送消息
+        if ($is_push) {
+            push_wm_msg($user_id , $data['content']);
+        }
+    }
+
+}
+
+if (!function_exists('get_mobile')) {
+    /**
+     * [get_mobile description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    function get_mobile($user_id)
+    {
+        return model('call/custom')->field('mobile,tel')->find($user_id);
+    }
+}
+
+if (!function_exists('get_extension')) {
+    /**
+     * [get_extension description]
+     * @param  [type] $user_id [description]
+     * @return [type]          [description]
+     */
+    function get_extension($user_id)
+    {
+        return model('user/user')->field('extension')->find($user_id);
+    }
+}
+if (!function_exists('get_projectnm')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_projectnm($id)
+    {
+        $info = model('call/projectls')->field('col1')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['col1'];
+    }
+}
+
+if (!function_exists('get_custom')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_custom($id)
+    {
+        $info = model('call/custom')->field('name')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['name'];
+    }
+}
+if (!function_exists('get_employ')) {
+    /**
+     * [get_projectnm description]
+     * @param  [type] $id [description]
+     * @return [type]     [description]
+     */
+    function get_employ($id)
+    {
+        $info = model('user/user')->field('nickname')->find($id);
+        if (!$info) {
+            return '';
+        }
+        return $info['nickname'];
+    }
+}
+
+if (!function_exists('push_24_report_msg')) {
+    function push_24_report_msg($touser = [], $toparty = [], $totag = [], $msgtype = 'text' , $content)
+    {
+        //张三|客户名称]已签约，操作员工[李四|操作人]，[2020-2-6|修改时间
+        $user = [];
+        array_push($user, $touser);
+        $toparty = [];
+        $totag = [];
+        $result = plugin_action('Wechat/Wechat/send',[$user , $toparty, $totag, 'text', $content]);
+        if($result['code']){
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+if (!function_exists('make_crontab')) {
+    /**
+     * [make_crontab 生成任务]
+     * @param  [type] $tag     [description]
+     * @param  [type] $aciton  [description]
+     * @param  [type] $content [description]
+     * @return [type]          [description]
+     */
+    function make_crontab($tag,$action,$content,$touser)
+    {
+        $data['content'] = $content;
+        $data['tag'] = $tag;
+        $data['action'] = $action;
+        $data['webchat'] = $touser;
+        db('call_crontab')->insert($data);
+    }
+}
+if (!function_exists('replaceTel')) {
+    function replaceTel($tels) {
+        $new_tels = substr_replace($tels, '****', 3, 4);
+        return $new_tels;
+    }
+}
+if (!function_exists('object_to_array')) {
+    function object_to_array($obj) {
+        $obj = (array)$obj;
+        foreach ($obj as $k => $v) {
+            if (gettype($v) == 'resource') {
+                return;
+            }
+            if (gettype($v) == 'object' || gettype($v) == 'array') {
+                $obj[$k] = (array)object_to_array($v);
+            }
+        }
+     
+        return $obj;
+    }
+}
+if (!function_exists('deep_array_map')) {
+
+    function deep_array_map($arr){
+        return array_map(function(&$v){
+            if(is_array($v)){
+                return deep_array_map($v);
+            }
+            $v =  str_replace('%2B',' ',$v);
+            return str_replace('+',' ',$v);
+        },$arr);
+    }
+}
+if (!function_exists('downloadFile')) {
+    function downloadFile($filePath, $readBuffer = 1024, $allowExt = ['jpeg', 'jpg', 'peg', 'gif', 'zip', 'rar', 'txt','mp3'])
+    {
+        //检测下载文件是否存在 并且可读
+        if (!is_file($filePath) && !is_readable($filePath)) {
+            return false;
+        }
+        //检测文件类型是否允许下载
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowExt)) {
+            return false;
+        }
+        //设置头信息
+        //声明浏览器输出的是字节流
+        header('Content-Type: application/octet-stream');
+        //声明浏览器返回大小是按字节进行计算
+        header('Accept-Ranges:bytes');
+        //告诉浏览器文件的总大小
+        $fileSize = filesize($filePath);//坑 filesize 如果超过2G 低版本php会返回负数
+        header('Content-Length:' . $fileSize); //注意是'Content-Length:' 非Accept-Length
+        //声明下载文件的名称
+        header('Content-Disposition:attachment;filename=' . basename($filePath));//声明作为附件处理和下载后文件的名称
+        //获取文件内容
+        $handle = fopen($filePath, 'rb');//二进制文件用‘rb’模式读取
+        while (!feof($handle) ) { //循环到文件末尾 规定每次读取（向浏览器输出为$readBuffer设置的字节数）
+            echo fread($handle, $readBuffer);
+        }
+        fclose($handle);//关闭文件句柄
+        exit;
+
     }
 }

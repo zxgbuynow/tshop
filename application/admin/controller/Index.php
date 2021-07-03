@@ -22,7 +22,12 @@ class Index extends Admin
      */
     public function index()
     {
-        $this->redirect('Log/index');exit;
+        if (UID==1) {
+            $this->redirect('Log/index');exit;
+        }
+
+        $this->redirect('call/Home/index');exit;
+        
         $admin_pass = Db::name('admin_user')->where('id', 1)->value('password');
 
         if (UID == 1 && $admin_pass && Hash::check('admin', $admin_pass)) {
@@ -137,7 +142,7 @@ class Index extends Admin
 
         if ($result['code'] == 1) {
             return json([
-                'update' => '<a class="badge badge-primary" href="http://www.dolphinphp.com/download" target="_blank">有新版本：'.$result["version"].'</a>',
+                'update' => '<a class="badge badge-primary" href="http://www.zgbuynow.com/download" target="_blank">有新版本：'.$result["version"].'</a>',
                 'auth'   => $result['auth']
             ]);
         } else {

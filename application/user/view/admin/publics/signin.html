@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
 
-        <title>大观心理平台登录</title>
+        <title>{:config('web_site_title')}</title>
 
         <meta name="description" content="">
         <meta name="author" content="caiweiming">
@@ -15,8 +15,8 @@
         <!-- The following icons can be replaced with your own, they are used by desktop and mobile browsers -->
         <link rel="shortcut icon" href="__ADMIN_IMG__/favicons/favicon.ico">
 
-        <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-16x16.png" sizes="16x16">
-        <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon.png" sizes="16x16">
+        <!-- <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-32x32.png" sizes="32x32">
         <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-96x96.png" sizes="96x96">
         <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-160x160.png" sizes="160x160">
         <link rel="icon" type="image/png" href="__ADMIN_IMG__/favicons/favicon-192x192.png" sizes="192x192">
@@ -29,7 +29,7 @@
         <link rel="apple-touch-icon" sizes="120x120" href="__ADMIN_IMG__/favicons/apple-touch-icon-120x120.png">
         <link rel="apple-touch-icon" sizes="144x144" href="__ADMIN_IMG__/favicons/apple-touch-icon-144x144.png">
         <link rel="apple-touch-icon" sizes="152x152" href="__ADMIN_IMG__/favicons/apple-touch-icon-152x152.png">
-        <link rel="apple-touch-icon" sizes="180x180" href="__ADMIN_IMG__/favicons/apple-touch-icon-180x180.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="__ADMIN_IMG__/favicons/apple-touch-icon-180x180.png"> -->
         <!-- END Icons -->
 
 
@@ -54,8 +54,8 @@
                         <div class="push-30-t push-50 animated fadeIn">
                             <!-- Login Title -->
                             <div class="text-center">
-                                <img src="__ADMIN_IMG__/tw5o.png" alt="大观心理平台">
-                                <p class="text-muted push-15-t">大观心理平台</p>
+                                <img src="{$logUrl}" alt="{:config('web_site_title')}">
+                                <p class="text-muted push-15-t">{:config('web_site_title')}</p>
                             </div>
                             <!-- END Login Title -->
 
@@ -114,7 +114,7 @@
 
         <!-- Login Footer -->
         <div class="pulldown push-30-t text-center animated fadeInUp">
-            <small class="text-muted"><span class="js-year-copy"></span> &copy; DaGuan {:config('dolphin.product_version')}</small>
+            <small class="text-muted"><span class="js-year-copy"></span> &copy; zgbuynow {:config('dolphin.product_version')}</small>
         </div>
         <!-- END Login Footer -->
 

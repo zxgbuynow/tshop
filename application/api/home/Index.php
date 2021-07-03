@@ -309,12 +309,12 @@ class Index
 
         // foreach ($article['list'] as $key => $value) {
         //     unset($article['list'][$key]['content']);
-        //     $article['list'][$key]['author'] = $value['userid']==0?'大观心理':db('member')->where('status',1)->column('nickname');
+        //     $article['list'][$key]['author'] = $value['userid']==0?'呼叫中心':db('member')->where('status',1)->column('nickname');
         // }
         foreach ($article['list'] as $key => $value) {
             unset($article['list'][$key]['content']);
             unset($article['list'][$key]['description']);
-            $article['list'][$key]['author'] = $value['userid']==0?'大观心理':db('member')->where('status',1)->column('nickname');
+            $article['list'][$key]['author'] = $value['userid']==0?'呼叫中心':db('member')->where('status',1)->column('nickname');
             $article['list'][$key]['cover'] = get_file_path($value['cover']);
         }
         //返回信息
@@ -810,11 +810,11 @@ class Index
 
         foreach ($article['list'] as $key => $value) {
             unset($article['list'][$key]['content']);
-            $article['list'][$key]['author'] = $value['userid']==0?'大观心理':db('member')->where('status',1)->column('nickname');
+            $article['list'][$key]['author'] = $value['userid']==0?'呼叫中心':db('member')->where('status',1)->column('nickname');
         }
         foreach ($article['list'] as $key => $value) {
             unset($article['list'][$key]['content']);
-            $article['list'][$key]['author'] = $value['userid']==0?'大观心理':db('member')->where('status',1)->column('nickname');
+            $article['list'][$key]['author'] = $value['userid']==0?'呼叫中心':db('member')->where('status',1)->column('nickname');
             $article['list'][$key]['cover'] = get_file_path($value['cover']);
         }
         //返回信息
@@ -3503,7 +3503,7 @@ class Index
 
         foreach ($article['list'] as $key => $value) {
             unset($article['list'][$key]['content']);
-            $value['author'] = $value['author']?$value['author']:'大观心理咨询中心';
+            $value['author'] = $value['author']?$value['author']:'呼叫中心咨询中心';
             $article['list'][$key]['author'] = $value['userid']==0?$value['author']:db('member')->where('status',1)->value('nickname');
             $article['list'][$key]['cover'] = get_file_path($value['cover']);
         }
@@ -6278,7 +6278,7 @@ class Index
     {
         $apikey = "8df6ed7129c50581eecdf1e875edbaa3"; 
 
-        $text = '【大观心理】温馨提示：您有新的心理咨询预约：'.$content."，时间（".date('Y-m-d H:i',$sj)."）"; 
+        $text = '【呼叫中心】温馨提示：您有新的心理咨询预约：'.$content."，时间（".date('Y-m-d H:i',$sj)."）"; 
 
         // error_log($text,3,'/home/wwwroot/daguan/mobile.log');
         $ch = curl_init();
@@ -6318,9 +6318,9 @@ class Index
     {
         $apikey = "8df6ed7129c50581eecdf1e875edbaa3"; 
 
-        $text = "【大观心理】温馨提示：您的心理咨询预约".$content."（".date('Y-m-d H:i',$sj)."）已取消。"; 
+        $text = "【呼叫中心】温馨提示：您的心理咨询预约".$content."（".date('Y-m-d H:i',$sj)."）已取消。"; 
 
-        // $text = '【大观心理】温馨提示：您有新的心理咨询预约：'.$content; 
+        // $text = '【呼叫中心】温馨提示：您有新的心理咨询预约：'.$content; 
 
         // error_log($text,3,'/home/wwwroot/daguan/mobile.log');
         $ch = curl_init();
@@ -6360,7 +6360,7 @@ class Index
         $apikey = "8df6ed7129c50581eecdf1e875edbaa3"; 
 
         $code  = rand(1000,9999);
-        $text="【大观心理】您的验证码是".$code; 
+        $text="【呼叫中心】您的验证码是".$code; 
 
         // error_log($text,3,'/home/wwwroot/daguan/mobile.log');
         $ch = curl_init();

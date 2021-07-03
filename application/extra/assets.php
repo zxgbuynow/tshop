@@ -41,14 +41,15 @@ return [
     ],
     'datetimepicker_js' => [ // 日期时间选择
         "__LIBS__/bootstrap-datetimepicker/moment.min.js",
-        "__LIBS__/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js",
+        "__LIBS__/bootstrap-datetimepicker/bootstrap-datetimepicker.js",
         "__LIBS__/bootstrap-datetimepicker/locale/zh-cn.js",
+        "__LIBS__/bootstrap-daterangepicker/myCalendar.js",
     ],
     'moment_js' => [
         "__LIBS__/bootstrap-datetimepicker/moment.min.js",
     ],
     'datetimepicker_css' => [ // 日期时间选择
-        "__LIBS__/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css"
+        "__LIBS__/bootstrap-datetimepicker/bootstrap-datetimepicker.css"
     ],
     'webuploader_js' => [ // 文件或图片上传
         "__LIBS__/webuploader/webuploader.min.js",
@@ -131,5 +132,8 @@ return [
     ],
     'daterangepicker_css' => [ // 日期时间范围
         "__LIBS__/bootstrap-daterangepicker/daterangepicker.css",
+    ],
+    'mycalendar_js' => [ // 日期时间范围
+        "__LIBS__/bootstrap-daterangepicker/myCalendar.js",
     ]
 ];

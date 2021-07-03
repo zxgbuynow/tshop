@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:6:{s:72:"/data/httpd/tshop/public/../application/common/builder/table/layout.html";i:1527318282;s:62:"/data/httpd/tshop/public/../application/admin/view/layout.html";i:1527318587;s:47:"../application/common/builder/aside/layout.html";i:1512640190;s:54:"../application/common/builder/aside/blocks/recent.html";i:1489042526;s:54:"../application/common/builder/aside/blocks/online.html";i:1489042526;s:54:"../application/common/builder/aside/blocks/switch.html";i:1489042526;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:6:{s:72:"/data/httpd/tshop/public/../application/common/builder/table/layout.html";i:1564111365;s:62:"/data/httpd/tshop/public/../application/admin/view/layout.html";i:1582174118;s:47:"../application/common/builder/aside/layout.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/recent.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/online.html";i:1564111365;s:54:"../application/common/builder/aside/blocks/switch.html";i:1564111365;}*/ ?>
 <!DOCTYPE html>
 <!--[if IE 9]>         <html class="ie9 no-focus" lang="zh"> <![endif]-->
 <!--[if gt IE 9]><!--> <html class="no-focus" lang="zh"> <!--<![endif]-->
@@ -486,25 +486,51 @@
                                 <i class="si si-settings pull-right"></i>个人设置
                             </a>
                         </li>
+                        <!-- <li>
+                            <a tabindex="-1" href="<?php echo url('admin/message/index'); ?>">
+                                <i class="si si-envelope-open pull-right"></i><span class="badge badge-primary pull-right"><?php echo (isset($_message) && ($_message !== '')?$_message:0); ?></span>消息中心
+                            </a>
+                        </li> -->
                         <li class="divider"></li>
                         <li>
                             <a tabindex="-1" href="<?php echo url('user/publics/signout'); ?>">
                                 <i class="si si-logout pull-right"></i>退出帐号
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </li>
+            <?php if(\think\Session::get('user_auth.uid') != '1'): ?>
+            <li>
+                <div class="btn-group">
+                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" type="button">
+                        <span class="extension-no"><?php echo (isset($_auth_sign) && ($_auth_sign !== '')?$_auth_sign:'签入分机'); ?></span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <?php if(is_array($_extens) || $_extens instanceof \think\Collection || $_extens instanceof \think\Paginator): $i = 0; $__LIST__ = $_extens;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$_exten): $mod = ($i % 2 );++$i;?>
+                            <li>
+                                <a tabindex="-1" href="javascript:void(0)" class="extension-toggle" data-id="<?php echo $_exten['id']; ?>">
+                                    <?php echo $_exten['title']; ?>
+                                </a>
+                            </li>
+                        
+                        <?php endforeach; endif; else: echo "" ;endif; ?>
+                    </ul>
+                </div>
+            </li>
+            <?php endif; ?>
             <li>
                 <a class="btn btn-default ajax-get" href="<?php echo url('admin/index/wipeCache'); ?>" data-toggle="tooltip" data-placement="bottom" data-original-title="清空缓存">
                     <i class="fa fa-trash"></i>
                 </a>
             </li>
-            <li>
+            <!-- <li>
                 <a class="btn btn-default" href="<?php echo rtrim(home_url('/'), '/'); ?>" target="_blank" data-toggle="tooltip" data-placement="bottom" data-original-title="打开前台">
                     <i class="fa fa-external-link-square"></i>
                 </a>
-            </li>
+            </li> -->
             <li>
                 <!-- Layout API, functionality initialized in App() -> uiLayoutApi() -->
                 <button class="btn btn-default" data-toggle="layout" data-action="side_overlay_toggle" title="侧边栏" type="button">
@@ -548,6 +574,24 @@
     <main id="main-container">
         <!-- Page Header -->
         
+        <style type="text/css">
+            .row .alert{
+                padding-bottom: 0px; 
+                margin-bottom: 0px;
+            }
+        </style>
+        <div class="row" style="margin: 10px 10px;">
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button style="display: none;" type="button" onclick="this.parentNode.parentNode.removeChild(this.parentNode);" class="close" data-dismiss="alert">
+                    <span aria-hidden="true">×</span>
+                    <span class="sr-only">Close</span></button>
+                <strong>
+                    <i class="fa fa-fw fa-bullhorn"></i>Notice!</strong>
+                <marquee>
+                    <p style="font-family: Impact; font-size: 18pt" class="swiper-adv-list"><?php echo $swiperAdvList; ?> </p></marquee>
+            </div>
+        </div>
+
         <?php if(empty($_pop) || (($_pop instanceof \think\Collection || $_pop instanceof \think\Paginator ) && $_pop->isEmpty())): ?>
         <div class="bg-gray-lighter">
             <ol class="breadcrumb">
@@ -835,6 +879,9 @@
     </footer>
     <?php endif; ?>
     <!-- END Footer -->
+
+    
+
 </div>
 <!-- END Page Container -->
 
@@ -937,5 +984,44 @@
 
 
 <?php echo (isset($extra_html) && ($extra_html !== '')?$extra_html:''); ?>
+<script src='http://cdn.bootcss.com/socket.io/1.3.7/socket.io.js'></script>
+<script>
+    // 连接服务端
+    var socket = io('http://'+document.domain+':2120');
+    // uid可以是自己网站的用户id，以便针对uid推送以及统计在线人数
+    uid = <?php echo \think\Session::get('user_auth.uid'); ?>;
+    console.log(uid)
+    // socket连接后以uid登录
+    socket.on('connect', function(){
+        socket.emit('login', uid);
+    });
+    // 后端推送来消息时
+    socket.on('new_msg', function(msg){
+        console.log("收到消息："+msg);
+        Dolphin.notify(msg, 'success');
+        // speckText(msg)
+    });
+    // 后端推送来在线数据时
+    socket.on('update_online_count', function(online_stat){
+        console.log(online_stat);
+    });
+
+    // 签入
+    $('.extension-toggle').click(function(e){
+        // Dolphin.loading();
+        var id = $(this).attr('data-id');
+        $.post("<?php echo url('call/ajax/getEextensionSt'); ?>", {id:id}, function(data) {
+            Dolphin.loading('hide');
+            console.log(data);
+            if (data.code) {
+                $('.extension-no').text(data.list.id);
+                Dolphin.notify(data.msg, 'success');
+            } else {
+                Dolphin.notify(data.msg, 'danger');
+            }
+        });
+    });
+
+</script>
 </body>
 </html>

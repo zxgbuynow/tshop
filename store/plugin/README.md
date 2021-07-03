@@ -1,4 +1,4 @@
-DolphinPHP
+zgbuynow
 ===============
 
 # 云商店插件存放目录

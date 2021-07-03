@@ -1,11 +1,11 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:75:"/data/httpd/tshop/public/../application/user/view/admin/publics/signin.html";i:1521188575;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:75:"/data/httpd/tshop/public/../application/user/view/admin/publics/signin.html";i:1578194464;}*/ ?>
 <!DOCTYPE html>
 <!--[if IE 9]>         <html class="ie9 no-focus" lang="zh"> <![endif]-->
 <!--[if gt IE 9]><!--> <html class="no-focus" lang="zh"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
 
-        <title>大观心理平台登录</title>
+        <title><?php echo config('web_site_title'); ?></title>
 
         <meta name="description" content="">
         <meta name="author" content="caiweiming">
@@ -55,8 +55,8 @@
                         <div class="push-30-t push-50 animated fadeIn">
                             <!-- Login Title -->
                             <div class="text-center">
-                                <img src="__ADMIN_IMG__/tw5o.png" alt="大观心理平台">
-                                <p class="text-muted push-15-t">大观心理平台</p>
+                                <img src="<?php echo $logUrl; ?>" alt="<?php echo config('web_site_title'); ?>">
+                                <p class="text-muted push-15-t"><?php echo config('web_site_title'); ?></p>
                             </div>
                             <!-- END Login Title -->
 
@@ -115,7 +115,7 @@
 
         <!-- Login Footer -->
         <div class="pulldown push-30-t text-center animated fadeInUp">
-            <small class="text-muted"><span class="js-year-copy"></span> &copy; DaGuan <?php echo config('dolphin.product_version'); ?></small>
+            <small class="text-muted"><span class="js-year-copy"></span> &copy; zgbuynow <?php echo config('dolphin.product_version'); ?></small>
         </div>
         <!-- END Login Footer -->
 
